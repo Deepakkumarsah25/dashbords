@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>EduAttend Pro | FullScreen Analytics & Attendance</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/slidebar.css">
+    <link rel="stylesheet" href="/css/attendence.css">
+    
+</head>
+<body>
+       <%- include('partials/sidebar') %>
+<div class="app-layout">
+      
+
+    <main class="main-content">
+        <div class="top-bar">
+            <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+            <!-- <div class="page-title"><h3 style="font-weight:700;"><i class="fas fa-crown" style="color:#8b5cf6;"></i> Advanced Attendance Intelligence</h3></div> -->
+            <!-- <div><span class="lecture-badge" style="background:#eef2ff; padding:6px 14px; border-radius:40px;"><i class="fas fa-brain"></i> Live Insights</span></div> -->
+        </div>
+
+        <!-- Stats Cards Row -->
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-info"><h4>Total Students</h4><div class="stat-number" id="totalStudents">0</div></div><div class="stat-icon" style="color:#3b82f6;"><i class="fas fa-users"></i></div></div>
+            <div class="stat-card"><div class="stat-info"><h4>Present</h4><div class="stat-number" id="presentCount">0</div></div><div class="stat-icon" style="color:#10b981;"><i class="fas fa-user-check"></i></div></div>
+            <div class="stat-card"><div class="stat-info"><h4>Late</h4><div class="stat-number" id="lateCount">0</div></div><div class="stat-icon" style="color:#f97316;"><i class="fas fa-clock"></i></div></div>
+            <div class="stat-card"><div class="stat-info"><h4>Absent</h4><div class="stat-number" id="absentCount">0</div></div><div class="stat-icon" style="color:#ef4444;"><i class="fas fa-user-slash"></i></div></div>
+            <div class="stat-card"><div class="stat-info"><h4>Attendance %</h4><div class="stat-number" id="attendancePercent">0%</div></div><div class="stat-icon" style="color:#8b5cf6;"><i class="fas fa-percent"></i></div></div>
+        </div>
+
+        <!-- Lecture Tracker -->
+     
+
+        <!-- Advanced Analytics Charts -->
+        <div class="analytics-grid" id="analyticsSection">
+            <div class="chart-card"><h4><i class="fas fa-chart-pie"></i> Today's Status Distribution</h4><canvas id="statusChart" width="400" height="200"></canvas></div>
+            <!-- <div class="chart-card"><h4><i class="fas fa-chart-line"></i> Weekly Trend (Last 7 days)</h4><canvas id="trendChart" width="400" height="200"></canvas></div>
+            <div class="chart-card"><h4><i class="fas fa-exclamation-triangle"></i> At-Risk Students (≤75% attendance)</h4><div id="riskList" style="max-height:160px; overflow-y:auto; font-size:0.75rem;"></div></div> -->
+        </div>
+
+        <!-- Course Controls + Table actions -->
+        <div class="course-header">
+            <div class="course-selector"><span><i class="fas fa-book-open"></i> Course:</span><select id="courseSelect" class="modern-select"><option value="BCA"> ADCA</option><option value="CS"> DCA</option><option value="MCA">HTML</option><option value="IT">CCC</option><option value="MCA">TALLY</option><option value="MCA">O LEVEL</option><option value="MCA">MS OFFICE</option><option value="MCA">JAVA</option><option value="MCA">PYTHON</option><option value="MCA">WEB DESIGNING</option><option value="MCA">GRAPHIC DESIGNING</option></select></div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;"><button id="openAddStudentBtn" class="btn-sm btn-primary-sm"><i class="fas fa-user-plus"></i> Add Student</button><button id="markAllPresent" class="btn-sm btn-outline-sm"><i class="fas fa-check-double"></i> All Present</button><button id="markAllLate" class="btn-sm btn-outline-sm"><i class="fas fa-clock"></i> All Late</button><button id="resetAll" class="btn-sm btn-outline-sm"><i class="fas fa-undo"></i> Reset</button>                                <button id="exportCSV" class="btn-sm btn-outline-sm"><i class="fas fa-download"></i> CSV</button></div>
+        </div>
+
+        <!-- Student Table -->
+        <div class="table-wrapper"><table class="attendance-table"><thead><tr><th>Roll No</th><th>Student</th><th>Status</th><th>Quick Actions</th><th>Remove</th></tr></thead><tbody id="tableBody"></tbody></table></div>
+    </main>
+</div>
+
+<!-- Add Student Modal -->
+<div id="studentModal" class="modal"><div class="modal-content"><h3 style="margin-bottom:1rem;"><i class="fas fa-graduation-cap"></i> Add Student</h3><input type="text" id="studentName" placeholder="Full Name" style="width:100%; padding:12px; border-radius:60px; border:1px solid #e2e8f0; margin-bottom:12px;"><select id="modalCourseSelect" style="width:100%; padding:12px; border-radius:60px;"><option value="BCA">BCA</option><option value="CS">B.Sc CS</option><option value="IT">B.Sc IT</option><option value="MCA">MCA</option></select><div style="display:flex; gap:10px; justify-content:flex-end; margin-top:1rem;"><button id="cancelModal" class="btn-sm btn-outline-sm">Cancel</button><button id="confirmAdd" class="btn-sm btn-primary-sm">Add Student</button></div></div></div>
+
+<script>
+    // ---------- FULL WORKING SYSTEM WITH ALL FEATURES : ANALYTICS, LECTURE TRACK, CHARTS ----------
+    let studentsData = {}, attendanceData = {}, weeklyData = {}, lectureCount = 0;
+    let currentCourse = "BCA";
+    let statusChart, trendChart;
+    const COURSES = ["BCA", "CS", "IT", "MCA"];
+
+    function initData() {
+        const storedStudents = localStorage.getItem("adv_students_full");
+        const storedAttendance = localStorage.getItem("adv_attendance_full");
+        const storedWeekly = localStorage.getItem("adv_weekly_full");
+        const storedLectures = localStorage.getItem("adv_lectures_full");
+        if(storedStudents) studentsData = JSON.parse(storedStudents);
+        else studentsData = { BCA: [{roll:"BCA-001",name:"Aarav Sharma"},{roll:"BCA-002",name:"Vihaan Verma"}], CS: [{roll:"CS-001",name:"Diya Mehta"},{roll:"CS-002",name:"Rohan Nair"}], IT: [{roll:"IT-001",name:"Pari Nair"}], MCA: [{roll:"MCA-001",name:"Ishita Kapoor"}] };
+        if(storedAttendance) attendanceData = JSON.parse(storedAttendance);
+        else { attendanceData = {}; COURSES.forEach(c=>{ attendanceData[c]={}; if(studentsData[c]) studentsData[c].forEach(s=>attendanceData[c][s.roll]="absent"); }); }
+        if(storedWeekly) weeklyData = JSON.parse(storedWeekly);
+        else { weeklyData = {}; COURSES.forEach(c=>{ weeklyData[c] = [0,0,0,0,0,0,0]; }); }
+        lectureCount = storedLectures ? parseInt(storedLectures) : 0;
+        COURSES.forEach(c=>{ if(!attendanceData[c]) attendanceData[c]={}; if(studentsData[c]) studentsData[c].forEach(s=>{ if(!attendanceData[c][s.roll]) attendanceData[c][s.roll]="absent"; }); });
+        saveAll();
+    }
+    function saveAll() { localStorage.setItem("adv_students_full",JSON.stringify(studentsData)); localStorage.setItem("adv_attendance_full",JSON.stringify(attendanceData)); localStorage.setItem("adv_weekly_full",JSON.stringify(weeklyData)); localStorage.setItem("adv_lectures_full",lectureCount); }
+
+    function generateRoll(course) { let max=0; (studentsData[course]||[]).forEach(s=>{ let parts=s.roll.split('-'); if(parts[0]===course){ let n=parseInt(parts[1]); if(n>max) max=n; } }); return `${course}-${String(max+1).padStart(3,'0')}`; }
+    function addStudent(course,name){ if(!name.trim()){toastMsg("Enter valid name",true); return false;} if(!studentsData[course]) studentsData[course]=[]; let roll=generateRoll(course); studentsData[course].push({roll,name:name.trim()}); attendanceData[course][roll]="absent"; saveAll(); if(currentCourse===course) renderTable(); updateChartsAndRisk(); toastMsg(`✅ ${name} added successfully`); return true; }
+    function deleteStudent(course,roll){ let idx=studentsData[course]?.findIndex(s=>s.roll===roll); if(idx!==-1){ studentsData[course].splice(idx,1); delete attendanceData[course][roll]; saveAll(); if(currentCourse===course) renderTable(); updateChartsAndRisk(); toastMsg(`🗑️ Student removed`); } }
+    function updateStatus(course,roll,status){ attendanceData[course][roll]=status; saveAll(); if(currentCourse===course) renderTable(); updateChartsAndRisk(); toastMsg(`📌 ${roll} → ${status.toUpperCase()}`); }
+    function bulkAction(course,status){ studentsData[course]?.forEach(s=>attendanceData[course][s.roll]=status); saveAll(); if(currentCourse===course) renderTable(); updateChartsAndRisk(); toastMsg(`✅ Bulk update: ${status}`); }
+
+    function markLectureCompleted(){ lectureCount++; let todayIndex = new Date().getDay(); let dayMap = [6,0,1,2,3,4,5]; let idx = dayMap[new Date().getDay()]; if(weeklyData[currentCourse] && idx>=0 && idx<7) weeklyData[currentCourse][idx] = (weeklyData[currentCourse][idx] || 0) + 1; else if(weeklyData[currentCourse]) weeklyData[currentCourse][0] = (weeklyData[currentCourse][0]||0)+1; saveAll(); updateChartsAndRisk(); document.getElementById("lectureCount").innerText = lectureCount; toastMsg(`🎓 Lecture recorded! Total lectures: ${lectureCount}`); }
+
+    function getAttendancePercentage(course, roll){ let total=0, attended=0; let weekData = weeklyData[course] || [0,0,0,0,0,0,0]; total = weekData.reduce((a,b)=>a+b,0); let status = attendanceData[course]?.[roll]; let countPresent = 0; for(let i=0;i<7;i++){ if(weekData[i]>0 && (status==="present" || status==="late")) countPresent+=weekData[i]; } if(total===0) return 100; return (countPresent/total)*100; }
+    function getAtRiskStudents(){ let risk=[]; let students=studentsData[currentCourse]||[]; students.forEach(s=>{ let percent=getAttendancePercentage(currentCourse,s.roll); if(percent<75 && percent>=0) risk.push({name:s.name,roll:s.roll,percent:percent.toFixed(1)}); }); return risk; }
+
+    function renderTable(){ let students=studentsData[currentCourse]||[]; let tbody=document.getElementById("tableBody"); if(!tbody) return; tbody.innerHTML=""; let p=0,l=0,a=0; students.forEach(s=>{ let status=attendanceData[currentCourse]?.[s.roll]||"absent"; let badge="",iconMsg="",text=""; if(status==="present"){ badge="status-present"; iconMsg="✅"; text="Present"; p++; } else if(status==="late"){ badge="status-late"; iconMsg="⏰"; text="Late"; l++; } else{ badge="status-absent"; iconMsg="❌"; text="Absent"; a++; } let percent=getAttendancePercentage(currentCourse,s.roll).toFixed(1); let row=`<tr><td style="font-weight:600;">${s.roll}</td><td><div style="display:flex; align-items:center; gap:8px;"><div class="student-avatar">${s.name.charAt(0)}</div> <div>${s.name}<div class="student-detail"><i class="fas fa-chart-simple"></i> ${percent}% attendance</div></div></div></td><td><div class="status-pill ${badge}">${iconMsg} ${text}</div></td><td><div class="action-icons"><div class="icon-circle icon-present" data-roll="${s.roll}" data-status="present"><i class="fas fa-check"></i></div><div class="icon-circle icon-late" data-roll="${s.roll}" data-status="late"><i class="fas fa-clock"></i></div><div class="icon-circle icon-absent" data-roll="${s.roll}" data-status="absent"><i class="fas fa-times"></i></div></div></td><td><div class="icon-circle icon-delete" data-roll="${s.roll}"><i class="fas fa-trash-alt"></i></div></td></tr>`; tbody.insertAdjacentHTML('beforeend',row); });
+        document.querySelectorAll(".icon-present, .icon-late, .icon-absent").forEach(el=>{ el.removeEventListener("click",handleStatus); el.addEventListener("click",handleStatus); });
+        document.querySelectorAll(".icon-delete").forEach(el=>{ el.removeEventListener("click",handleDelete); el.addEventListener("click",handleDelete); });
+        document.getElementById("totalStudents").innerText=students.length; document.getElementById("presentCount").innerText=p; document.getElementById("lateCount").innerText=l; document.getElementById("absentCount").innerText=a; let percent=students.length===0?0:(((p+l)/students.length)*100).toFixed(1); document.getElementById("attendancePercent").innerText=`${percent}%`; updateChartsAndRisk(); }
+    
+    function handleStatus(e){ let div=e.currentTarget; let roll=div.getAttribute("data-roll"); let status=div.getAttribute("data-status"); if(roll&&status) updateStatus(currentCourse,roll,status); }
+    function handleDelete(e){ let div=e.currentTarget; let roll=div.getAttribute("data-roll"); if(roll&&confirm(`Remove student permanently?`)) deleteStudent(currentCourse,roll); }
+
+    function updateChartsAndRisk(){ let students=studentsData[currentCourse]||[]; let p=0,l=0,a=0; students.forEach(s=>{ let st=attendanceData[currentCourse]?.[s.roll]||"absent"; if(st==="present") p++; else if(st==="late") l++; else a++; }); if(statusChart){ statusChart.data.datasets[0].data=[p,l,a]; statusChart.update(); } else{ let ctx=document.getElementById("statusChart")?.getContext("2d"); if(ctx) statusChart=new Chart(ctx,{type:'doughnut',data:{labels:['Present','Late','Absent'],datasets:[{data:[p,l,a],backgroundColor:['#10b981','#f97316','#ef4444'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}}); }
+        let weekData=weeklyData[currentCourse]||[0,0,0,0,0,0,0]; if(trendChart){ trendChart.data.datasets[0].data=weekData; trendChart.update(); } else{ let ctx2=document.getElementById("trendChart")?.getContext("2d"); if(ctx2) trendChart=new Chart(ctx2,{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Lectures Count',data:weekData,borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,0.1)',fill:true,tension:0.3,pointBackgroundColor:'#7c3aed'}]},options:{responsive:true}}); }
+        let riskStudents=getAtRiskStudents(); let riskDiv=document.getElementById("riskList"); if(riskDiv) riskDiv.innerHTML=riskStudents.length?riskStudents.map(r=>`<div style="padding:8px; border-bottom:1px solid #f0f0f0;"><i class="fas fa-user-graduate"></i> <strong>${r.name}</strong> (${r.roll}) — ${r.percent}%</div>`).join('') : `<div style="padding:12px; text-align:center; color:#22c55e;">🎉 All students above 75%</div>`;
+    }
+
+    function exportCSVFunc(){ let students=studentsData[currentCourse]||[]; if(!students.length){toastMsg("No data",true); return;} let rows=[["Roll","Name","Status","Attendance %","Course"]]; students.forEach(s=>{ let stat=attendanceData[currentCourse][s.roll]||"absent"; let perc=getAttendancePercentage(currentCourse,s.roll).toFixed(1); rows.push([s.roll,s.name,stat.toUpperCase(),perc+"%",currentCourse]); }); let csv=rows.map(r=>r.map(c=>`"${c}"`).join(",")).join("\n"); let blob=new Blob(["\uFEFF"+csv],{type:"text/csv"}); let a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`Adv_Attend_${currentCourse}.csv`; a.click(); toastMsg("CSV Exported"); }
+    function toastMsg(msg,err=false){ let t=document.querySelector(".toast"); if(t) t.remove(); let div=document.createElement("div"); div.className="toast"; div.innerHTML=`<i class="fas ${err?'fa-exclamation-triangle':'fa-circle-check'}"></i> ${msg}`; div.style.background=err?"#b91c1c":"#1e293b"; document.body.appendChild(div); setTimeout(()=>{div.style.opacity="0"; setTimeout(()=>div.remove(),300);},2000); }
+
+    // Sidebar & Mobile logic
+    const sidebar=document.getElementById("sidebar"), overlay=document.getElementById("overlay"), menuToggleBtn=document.getElementById("menuToggle");
+    menuToggleBtn?.addEventListener("click",()=>{ sidebar.classList.toggle("open"); overlay.classList.toggle("active"); });
+    overlay?.addEventListener("click",()=>{ sidebar.classList.remove("open"); overlay.classList.remove("active"); });
+    // nav interactions
+    document.querySelectorAll(".nav-item").forEach(nav=>{ nav.addEventListener("click",function(){ document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active")); this.classList.add("active"); toastMsg(`📊 ${this.innerText.trim()} view`); }); });
+    document.getElementById("courseSelect")?.addEventListener("change",(e)=>{ currentCourse=e.target.value; renderTable(); updateChartsAndRisk(); document.getElementById("lectureCount").innerText=lectureCount; });
+    document.getElementById("openAddStudentBtn")?.addEventListener("click",()=>document.getElementById("studentModal").style.display="flex");
+    document.getElementById("cancelModal")?.addEventListener("click",()=>document.getElementById("studentModal").style.display="none");
+    document.getElementById("confirmAdd")?.addEventListener("click",()=>{ let name=document.getElementById("studentName").value.trim(); let course=document.getElementById("modalCourseSelect").value; if(name){ addStudent(course,name); document.getElementById("studentModal").style.display="none"; document.getElementById("studentName").value=""; } else toastMsg("Enter name",true); });
+    document.getElementById("markAllPresent")?.addEventListener("click",()=>bulkAction(currentCourse,"present"));
+    document.getElementById("markAllLate")?.addEventListener("click",()=>bulkAction(currentCourse,"late"));
+    document.getElementById("resetAll")?.addEventListener("click",()=>bulkAction(currentCourse,"absent"));
+    document.getElementById("exportCSV")?.addEventListener("click",exportCSVFunc);
+    document.getElementById("markLectureBtn")?.addEventListener("click",markLectureCompleted);
+    window.onclick=(e)=>{ if(e.target===document.getElementById("studentModal")) document.getElementById("studentModal").style.display="none"; };
+    
+    initData(); renderTable(); updateChartsAndRisk(); document.getElementById("lectureCount").innerText=lectureCount;
+</script>
+</body>
+</html>

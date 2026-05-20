@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>📝 RID Tech | Franchise Registration Portal</title>
+    <!-- Google Fonts + Font Awesome 6 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/slidebar.css">
+    <link rel="stylesheet" href="/css/registrations.css">
+
+    
+</head>
+<body>
+     <%- include('partials/sidebar') %>
+
+<div class="dashboard">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- SIDEBAR -->
+   
+    <!-- MAIN CONTENT - FULL SCREEN ADAPTIVE -->
+    <main class="main-content">
+        <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
+        
+        <div class="form-container">
+            <div class="top-bar">
+        
+              
+            </div>
+
+            <div class="header-section">
+                <div class="logo-icon">
+                    <img src="images/image.jpeg" alt="RID Tech Logo" onerror="this.src='https://via.placeholder.com/100?text=RID'">
+                </div>
+                <h1>Franchise Registration</h1>
+                <p>Join India's leading tech education network — start your journey today</p>
+            </div>
+<!-- 
+            <form id="registrationForm" action="/franchise/register" method="POST"> -->
+           <form action="/franchise/register" method="POST" id="registrationForm">
+                    
+                <!-- Section 1: Basic Information -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-building"></i>
+                        <h3>Franchisee Information</h3>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-store"></i> Franchise Name *</label>
+                            <input type="text" id="franchiseName" name="franchiseName" placeholder="Enter franchise name" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Location / Address *</label>
+                            <input type="text" id="location" name="location" placeholder="Full address with city, state" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-user-tie"></i> Owner / Head Name *</label>
+                            <input type="text" id="ownerName" name="ownerName" placeholder="Full name of franchise owner" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> Contact Number *</label>
+                            <input type="tel" id="contact" name="contact" placeholder="10-digit mobile number" maxlength="10" minlength="10" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Email Address *</label>
+                            <input type="email" id="email" name="email" placeholder="Enter email address" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Established Year</label>
+                            <input type="number" id="establishedYear" name="establishedYear" placeholder="e.g., 2020" min="1990" max="2026">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: License Type -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-certificate"></i>
+                        <h3>License Type</h3>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> Select License Category *</label>
+                        <select id="licenseType" name="licenseType" required>
+                            <option value="">-- Select License Type --</option>
+                            <option value="computer_education">💻 Computer Education Center</option>
+                            <option value="technical_institute">🔧 Technical Institute</option>
+                            <option value="college_affiliate">🏛️ College Affiliate</option>
+                            <option value="it_hub">🎯 IT Training Hub</option>
+                            <option value="vocational">🛠️ Vocational Training Center</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section 3: Courses -->
+                <div class="form-section" id="coursesSection">
+                    <div class="section-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h3 id="courseSectionTitle">Courses / Programs You Will Offer</h3>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-list"></i> Select Courses *</label>
+                        <div class="multi-select-wrapper">
+                            <div class="multi-select-btn" id="multiSelectBtn">
+                                <span id="selectedCountText">Select courses</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="multi-select-dropdown" id="multiSelectDropdown">
+                                <div class="dropdown-search">
+                                    <input type="text" id="courseSearch" placeholder="Search courses..." autocomplete="off">
+                                </div>
+                                <div id="courseOptions"></div>
+                            </div>
+                        </div>
+                        <!-- Hidden input to store selected courses for form submission -->
+                       <input type="hidden" name="selectedCourses" id="selectedCoursesInput">
+                        <div class="selected-tags" id="selectedTags"></div>
+                    </div>
+                </div>
+
+                <!-- Additional Remarks -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-comment"></i>
+                        <h3>Additional Remarks / Experience</h3>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="remarks" name="remarks" rows="3" placeholder="Tell us about your experience, why you want to join RID Tech franchise..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i> Register Franchise
+                </button>
+            </form>
+            <div class="form-note">
+                <i class="fas fa-lock"></i> Your information is secure. We'll contact within 48 hours.
+            </div>
+        </div>
+    </main>
+</div>
+<div id="toast" class="toast-message"></div>
+
+<script>
+    // ---------- COURSES DATABASE ----------
+    const coursesDatabase = {
+        computer_education: { name: "Computer Education Center", icon: "💻", courses: ["DCA (Diploma in Computer Applications)", "ADCA (Advanced Diploma in Computer Applications)", "Tally Prime with GST", "Computer Fundamentals", "MS Office & Internet Basics", "Typing & Data Entry", "Basic Web Design (HTML/CSS)", "Digital Literacy Program"] },
+        technical_institute: { name: "Technical Institute", icon: "🔧", courses: ["Full Stack Web Development", "Python Programming", "Java Programming", "C / C++ Programming", "Data Science & AI", "Cyber Security", "Cloud Computing", "Mobile App Development", "DevOps Engineering", "Machine Learning", "Database Management", "Computer Hardware & Networking", "Ethical Hacking"] },
+        college_affiliate: { name: "College Affiliate", icon: "🏛️", courses: ["BCA (Bachelor of Computer Applications)", "MCA (Master of Computer Applications)", "B.Sc IT", "M.Sc IT", "Diploma in Computer Science", "PG Diploma in AI & ML", "Certificate Programs in Programming", "Research Projects & Internships"] },
+        it_hub: { name: "IT Training Hub", icon: "🎯", courses: ["Full Stack Development (MERN/MEAN)", "Python with Django", "Java with Spring Boot", "UI/UX Design", "Digital Marketing", "SEO & Analytics", "Graphic Designing", "Video Editing", "Android App Development", "iOS Development", "Flutter Cross-Platform", "Data Analytics"] },
+        vocational: { name: "Vocational Training Center", icon: "🛠️", courses: ["Hardware & Networking", "Mobile Repairing", "Computer Typing (English/Hindi)", "Accounting with Tally", "Basic Computer Skills", "Soft Skills Training", "Spoken English", "Office Management", "Data Entry Operator Course"] }
+    };
+
+    let selectedCourses = [];
+    let currentLicenseType = "";
+
+    // DOM refs
+    const form = document.getElementById("registrationForm");
+    const franchiseName = document.getElementById("franchiseName");
+    const locationInput = document.getElementById("location");
+    const ownerName = document.getElementById("ownerName");
+    const contact = document.getElementById("contact");
+    const email = document.getElementById("email");
+    const establishedYear = document.getElementById("establishedYear");
+    const licenseTypeSelect = document.getElementById("licenseType");
+    const remarks = document.getElementById("remarks");
+    const multiSelectBtn = document.getElementById("multiSelectBtn");
+    const multiSelectDropdown = document.getElementById("multiSelectDropdown");
+    const courseSearch = document.getElementById("courseSearch");
+    const courseOptionsDiv = document.getElementById("courseOptions");
+    const selectedTagsDiv = document.getElementById("selectedTags");
+    const selectedCountText = document.getElementById("selectedCountText");
+    const courseSectionTitle = document.getElementById("courseSectionTitle");
+    const selectedCoursesInput = document.getElementById("selectedCoursesInput");
+
+    function escapeHtml(str) { if(!str) return ""; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    
+    function showToast(msg, isErr = false) {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.style.background = isErr ? '#b91c1c' : '#0f172a';
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+
+    function getCurrentCourses() { return currentLicenseType && coursesDatabase[currentLicenseType] ? coursesDatabase[currentLicenseType].courses : []; }
+
+    function updateSelectedCoursesInput() {
+        selectedCoursesInput.value = selectedCourses.join(',');
+    }
+
+    function populateCourseOptions(filter = "") {
+        const courses = getCurrentCourses();
+        const filtered = courses.filter(c => c.toLowerCase().includes(filter.toLowerCase()));
+        if(filtered.length === 0) { 
+            courseOptionsDiv.innerHTML = `<div class="dropdown-option" style="justify-content:center; color:#94a3b8;">No courses available</div>`; 
+            return; 
+        }
+        courseOptionsDiv.innerHTML = filtered.map(course => `<label class="dropdown-option"><input type="checkbox" value="${escapeHtml(course)}" ${selectedCourses.includes(course) ? 'checked' : ''}><span>${escapeHtml(course)}</span></label>`).join("");
+        document.querySelectorAll('#courseOptions input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', function() { 
+                if(this.checked) { 
+                    if(!selectedCourses.includes(this.value)) selectedCourses.push(this.value); 
+                } else { 
+                    selectedCourses = selectedCourses.filter(c => c !== this.value); 
+                } 
+                updateSelectedTags(); 
+                updateSelectedCount();
+                updateSelectedCoursesInput();
+            });
+        });
+    }
+
+    function updateSelectedTags() {
+        if(selectedCourses.length === 0) { 
+            selectedTagsDiv.innerHTML = '<span style="font-size:0.8rem; color:#94a3b8;">No courses selected</span>'; 
+            return; 
+        }
+        selectedTagsDiv.innerHTML = selectedCourses.map(course => `<span class="selected-tag">${course.length > 55 ? course.substring(0,55)+'...' : course}<i class="fas fa-times" onclick="removeCourse('${escapeHtml(course)}')"></i></span>`).join("");
+    }
+    
+    function updateSelectedCount() { 
+        selectedCountText.textContent = selectedCourses.length === 0 ? "Select courses" : `${selectedCourses.length} course${selectedCourses.length>1?'s':''} selected`; 
+    }
+    
+    window.removeCourse = function(course) { 
+        selectedCourses = selectedCourses.filter(c => c !== course); 
+        updateSelectedTags(); 
+        updateSelectedCount();
+        updateSelectedCoursesInput();
+        document.querySelectorAll('#courseOptions input[type="checkbox"]').forEach(cb => { 
+            if(cb.value === course) cb.checked = false; 
+        }); 
+    }
+    
+    function resetCourses() {
+        selectedCourses = [];
+        updateSelectedTags(); 
+        updateSelectedCount();
+        updateSelectedCoursesInput();
+        if(currentLicenseType && coursesDatabase[currentLicenseType]) {
+            const info = coursesDatabase[currentLicenseType];
+            courseSectionTitle.innerHTML = `Courses / Programs You Will Offer (${info.icon} ${info.name})`;
+        } else { 
+            courseSectionTitle.innerHTML = `Courses / Programs You Will Offer`; 
+        }
+        populateCourseOptions();
+        if(courseSearch) courseSearch.value = "";
+    }
+
+    function onLicenseChange() {
+        const val = licenseTypeSelect.value;
+        if(!val) { 
+            currentLicenseType = ""; 
+            courseOptionsDiv.innerHTML = '<div class="dropdown-option" style="justify-content:center; color:#94a3b8;">Please select a license type first</div>'; 
+            selectedCourses = []; 
+            updateSelectedTags(); 
+            updateSelectedCount();
+            updateSelectedCoursesInput();
+            courseSectionTitle.innerHTML = `Courses / Programs You Will Offer`; 
+            return; 
+        }
+        currentLicenseType = val;
+        resetCourses();
+    }
+
+    // Events
+    multiSelectBtn.addEventListener("click", (e) => { 
+        e.stopPropagation(); 
+        if(!currentLicenseType) { 
+            showToast("⚠️ Please select license type first!", true); 
+            licenseTypeSelect.focus(); 
+            return; 
+        } 
+        multiSelectDropdown.classList.toggle("show"); 
+        if(multiSelectDropdown.classList.contains("show")) courseSearch.focus(); 
+    });
+    
+    document.addEventListener("click", (e) => { 
+        if(!multiSelectBtn.contains(e.target) && !multiSelectDropdown.contains(e.target)) 
+            multiSelectDropdown.classList.remove("show"); 
+    });
+    
+    courseSearch.addEventListener("input", (e) => populateCourseOptions(e.target.value));
+    licenseTypeSelect.addEventListener("change", onLicenseChange);
+
+    // FORM VALIDATION & SUBMIT
+    function validateForm() {
+        if(!franchiseName.value.trim()) { showToast("⚠️ Please enter franchise name", true); franchiseName.focus(); return false; }
+        if(!locationInput.value.trim()) { showToast("📍 Please enter location/address", true); locationInput.focus(); return false; }
+        if(!ownerName.value.trim()) { showToast("👤 Please enter owner/head name", true); ownerName.focus(); return false; }
+        if(!contact.value.trim()) { showToast("📞 Please enter contact number", true); contact.focus(); return false; }
+        if(!/^[0-9]{10}$/.test(contact.value.trim())) { showToast("📱 Valid 10-digit mobile number required", true); contact.focus(); return false; }
+        if(!email.value.trim()) { showToast("📧 Please enter email address", true); email.focus(); return false; }
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { showToast("📧 Valid email address required", true); email.focus(); return false; }
+        if(!licenseTypeSelect.value) { showToast("🏷️ Please select a license type", true); licenseTypeSelect.focus(); return false; }
+        if(selectedCourses.length === 0) { showToast("📚 Please select at least one course to offer", true); return false; }
+        return true;
+    }
+
+form.addEventListener("submit", async function(e) {
+
+  e.preventDefault();
+
+  if(!validateForm()) return;
+
+  const formData = {
+
+    franchiseName: franchiseName.value.trim(),
+    location: locationInput.value.trim(),
+    ownerName: ownerName.value.trim(),
+    contact: contact.value.trim(),
+    email: email.value.trim(),
+    establishedYear: establishedYear.value.trim(),
+
+    licenseType: licenseTypeSelect.value,
+
+    licenseCategory: currentLicenseType,
+
+    selectedCourses: selectedCourses,
+
+    remarks: remarks.value.trim()
+
+  };
+
+  try {
+
+    const res = await fetch("/franchise/register", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify(formData)
+
+    });
+
+    const data = await res.json();
+
+    if(data.success){
+
+      alert(" Franchise Request Sent To Admin. Our team will review your application and send you a reply within 24 hours.");
+
+      form.reset();
+
+      selectedCourses = [];
+
+      updateSelectedTags();
+
+      updateSelectedCount();
+
+    } else {
+
+      alert(data.message);
+
+    }
+
+  } catch(err){
+
+    console.log(err);
+
+    alert("Server Error");
+
+  }
+
+});
+
+    // Live date update
+function updateDate() { 
+    const el = document.getElementById('liveDate');
+    if(!el) return; // element nahi hai toh bas return karo
+    const d = new Date(); 
+    el.innerHTML = `<i class="far fa-calendar-alt"></i> ${d.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' })}`;
+}
+updateDate(); 
+setInterval(updateDate, 60000);
+
+    // Sidebar + Mobile toggle
+    const menuToggle = document.getElementById('menuToggleBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if(menuToggle) {
+        menuToggle.addEventListener('click', () => { 
+            sidebar.classList.toggle('open'); 
+            overlay.classList.toggle('active'); 
+        });
+        overlay.addEventListener('click', () => { 
+            sidebar.classList.remove('open'); 
+            overlay.classList.remove('active'); 
+        });
+    }
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            item.classList.add('active');
+            showToast(`📁 ${item.innerText.trim()} section`, false);
+            if(window.innerWidth <= 768) { 
+                sidebar.classList.remove('open'); 
+                overlay.classList.remove('active'); 
+            }
+        });
+    });
+
+    // initial state
+    courseOptionsDiv.innerHTML = '<div class="dropdown-option" style="justify-content: center; color: #94a3b8;">Please select a license type first</div>';
+    updateSelectedTags();
+    updateSelectedCoursesInput();
+</script>
+</body>
+</html>

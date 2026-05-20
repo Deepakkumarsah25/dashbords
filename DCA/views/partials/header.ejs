@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>RID Tech | Professional Education Dashboard</title>
+    <!-- Google Fonts + Font Awesome 6 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ---------- GLOBAL RESET & BASE (shared) ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edf8 100%);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ---------- KEYFRAMES (shared) ---------- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        /* ========== SIDEBAR STYLES (COMPLETE & ISOLATED) ========== */
+        /* All sidebar-related CSS is grouped here for easy extraction */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #0f2b3d 0%, #1a4a6f 50%, #1e3a5f 100%);
+            color: white;
+            padding: 1.8rem 1.2rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            box-shadow: 8px 0 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.6);
+            border-radius: 10px;
+        }
+
+        .logo-area {
+            text-align: center;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            margin-bottom: 1.8rem;
+            animation: fadeInUp 0.6s ease;
+        }
+        .logo-area h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #93c5fd, #60a5fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .logo-area p {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+            color: #bfdbfe;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .section-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #93c5fd;
+            padding: 0.8rem 1rem 0.5rem;
+            font-weight: 700;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.25), transparent);
+            transition: width 0.3s ease;
+        }
+        .nav-item:hover::before {
+            width: 100%;
+        }
+        .nav-item i {
+            width: 22px;
+            font-size: 1.1rem;
+            transition: transform 0.2s ease;
+        }
+        .nav-item:hover {
+            background: linear-gradient(95deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1));
+            transform: translateX(5px);
+            color: white;
+        }
+        .nav-item:hover i {
+            transform: scale(1.1);
+            color: #93c5fd;
+        }
+        .nav-item.active {
+            background: linear-gradient(95deg, #2563eb, #3b82f6);
+            color: white;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+            animation: glowPulse 2s infinite;
+        }
+        .nav-item.active i {
+            color: white;
+        }
+        .nav-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            margin: 1rem 0;
+        }
+
+        /* ---------- MAIN CONTENT & DASHBOARD GLOBAL STYLES (shared) ---------- */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+        }
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        /* Overlay for mobile (sidebar related but placed globally) */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Mobile sidebar toggle & adjustments */
+        .menu-toggle {
+            display: none;
+            background: linear-gradient(95deg, #2563eb, #3b82f6);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            z-index: 1001;
+        }
+        .menu-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+        }
+        /* force desktop always visible */
+        @media (min-width: 769px) {
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+        }
+
+        /* ---------- CARDS, GRID, UI COMPONENTS (shared / rest of dashboard) ---------- */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            animation: fadeInLeft 0.5s ease;
+        }
+        .greeting h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e3a5f, #2563eb);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .greeting p {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.3rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: scaleIn 0.5s ease backwards;
+            border: 1px solid rgba(0,0,0,0.03);
+            cursor: pointer;
+        }
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px -12px rgba(37, 99, 235, 0.2);
+        }
+        .stat-info h3 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+            border-radius: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover .stat-icon {
+            transform: scale(1.08) rotate(5deg);
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+        .stat-card:hover .stat-icon i {
+            color: white;
+        }
+        .stat-icon i {
+            font-size: 1.8rem;
+            color: #2563eb;
+            transition: all 0.3s ease;
+        }
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.3rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transition: all 0.35s ease;
+            animation: fadeInUp 0.5s ease backwards;
+            border: 1px solid rgba(37, 99, 235, 0.08);
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -12px rgba(0, 0, 0, 0.12);
+            border-color: rgba(37, 99, 235, 0.15);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        .card-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-header h3 i {
+            color: #2563eb;
+        }
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 1rem;
+            justify-content: space-around;
+            padding: 1.2rem 0;
+        }
+        .chart-bar-item {
+            text-align: center;
+            flex: 1;
+            animation: fadeInUp 0.5s ease backwards;
+        }
+        .bar {
+            background: linear-gradient(180deg, #2563eb, #3b82f6);
+            height: var(--height);
+            min-height: 30px;
+            border-radius: 12px;
+            transition: height 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .chart-label {
+            font-size: 0.7rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .course-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.9rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+            animation: fadeInRight 0.4s ease backwards;
+        }
+        .course-item:hover {
+            transform: translateX(5px);
+            background: #f8fafc;
+            padding-left: 10px;
+            border-radius: 12px;
+        }
+        .course-name {
+            font-weight: 600;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .course-name i {
+            font-size: 1rem;
+            width: 24px;
+            color: #2563eb;
+        }
+        .course-count {
+            background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+            padding: 5px 14px;
+            border-radius: 25px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #2563eb;
+            transition: all 0.2s ease;
+        }
+        .course-item:hover .course-count {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            transform: scale(1.05);
+        }
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        .recent-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .recent-table th {
+            text-align: left;
+            padding: 12px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #eef2ff;
+        }
+        .recent-table td {
+            padding: 12px 8px;
+            font-size: 0.85rem;
+            color: #1e293b;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+        }
+        .recent-table tr:hover td {
+            background: #f8fafc;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 25px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .status-active {
+            background: linear-gradient(135deg, #dff9e6, #c8f0d9);
+            color: #0e6b3e;
+        }
+        .status-pending {
+            background: linear-gradient(135deg, #ffefdb, #ffe4c4);
+            color: #b45a1c;
+        }
+        .franchise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .franchise-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+            animation: fadeInLeft 0.4s ease backwards;
+        }
+        .franchise-item:hover {
+            transform: translateX(5px);
+            background: #f8fafc;
+            padding-left: 10px;
+            border-radius: 12px;
+        }
+        .franchise-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .franchise-name i {
+            color: #2563eb;
+        }
+        .franchise-status {
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #dff9e6, #c8f0d9);
+            color: #0e6b3e;
+            font-weight: 600;
+        }
+        .two-col-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 550px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .two-col-grid { grid-template-columns: 1fr; }
+            .stat-number { font-size: 1.6rem; }
+            .greeting h1 { font-size: 1.3rem; }
+            .chart-container { gap: 0.5rem; }
+            .chart-label { font-size: 0.6rem; }
+        }
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <!-- Overlay for mobile (side panel) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+
+   
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-area">
+            <h2>RID Tech</h2>
+            <p>Empowering Computer Education</p>
+        </div>
+        <div class="nav-menu">
+            <!-- <div class="section-title">MAIN</div> -->
+            <a href="/" class="nav-item active">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/students" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Students</span>
+            </a>
+            <a href="/courses" class="nav-item">
+                <i class="fas fa-book-open"></i>
+                <span>Courses</span>
+            </a>
+            <!-- <a href="/franchises" class="nav-item">
+                <i class="fas fa-store"></i>
+                <span> Franchises</span>
+            </a> -->
+
+            <a href="/certificates" class="nav-item">
+                <i class="fas fa-certificate"></i>
+                <span> apply for Certificates</span>
+            </a>
+              <a href="/test" class="nav-item">
+                <i class="fas fa-plus-circle"></i>
+                <span>Create Test</span>
+            </a>
+             <a href="/colection" class="nav-item">
+                <i class="fas fa-plus-circle"></i>
+                <span>Test Collection</span>
+            </a>
+            
+            <a href="/Create_ID" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Create ID card</span>
+
+              <a href="/registrations" class="nav-item">
+                <i class="fas fa-file-alt"></i>
+                <span>apply for Franchises</span>
+            </a>
+              <a href="/fees" class="nav-item">
+                <i class="fas fa-rupee-sign"></i>
+                <span>Fee Management</span>
+            </a>
+        <a href="/Attendence" class="nav-item">
+                <i class="fas fa-calendar-check"></i>
+                <span>Attendence management</span>
+            </a>
+             <a href="/results" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Result</span>
+            </a>
+            <a href="/settings" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <!-- <div class="section-title">MANAGEMENT</div> -->
+           
+   
+          
+         
+           
+        </div>
+    </aside>
+  
+<!-- Separate JavaScript (Sidebar Toggle & Active State Management) -->
+<script>
+    (function() {
+        // ----- SIDEBAR TOGGLE & OVERLAY (fully isolated logic for sidebar component) -----
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        function openSidebar() {
+            if (sidebar) {
+                sidebar.classList.add("open");
+                if (overlay) overlay.classList.add("active");
+                document.body.style.overflow = "hidden";
+            }
+        }
+
+        function closeSidebar() {
+            if (sidebar) {
+                sidebar.classList.remove("open");
+                if (overlay) overlay.classList.remove("active");
+                document.body.style.overflow = "";
+            }
+        }
+
+        function toggleSidebar() {
+            if (sidebar && sidebar.classList.contains("open")) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        }
+
+        function initSidebarResponsive() {
+            if (!sidebar) return;
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove("open");
+                if (overlay) overlay.classList.remove("active");
+                document.body.style.overflow = "";
+            } else {
+                // on mobile ensure it starts closed
+                sidebar.classList.remove("open");
+                if (overlay) overlay.classList.remove("active");
+                document.body.style.overflow = "";
+            }
+        }
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleSidebar();
+            });
+        }
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+
+        // close on nav item click (mobile only)
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") closeSidebar();
+        });
+
+        window.addEventListener('resize', initSidebarResponsive);
+        window.addEventListener('load', initSidebarResponsive);
+        initSidebarResponsive();
+
+        // ----- ACTIVE NAVIGATION HIGHLIGHT (works with links) -----
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll(".nav-item");
+        navLinks.forEach(link => {
+            const href = link.getAttribute("href");
+            if (href && (href === currentPath || (currentPath === "/" && href === "/"))) {
+                link.classList.add("active");
+            } else if (href === "#") {
+                // do nothing for hash links, but keep optional
+            } else {
+                link.classList.remove("active");
+            }
+        });
+        // Ensure Dashboard remains active on root path
+        if (currentPath === "/" || currentPath === "") {
+            const dashboardLink = document.querySelector('.nav-item[href="/"]');
+            if (dashboardLink) dashboardLink.classList.add("active");
+        }
+    })();
+</script>
+</body>
+</html>

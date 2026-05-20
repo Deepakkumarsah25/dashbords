@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>TestMaster | Smart Assessment Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        /* ========= MAIN LAYOUT: SIDEBAR + CONTENT ========= */
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ---------- SIDEBAR (RESPONSIVE) ---------- */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border-right: 1px solid #e2e8f0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e293b, #2c3e66);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            margin-top: 6px;
+        }
+
+        .sidebar-nav {
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            border-radius: 16px;
+            background: transparent;
+            color: #334155;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-item i {
+            font-style: normal;
+            font-weight: 500;
+            font-size: 1.25rem;
+        }
+
+        .nav-item.active {
+            background: #eef2ff;
+            color: #1e40af;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .nav-item:hover:not(.active) {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .create-test-btn-side {
+            margin: 20px 16px 0 16px;
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 12px 0;
+            border-radius: 40px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .create-test-btn-side:hover {
+            background: #1e293b;
+            transform: scale(0.98);
+        }
+
+        /* ---------- MAIN CONTENT (DYNAMIC) ---------- */
+        .main-content {
+            flex: 1;
+            padding: 28px 32px;
+            overflow-x: auto;
+            transition: 0.2s;
+        }
+
+        /* Header with search + create button side by side */
+        .dashboard-header-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 28px;
+            background: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            border: 1px solid #eef2f6;
+        }
+
+        .header-title-area h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .header-title-area p {
+            font-size: 0.75rem;
+            color: #5b6e8c;
+        }
+
+        .search-create-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 48px;
+            padding: 6px 16px;
+            transition: all 0.2s;
+        }
+
+        .search-box:focus-within {
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 2px #e2e8f0;
+        }
+
+        .search-box span {
+            font-size: 1rem;
+            margin-right: 8px;
+            opacity: 0.6;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            width: 220px;
+            outline: none;
+        }
+
+        .create-primary-btn {
+            background: #0f172a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .create-primary-btn:hover {
+            background: #1e293b;
+            transform: scale(0.97);
+        }
+
+        /* ===== CARDS, MODALS, TOAST ===== */
+        .test-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 24px;
+            padding: 18px;
+            border: 1px solid #e9edf2;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.03);
+            transition: all 0.25s ease;
+        }
+
+        .test-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
+        }
+
+        .test-card h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #0f172a;
+            word-break: break-word;
+        }
+
+        .category-tag {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            background: #f1f5f9;
+            border-radius: 40px;
+            color: #1e293b;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .share-link-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+            align-items: center;
+        }
+
+        .share-link-container input {
+            flex: 1;
+            min-width: 120px;
+            padding: 8px 12px;
+            font-size: 0.7rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            background: #fafcff;
+        }
+
+        .copy-btn, .edit-btn, .view-btn, .delete-btn {
+            padding: 6px 12px;
+            font-size: 0.7rem;
+            border-radius: 40px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .copy-btn { background: #eef2ff; color: #1e3a8a; }
+        .edit-btn { background: #fffbeb; color: #b45309; border: 1px solid #fed7aa; }
+        .view-btn { background: #ecfdf5; color: #047857; }
+        .delete-btn { background: #fef2f2; color: #b91c1c; }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: white;
+            max-width: 650px;
+            width: 90%;
+            border-radius: 32px;
+            padding: 28px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 40px -12px black;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: #0f172ad9;
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: 0.2s;
+            pointer-events: none;
+            z-index: 1100;
+        }
+
+        .edit-question-block, .new-question-block {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        .edit-question-block input, .new-question-block input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 30px;
+            border: 1px solid #cbd5e6;
+            outline: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            background: #fefce8;
+            border-radius: 40px;
+            margin-top: 30px;
+            color: #4b5563;
+        }
+
+        @media (max-width: 780px) {
+            .sidebar {
+                width: 80px;
+                overflow-x: hidden;
+            }
+            .sidebar-header h2, .sidebar-header p, .nav-item span:not(.nav-icon) {
+                display: none;
+            }
+            .sidebar-header { padding: 20px 10px; text-align: center; }
+            .nav-item { justify-content: center; padding: 12px 0; }
+            .nav-item i { font-size: 1.5rem; }
+            .create-test-btn-side span { display: none; }
+            .create-test-btn-side { justify-content: center; }
+            .main-content { padding: 20px 16px; }
+            .dashboard-header-bar { flex-direction: column; align-items: stretch; border-radius: 28px; }
+            .search-create-wrapper { justify-content: space-between; }
+        }
+
+        @media (max-width: 550px) {
+            .test-cards-grid { grid-template-columns: 1fr; }
+            .share-link-container { flex-direction: column; align-items: stretch; }
+        }
+
+        button { cursor: pointer; }
+        .input-field { border-radius: 40px; border: 1px solid #cbd5e1; padding: 10px 14px; width: 100%; }
+    </style>
+</head>
+<body>
+      <%- include('partials/sidebar') %>
+<div class="dashboard-layout">
+    <!-- SIDEBAR -->
+
+
+    <!-- Main dynamic panel -->
+    <main class="main-content" id="mainContentArea">
+        <div id="dynamicPanel"></div>
+    </main>
+</div>
+
+<!-- MODALS -->
+<div id="submissionsModal" class="modal-overlay">
+    <div class="modal-card">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+            <h3>📌 Submissions</h3>
+            <button id="closeSubModal" style="background: none; border: none; font-size: 1.8rem;">&times;</button>
+        </div>
+        <div id="submissionsListContainer"></div>
+    </div>
+</div>
+
+<div id="editTestModal" class="modal-overlay">
+    <div class="modal-card">
+        <div style="display: flex; justify-content: space-between;">
+            <h3>✏️ Edit Test</h3>
+            <button id="closeEditModal" style="background: none; border: none; font-size: 1.8rem;">&times;</button>
+        </div>
+        <input type="hidden" id="editTestId">
+        <div style="margin: 16px 0;">
+            <label>Test Title</label>
+            <input type="text" id="editTestTitle" class="input-field">
+        </div>
+        <div>
+            <label>Time Limit (minutes)</label>
+            <input type="number" id="editTestTime" class="input-field">
+        </div>
+        <div style="margin: 20px 0;">
+            <label>Questions</label>
+            <div id="editQuestionsContainer"></div>
+            <button id="addEditQuestionBtn" style="margin-top:12px; background:#e2e8f0; border-radius:40px; padding:8px 16px;">+ Add Question</button>
+        </div>
+        <button id="saveEditTestBtn" style="background:#0f172a; color:white; padding:12px; width:100%; border-radius:40px;">Save Changes</button>
+    </div>
+</div>
+
+<div id="createTestModal" class="modal-overlay">
+    <div class="modal-card">
+        <div style="display: flex; justify-content: space-between;">
+            <h3>🆕 Create New Test</h3>
+            <button id="closeCreateModal" style="background: none; border: none; font-size: 1.8rem;">&times;</button>
+        </div>
+        <div style="margin: 12px 0;">
+            <label>Test Title</label>
+            <input type="text" id="newTestTitle" placeholder="e.g., JavaScript Fundamentals" class="input-field">
+        </div>
+        <div>
+            <label>Time Limit (minutes)</label>
+            <input type="number" id="newTestTime" value="15" class="input-field">
+        </div>
+        <div id="newQuestionsContainer" style="margin: 20px 0;"></div>
+        <button id="addQuestionBtn" style="background:#eef2ff; border-radius:40px; padding:10px 18px; margin-bottom:16px; font-weight:500;">➕ Add New Question</button>
+        <button id="finalCreateTestBtn" style="background:#0f172a; color:white; width:100%; border-radius:40px; padding:12px;">✅ Publish Test</button>
+    </div>
+</div>
+
+<div id="toastMsg" class="toast"></div>
+
+<script>
+    // ---------- PERSISTENCE (localStorage) ----------
+    let allTests = [];
+
+    function saveTestsToLocal() {
+        localStorage.setItem('dashboard_tests_v3', JSON.stringify(allTests));
+    }
+
+    function loadTestsFromLocal() {
+        const stored = localStorage.getItem('dashboard_tests_v3');
+        if (stored) {
+            allTests = JSON.parse(stored);
+        } else {
+            allTests = [
+                { _id: "test_1", testTitle: "React Fundamentals", timeLimit: 15, questions: [{ text: "What is JSX?" }, { text: "Explain useState hook" }], attempts: 4 },
+                { _id: "test_2", testTitle: "CSS Grid & Flex", timeLimit: 12, questions: [{ text: "Difference between grid and flex?" }, { text: "What is fr unit?" }], attempts: 2 }
+            ];
+            saveTestsToLocal();
+        }
+        allTests = allTests.map(t => ({ ...t, attempts: t.attempts || 0, questions: t.questions || [] }));
+        saveTestsToLocal();
+    }
+
+    function genId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 8); }
+
+    // API sim
+    async function deleteTestAPI(id) { allTests = allTests.filter(t => t._id !== id); saveTestsToLocal(); }
+    async function updateTestAPI(updated) { const idx = allTests.findIndex(t => t._id === updated._id); if(idx !== -1) allTests[idx] = updated; saveTestsToLocal(); }
+    async function createTestAPI(newTest) { allTests.push(newTest); saveTestsToLocal(); }
+    async function fetchSubmissionsAPI(testId) {
+        const stored = localStorage.getItem(`sub_${testId}`);
+        if(stored) return JSON.parse(stored);
+        if(allTests[0] && testId === allTests[0]._id) return [{ studentName: "Alex Johnson", score: "88%" }, { studentName: "Sophia Lee", score: "94%" }];
+        return [];
+    }
+
+    // RENDER ALL TESTS with Header (search bar + create button side by side)
+    let currentSearchTerm = '';
+
+    function renderAllTestsPanel() {
+        const filtered = allTests.filter(t => t.testTitle.toLowerCase().includes(currentSearchTerm.toLowerCase()));
+        const headerHtml = `
+            <div class="dashboard-header-bar">
+                <div class="header-title-area">
+                    <h1>📋 Published Tests</h1>
+                    <p>Manage, edit, share and track attempts</p>
+                </div>
+                <div class="search-create-wrapper">
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" id="globalSearchInput" placeholder="Search tests..." value="${currentSearchTerm.replace(/"/g, '&quot;')}">
+                    </div>
+                    <button class="create-primary-btn" id="headerCreateBtn">
+                        <span>+</span> Create Test
+                    </button>
+                </div>
+            </div>
+            <div id="testsCardsContainer" class="test-cards-grid"></div>
+        `;
+        document.getElementById('dynamicPanel').innerHTML = headerHtml;
+        const container = document.getElementById('testsCardsContainer');
+        if (!filtered.length) {
+            container.innerHTML = '<div class="empty-state">✨ No tests match. Create a new test to get started.</div>';
+        } else {
+            let cardsHtml = '';
+            filtered.forEach(test => {
+                const shareUrl = `${window.location.origin}/collection?student_test=${test._id}`;
+                cardsHtml += `
+                    <div class="test-card" data-id="${test._id}">
+                        <div style="display:flex;justify-content:space-between; align-items:center;">
+                            <h4>${escapeHtml(test.testTitle)}</h4>
+                            <span class="category-tag">📊 ${test.attempts || 0} attempts</span>
+                        </div>
+                        <div style="margin:12px 0; display:flex; gap:8px; flex-wrap:wrap;">
+                            <span class="category-tag">⏰ ${test.timeLimit} min</span>
+                            <span class="category-tag">❓ ${test.questions.length} Qs</span>
+                        </div>
+                        <div class="share-link-container">
+                            <input type="text" readonly value="${shareUrl}" id="urlInput_${test._id}">
+                            <button class="copy-btn" data-url="${shareUrl}">📋 Copy</button>
+                            <button class="edit-btn" data-id="${test._id}">✏️ Edit</button>
+                            <button class="view-btn" data-id="${test._id}">👥 Subm</button>
+                            <button class="delete-btn" data-id="${test._id}">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = cardsHtml;
+        }
+
+        // attach search event
+        const searchInput = document.getElementById('globalSearchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                currentSearchTerm = e.target.value;
+                renderAllTestsPanel();
+            });
+        }
+        // header create button
+        const headerBtn = document.getElementById('headerCreateBtn');
+        if (headerBtn) headerBtn.onclick = () => openCreateTestModal();
+
+        attachCardEvents();
+    }
+
+    function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    function attachCardEvents() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.onclick = () => { navigator.clipboard.writeText(btn.dataset.url); showToast("🔗 Link copied!"); };
+        });
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.onclick = () => { const test = allTests.find(t => t._id === btn.dataset.id); if(test) openEditTestModal(test); };
+        });
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.onclick = async () => {
+                const submissions = await fetchSubmissionsAPI(btn.dataset.id);
+                let html = submissions.length ? submissions.map(s => `<div style="background:#f9f9ff; padding:12px; border-radius:20px; margin-bottom:10px;"><strong>🧑‍🎓 ${escapeHtml(s.studentName)}</strong><div style="font-size:0.85rem;">⭐ Score: ${s.score}</div></div>`).join('') : '<p style="padding:20px; text-align:center;">📭 No submissions yet</p>';
+                document.getElementById('submissionsListContainer').innerHTML = html;
+                document.getElementById('submissionsModal').style.display = 'flex';
+            };
+        });
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.onclick = async () => { if(confirm('Delete test permanently?')){ await deleteTestAPI(btn.dataset.id); showToast('Test deleted'); renderAllTestsPanel(); } };
+        });
+    }
+
+    // Edit modal logic
+    let currentEditingTest = null;
+    function openEditTestModal(test) {
+        currentEditingTest = test;
+        document.getElementById('editTestId').value = test._id;
+        document.getElementById('editTestTitle').value = test.testTitle;
+        document.getElementById('editTestTime').value = test.timeLimit;
+        renderEditQuestions(test.questions);
+        document.getElementById('editTestModal').style.display = 'flex';
+    }
+
+    function renderEditQuestions(questions) {
+        const container = document.getElementById('editQuestionsContainer');
+        container.innerHTML = '';
+        questions.forEach((q, idx) => {
+            const div = document.createElement('div');
+            div.className = 'edit-question-block';
+            div.innerHTML = `<input type="text" class="edit-q-text" data-idx="${idx}" value="${escapeHtml(q.text)}" placeholder="Question text">`;
+            container.appendChild(div);
+        });
+    }
+
+    document.getElementById('addEditQuestionBtn')?.addEventListener('click', () => {
+        const container = document.getElementById('editQuestionsContainer');
+        const div = document.createElement('div');
+        div.className = 'edit-question-block';
+        div.innerHTML = `<input type="text" class="edit-q-text" value="New question" placeholder="Enter question">`;
+        container.appendChild(div);
+    });
+
+    document.getElementById('saveEditTestBtn')?.addEventListener('click', async () => {
+        const newTitle = document.getElementById('editTestTitle').value.trim();
+        const newTime = parseInt(document.getElementById('editTestTime').value);
+        if (!newTitle) { showToast("Title required"); return; }
+        const qInputs = document.querySelectorAll('#editQuestionsContainer .edit-q-text');
+        const updatedQuestions = Array.from(qInputs).map(inp => ({ text: inp.value.trim() || "Untitled" }));
+        if (updatedQuestions.length === 0) { showToast("At least one question needed"); return; }
+        const updatedTest = { ...currentEditingTest, testTitle: newTitle, timeLimit: newTime, questions: updatedQuestions };
+        await updateTestAPI(updatedTest);
+        showToast("Test updated");
+        document.getElementById('editTestModal').style.display = 'none';
+        renderAllTestsPanel();
+    });
+
+    // CREATE TEST MODAL with BUTTONS (Add Question button clearly visible)
+    function openCreateTestModal() {
+        document.getElementById('newTestTitle').value = '';
+        document.getElementById('newTestTime').value = 15;
+        const container = document.getElementById('newQuestionsContainer');
+        container.innerHTML = '';
+        addNewQuestionBlock(); // start with one empty question block
+        document.getElementById('createTestModal').style.display = 'flex';
+    }
+
+    function addNewQuestionBlock() {
+        const container = document.getElementById('newQuestionsContainer');
+        const div = document.createElement('div');
+        div.className = 'new-question-block';
+        div.innerHTML = `<input type="text" class="new-q-text" placeholder="e.g., What is the purpose of useState?">`;
+        container.appendChild(div);
+    }
+
+    // Event listeners for create modal buttons
+    document.getElementById('addQuestionBtn')?.addEventListener('click', () => {
+        addNewQuestionBlock();
+        showToast("📝 New question field added");
+    });
+
+    document.getElementById('finalCreateTestBtn')?.addEventListener('click', async () => {
+        const title = document.getElementById('newTestTitle').value.trim();
+        const time = parseInt(document.getElementById('newTestTime').value);
+        if (!title) { showToast("Test title required"); return; }
+        const questionInputs = document.querySelectorAll('#newQuestionsContainer .new-q-text');
+        const questions = Array.from(questionInputs).map(inp => ({ text: inp.value.trim() || "Sample question" }));
+        if (questions.length === 0) { showToast("Please add at least one question using the button"); return; }
+        const newTest = {
+            _id: genId(),
+            testTitle: title,
+            timeLimit: time,
+            questions: questions,
+            attempts: 0
+        };
+        await createTestAPI(newTest);
+        showToast(`✅ "${title}" created successfully!`);
+        document.getElementById('createTestModal').style.display = 'none';
+        renderAllTestsPanel();
+        setActiveNav('all');
+    });
+
+    // Modal close handlers
+    document.getElementById('closeSubModal')?.addEventListener('click', () => document.getElementById('submissionsModal').style.display = 'none');
+    document.getElementById('closeEditModal')?.addEventListener('click', () => document.getElementById('editTestModal').style.display = 'none');
+    document.getElementById('closeCreateModal')?.addEventListener('click', () => document.getElementById('createTestModal').style.display = 'none');
+    window.onclick = (e) => { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; };
+
+    function showToast(msg) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(-50%) scale(1)';
+        setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) scale(0.9)'; }, 2200);
+    }
+
+    function setActiveNav(section) {
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        if (section === 'all') document.getElementById('navAllTests')?.classList.add('active');
+        else if (section === 'create') document.getElementById('navCreateTest')?.classList.add('active');
+        else if (section === 'analytics') document.getElementById('navAnalytics')?.classList.add('active');
+    }
+
+    // Sidebar navigation
+    document.getElementById('navAllTests')?.addEventListener('click', () => { renderAllTestsPanel(); setActiveNav('all'); });
+    document.getElementById('navCreateTest')?.addEventListener('click', () => { openCreateTestModal(); setActiveNav('create'); });
+    document.getElementById('quickCreateBtn')?.addEventListener('click', () => { openCreateTestModal(); setActiveNav('create'); });
+    document.getElementById('navAnalytics')?.addEventListener('click', () => {
+        const totalTests = allTests.length;
+        const totalAttempts = allTests.reduce((sum, t) => sum + (t.attempts || 0), 0);
+        const avgQs = totalTests ? (allTests.reduce((sum,t)=> sum + t.questions.length,0)/totalTests).toFixed(1) : 0;
+        document.getElementById('dynamicPanel').innerHTML = `
+            <div class="dashboard-header-bar" style="margin-bottom:20px;">
+                <div class="header-title-area"><h1>📊 Analytics Dashboard</h1><p>Test performance overview</p></div>
+                <button class="create-primary-btn" id="backFromAnalyticsBtn" style="background:#334155;">← Back to Tests</button>
+            </div>
+            <div style="display:grid; gap:24px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+                <div style="background:white; border-radius:28px; padding:24px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.05);"><h2 style="font-size:2rem;">${totalTests}</h2><p>📚 Total Tests</p></div>
+                <div style="background:white; border-radius:28px; padding:24px; text-align:center;"><h2 style="font-size:2rem;">${totalAttempts}</h2><p>🎯 Total Attempts</p></div>
+                <div style="background:white; border-radius:28px; padding:24px; text-align:center;"><h2 style="font-size:2rem;">${avgQs}</h2><p>❓ Avg Questions/Test</p></div>
+            </div>
+        `;
+        document.getElementById('backFromAnalyticsBtn')?.addEventListener('click', () => renderAllTestsPanel());
+        setActiveNav('analytics');
+    });
+
+    // start application
+    loadTestsFromLocal();
+    renderAllTestsPanel();
+</script>
+</body>
+</html>

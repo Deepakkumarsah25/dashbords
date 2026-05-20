@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Lumina Student Hub | Fee Manager</title>
+    <!-- Google Fonts & Font Awesome 6 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/slidebar.css">
+    <link rel="stylesheet" href="/css/students.css">
+   
+</head>
+<body>
+     <%- include('partials/sidebar') %>
+<div class="app-layout">
+    <!-- SIDEBAR (Fully functional) -->
+
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="mainContent">
+        <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
+        <div id="studentPanel"></div>
+    </main>
+</div>
+
+<!-- Popup Modal -->
+<div class="popup" id="popup">
+    <form action="/api/students" method="POST">
+    <div class="popup-box">
+        <div class="close-modal" id="closeModalBtn"><i class="fas fa-times-circle"></i></div>
+        <h3><i class="fas fa-rupee-sign"></i>  All Student </h3>
+
+        <input type="text" id="name" placeholder="Full name * (letters & spaces)"  name="name" autocomplete="off">
+        <div id="nameError" class="error-text"></div>
+        <input type="text" id="course" placeholder="Course name * (e.g., Full Stack, DCA)" name="course" autocomplete="off">
+        <div id="courseError" class="error-text"></div>
+        <input type="tel" id="mobile" placeholder="Mobile number * (10 digits, 6-9 start)"  name="mobile" autocomplete="off">
+        <div id="mobileError" class="error-text"></div>
+        <input type="number" id="amount" placeholder="Fee Amount (₹) * e.g., 5000" step="1" name="amount" min="1" value="5000">
+        <div id="amountError" class="error-text"></div>
+        <select id="fee" name="fee">
+            <option value="Paid">✅ Paid</option>
+            <option value="Pending">⏳ Pending</option>
+        </select>
+        <button type="submit" id="saveStudentBtn"><i class="fas fa-save"></i> Save Student</button>
+    </div>
+</form>
+</div>
+
+<script>
+    // ---------- STUDENT DATA ----------
+    let students = [
+        { id: "s1", name: "Amit Sharma", course: "Full Stack Dev", mobile: "9876543210", amount: 12500, fee: "Paid" },
+        { id: "s2", name: "Pooja Verma", course: "ADCA", mobile: "9988776655", amount: 8500, fee: "Pending" },
+        { id: "s3", name: "Rajesh Kumar", course: "Tally Prime", mobile: "9123456789", amount: 6000, fee: "Paid" },
+        { id: "s4", name: "Neha Gupta", course: "Computer Fundamentals", mobile: "9898989898", amount: 4500, fee: "Paid" },
+        { id: "s5", name: "Vikram Singh", course: "DCA", mobile: "8765432190", amount: 7200, fee: "Pending" }
+    ];
+    
+    let editId = null;
+    let searchQuery = "";
+
+    function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    }
+
+    // ---------- VALIDATIONS ----------
+    function validateName(name) {
+        const trimmed = name.trim();
+        if (!trimmed) return "Name is required.";
+        if (trimmed.length < 2) return "Name must be at least 2 characters.";
+        const nameRegex = /^[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\s\.\'-]{2,50}$/;
+        if (!nameRegex.test(trimmed)) return "Only letters, spaces, dots, apostrophes and hyphens allowed.";
+        return "";
+    }
+
+    function validateCourse(course) {
+        const trimmed = course.trim();
+        if (!trimmed) return "Course name is required.";
+        if (trimmed.length < 2) return "Course must be at least 2 characters.";
+        if (trimmed.length > 60) return "Course name too long (max 60).";
+        return "";
+    }
+
+    function validateMobile(mobile, excludeStudentId = null) {
+        const trimmed = mobile.trim();
+        if (!trimmed) return "Mobile number is required.";
+        const mobileRegex = /^[6-9]\d{9}$/;
+        if (!mobileRegex.test(trimmed)) return "Enter valid 10-digit mobile number starting with 6-9.";
+        const isDuplicate = students.some(s => s.mobile === trimmed && (excludeStudentId === null || s.id !== excludeStudentId));
+        if (isDuplicate) return "Mobile number already registered!";
+        return "";
+    }
+
+    function validateAmount(amount) {
+        const num = parseFloat(amount);
+        if (isNaN(num)) return "Amount must be a valid number.";
+        if (num < 1) return "Amount must be at least ₹1.";
+        if (num > 1000000) return "Amount cannot exceed ₹10,00,000.";
+        return "";
+    }
+
+    function clearModalErrors() {
+        document.getElementById("nameError").innerHTML = "";
+        document.getElementById("courseError").innerHTML = "";
+        document.getElementById("mobileError").innerHTML = "";
+        document.getElementById("amountError").innerHTML = "";
+        ["name", "course", "mobile", "amount"].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) input.style.borderColor = "#e2e8f0";
+        });
+    }
+
+    function showFieldError(fieldId, errorMsg) {
+        const errorDiv = document.getElementById(fieldId + "Error");
+        if (errorDiv) errorDiv.innerHTML = errorMsg ? `<i class="fas fa-exclamation-circle"></i> ${errorMsg}` : "";
+        const inputEl = document.getElementById(fieldId);
+        if (inputEl) inputEl.style.borderColor = errorMsg ? "#dc2626" : "#e2e8f0";
+    }
+
+    function validateFormData(excludeId = null) {
+        const name = document.getElementById("name").value;
+        const course = document.getElementById("course").value;
+        const mobile = document.getElementById("mobile").value;
+        const amount = document.getElementById("amount").value;
+        
+        const nameErr = validateName(name);
+        const courseErr = validateCourse(course);
+        const mobileErr = validateMobile(mobile, excludeId);
+        const amountErr = validateAmount(amount);
+        
+        showFieldError("name", nameErr);
+        showFieldError("course", courseErr);
+        showFieldError("mobile", mobileErr);
+        showFieldError("amount", amountErr);
+        
+        return !nameErr && !courseErr && !mobileErr && !amountErr;
+    }
+
+    function showToast(message, isError = false) {
+        let toast = document.createElement('div');
+        toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${message}`;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = isError ? '#b91c1c' : '#0f172a';
+        toast.style.color = '#fff';
+        toast.style.padding = '10px 22px';
+        toast.style.borderRadius = '40px';
+        toast.style.fontSize = '0.8rem';
+        toast.style.fontWeight = '600';
+        toast.style.zIndex = '1200';
+        toast.style.boxShadow = '0 8px 20px rgba(0,0,0,0.2)';
+        toast.style.textAlign = 'center';
+        toast.style.whiteSpace = 'nowrap';
+        toast.style.backdropFilter = 'blur(4px)';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 2400);
+    }
+
+    // ---------- RENDER & UI ----------
+    function updateStatsUI() {
+        const total = students.length;
+        const paid = students.filter(s => s.fee === "Paid").length;
+        const pending = total - paid;
+        const totalFeesSum = students.reduce((sum, s) => sum + (s.amount || 0), 0);
+        const totalSpan = document.getElementById("totalCount");
+        const paidSpan = document.getElementById("paidCount");
+        const pendingSpan = document.getElementById("pendingCount");
+        const amountSpan = document.getElementById("totalAmountSpan");
+        if (totalSpan) totalSpan.innerText = total;
+        if (paidSpan) paidSpan.innerText = paid;
+        if (pendingSpan) pendingSpan.innerText = pending;
+        if (amountSpan) amountSpan.innerText = totalFeesSum.toLocaleString('en-IN');
+    }
+
+    function getFilteredStudents() {
+        if (!searchQuery.trim()) return [...students];
+        const q = searchQuery.trim().toLowerCase();
+        return students.filter(s => 
+            s.name.toLowerCase().includes(q) ||
+            s.course.toLowerCase().includes(q) ||
+            s.mobile.includes(q) ||
+            s.amount.toString().includes(q)
+        );
+    }
+
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    }
+
+    function highlightText(text, query) {
+        if (!query.trim()) return escapeHtml(text);
+        const regex = new RegExp(`(${escapeRegex(query.trim())})`, 'gi');
+        return escapeHtml(text).replace(regex, `<mark>$1</mark>`);
+    }
+
+    function escapeRegex(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function formatAmount(amt) {
+        return `₹${amt.toLocaleString('en-IN')}`;
+    }
+
+    function renderStudentManager() {
+        const container = document.getElementById('studentPanel');
+        if (!container) return;
+        const filtered = getFilteredStudents();
+        const totalStudents = students.length;
+        const paidCount = students.filter(s => s.fee === "Paid").length;
+        const pendingCount = totalStudents - paidCount;
+        const totalFeesSum = students.reduce((sum, s) => sum + (s.amount || 0), 0);
+
+        let tableRows = '';
+        if (filtered.length === 0) {
+            tableRows = `<tr class="empty-row"><td colspan="7"><i class="fas fa-user-slash"></i> No matching students found ✨</td></tr>`;
+        } else {
+            filtered.forEach((student, idx) => {
+                const highlightedName = highlightText(student.name, searchQuery);
+                const highlightedCourse = highlightText(student.course, searchQuery);
+                tableRows += `
+                    <tr style="animation-delay: ${idx * 0.02}s">
+                        <td><strong><i class="fas fa-user-circle" style="color:#4f46e5;"></i> ${highlightedName}</strong></td>
+                        <td>${highlightedCourse}</td>
+                        <td>${escapeHtml(student.mobile)}</td>
+                        <td><strong>${formatAmount(student.amount)}</strong></td>
+                        <td><span class="badge ${student.fee === "Paid" ? "paid" : "pending"}">${student.fee === "Paid" ? "✓ Paid" : "⏳ Pending"}</span></td>
+                        <td><span class="status-active"><i class="fas fa-bolt"></i> Active</span></td>
+                        <td class="actions">
+                            <button class="edit-student" data-id="${student.id}"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="delete-student" data-id="${student.id}"><i class="fas fa-trash-alt"></i> Del</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        const html = `
+            <div class="container">
+                <div class="header">
+                    <div class="title-section">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h2>All Student Fee </h2>
+                    </div>
+                    <button class="add-btn" id="openAddStudentBtn"><i class="fas fa-plus-circle"></i> Add Student</button>
+                </div>
+                <div class="stats-container">
+                    <div class="stat-cards-row">
+                        <div class="stat-item"><i class="fas fa-users" style="color:#4f46e5;"></i> Total: <span class="stat-number" id="totalCount">${totalStudents}</span></div>
+                        <div class="stat-item"><i class="fas fa-check-circle" style="color:#16a34a;"></i> Paid: <span class="stat-number" id="paidCount">${paidCount}</span></div>
+                        <div class="stat-item"><i class="fas fa-clock" style="color:#eab308;"></i> Pending: <span class="stat-number" id="pendingCount">${pendingCount}</span></div>
+
+                    </div>
+                    <div class="search-wrapper">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchStudentInput" placeholder="Search name, course, mobile or amount..." value="${escapeHtml(searchQuery)}">
+                            ${searchQuery ? '<span class="clear-search" id="clearSearchBtn"><i class="fas fa-times-circle"></i></span>' : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>👤 Name</th><th>📘 Course</th><th>📱 Mobile</th><th>💰 Amount</th><th>💵 Status</th><th>⚡ Active</th><th>🛠️ Actions</th></tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        container.innerHTML = html;
+        updateStatsUI();
+
+        // Bind events
+        document.getElementById('searchStudentInput')?.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderStudentManager();
+        });
+        document.getElementById('clearSearchBtn')?.addEventListener('click', () => {
+            searchQuery = '';
+            renderStudentManager();
+        });
+        document.getElementById('openAddStudentBtn')?.addEventListener('click', () => openForm());
+        document.querySelectorAll('.edit-student').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = btn.getAttribute('data-id');
+                editStudentById(id);
+            });
+        });
+        document.querySelectorAll('.delete-student').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = btn.getAttribute('data-id');
+                deleteStudentById(id);
+            });
+        });
+    }
+
+    function openForm() {
+        editId = null;
+        document.getElementById("popup").style.display = "flex";
+        document.getElementById("name").value = "";
+        document.getElementById("course").value = "";
+        document.getElementById("mobile").value = "";
+        document.getElementById("amount").value = "5000";
+        document.getElementById("fee").value = "Paid";
+        clearModalErrors();
+    }
+
+    function closeForm() {
+        document.getElementById("popup").style.display = "none";
+        editId = null;
+        clearModalErrors();
+    }
+
+    function saveStudentHandler() {
+        const name = document.getElementById("name").value.trim();
+        const course = document.getElementById("course").value.trim();
+        const mobile = document.getElementById("mobile").value.trim();
+        const amountRaw = document.getElementById("amount").value;
+        const fee = document.getElementById("fee").value;
+        const amount = parseFloat(amountRaw);
+
+        const isValid = validateFormData(editId);
+        if (!isValid) {
+            showToast("❌ Please fix validation errors before saving.", true);
+            return;
+        }
+
+        if (editId === null) {
+            const newId = generateId();
+            students.push({ id: newId, name, course, mobile, amount, fee });
+            showToast(`✨ Student added with fee ${formatAmount(amount)}!`);
+        } else {
+            const index = students.findIndex(s => s.id === editId);
+            if (index !== -1) {
+                students[index] = { ...students[index], name, course, mobile, amount, fee };
+                showToast(`✏️ Student updated with fee ${formatAmount(amount)}.`);
+            } else {
+                showToast("Student not found", true);
+            }
+        }
+        closeForm();
+        renderStudentManager();
+    }
+
+    function editStudentById(id) {
+        const student = students.find(s => s.id === id);
+        if (!student) return;
+        editId = id;
+        document.getElementById("name").value = student.name;
+        document.getElementById("course").value = student.course;
+        document.getElementById("mobile").value = student.mobile;
+        document.getElementById("amount").value = student.amount;
+        document.getElementById("fee").value = student.fee;
+        clearModalErrors();
+        document.getElementById("popup").style.display = "flex";
+    }
+
+    function deleteStudentById(id) {
+        const student = students.find(s => s.id === id);
+        if (!student) return;
+        if (confirm(`🗑️ Delete "${student.name}" (${formatAmount(student.amount)}) permanently?`)) {
+            students = students.filter(s => s.id !== id);
+            renderStudentManager();
+            showToast("✔️ Student removed.");
+        }
+    }
+
+    // ---------- SIDEBAR NAVIGATION ----------
+    function initNav() {
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                const navVal = item.getAttribute('data-nav');
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                if (navVal === 'students') {
+                    renderStudentManager();
+                } else {
+                    const panelDiv = document.getElementById('studentPanel');
+                    if (panelDiv) {
+                        panelDiv.innerHTML = `
+                            <div class="container" style="text-align:center; padding:2rem;">
+                                <i class="fas fa-chalkboard-user" style="font-size:3rem; color:#4f46e5; margin-bottom:1rem;"></i>
+                                <h3 style="margin-bottom:0.5rem;">${navVal === 'courses' ? '📚 Course Management' : navVal === 'reports' ? '📊 Reports & Analytics' : navVal === 'fees' ? '💰 Advanced Fee Insights' : '⚙️ System Settings'}</h3>
+                                <p style="color:#475569;">This module is under active development.<br>But <strong>Student Manager with Fee Amount</strong> is fully functional.</p>
+                                <button class="add-btn" id="backToStudents" style="margin-top:1.5rem;"><i class="fas fa-arrow-left"></i> Go to Student Manager</button>
+                            </div>
+                        `;
+                        document.getElementById('backToStudents')?.addEventListener('click', () => {
+                            document.querySelector('.nav-item[data-nav="students"]').click();
+                        });
+                    }
+                }
+                if (window.innerWidth <= 768) {
+                    document.getElementById('sidebar')?.classList.remove('open');
+                    document.getElementById('sidebarOverlay')?.classList.remove('active');
+                }
+            });
+        });
+    }
+
+    // Mobile toggle
+    const menuToggle = document.getElementById('menuToggleBtn');
+    const sidebarEl = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            sidebarEl.classList.toggle('open');
+            overlay.classList.toggle('active');
+        });
+        overlay.addEventListener('click', () => {
+            sidebarEl.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+    }
+
+    document.getElementById('closeModalBtn')?.addEventListener('click', closeForm);
+    document.getElementById('saveStudentBtn')?.addEventListener('click', saveStudentHandler);
+    window.addEventListener('click', (e) => { if (e.target === document.getElementById('popup')) closeForm(); });
+
+    initNav();
+    renderStudentManager();
+</script>
+</body>
+</html>

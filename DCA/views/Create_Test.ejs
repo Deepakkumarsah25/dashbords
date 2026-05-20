@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>RID Tech | Exam Portal - MongoDB Ready</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/slidebar.css">
+    <link rel="stylesheet" href="/css/test.css">
+
+  
+    
+</head>
+<body>
+     <%- include('partials/sidebar') %>
+<div class="dashboard">
+   
+      
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="main-content">
+        <!-- IMPROVED TAB BAR - SMOOTH & VISUALLY APPEALING -->
+        <div class="top-tabs-bar">
+            <button class="tab-btn active" data-tab="create"><i class="fas fa-plus-circle"></i> Create Question</button>
+            <button class="tab-btn" data-tab="bank"><i class="fas fa-database"></i> All Questions</button>
+            <button class="tab-btn" data-tab="tests"><i class="fas fa-clipboard-list"></i> Manage Tests</button>
+        </div>
+        <div class="dashboard-container">
+            <!-- CREATE TAB -->
+            <div id="createTab" style="display:block;">
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-plus-circle"></i> ✨ Add New Question to Bank</div>
+                    <div class="card-body">
+                        <form id="addBankForm" method="POST" action="/api/questions">
+                            <div class="form-group">
+                                <label>Question Text</label>
+                                <textarea name="questionText" rows="3" required placeholder="Enter question..."></textarea>
+                            </div>
+                            <div class="options-row">
+                                <div class="opt-box"><input type="text" name="optA" placeholder="Option A" required></div>
+                                <div class="opt-box"><input type="text" name="optB" placeholder="Option B" required></div>
+                                <div class="opt-box"><input type="text" name="optC" placeholder="Option C" required></div>
+                                <div class="opt-box"><input type="text" name="optD" placeholder="Option D" required></div>
+                            </div>
+                            <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1rem;">
+                                <span><strong>✅ Correct:</strong></span>
+                                <select name="correctAnswer" style="width:auto;">
+                                    <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+                                </select>
+                                <span><strong>📚 Category:</strong></span>
+                                <select name="category" style="width:auto;">
+                                    <option>Computer Fundamentals</option><option>ADCA/DCA</option><option>CCC</option><option>Tally</option><option>O Level</option><option>Other</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success" style="width:100%;"><i class="fas fa-database"></i> Add to Bank (POST /api/questions)</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BANK TAB -->
+            <div id="bankTab" style="display:none;">
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-database"></i> All Questions <button id="resetBankBtn" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Reset Demo</button></div>
+                    <div class="card-body">
+                        <div class="search-box"><input type="text" id="bankSearch" placeholder="🔍 Search by category or question..."></div>
+                        <div id="bankListContainer" class="question-list"></div>
+                        <div class="bank-test-creator">
+                            <h4><i class="fas fa-file-alt"></i> 📋 Create Test from Selected Questions</h4>
+                            <form id="createTestFromBankForm" method="POST" action="/api/tests">
+                                <div class="form-group"><label>Test Title</label><input type="text" name="testTitle" placeholder="Exam title" required></div>
+                                <div class="form-group"><label>Time Limit (minutes)</label><input type="number" name="timeLimit" value="15" min="1" required></div>
+                                <div id="selectedQuestionsIds"></div>
+                                <button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-save"></i> Publish Test (POST /api/tests)</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TESTS TAB -->
+            <div id="testsTab" style="display:none;">
+                <div class="card">
+                    <div class="card-header">📋 All Tests (Manage, Share via Link)</div>
+                    <div class="card-body">
+                        <div class="search-box"><input type="text" id="testSearch" placeholder="🔍 Search test Title..."></div>
+                        <div id="testsCardsContainer" class="test-cards-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<button class="menu-toggle" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
+
+<!-- MODALS (unchanged but fully functional) -->
+<div id="submissionsModal" class="modal-overlay"><div class="modal-card"><div style="display:flex; justify-content:space-between;"><h3 id="submissionsModalTitle">Submissions</h3><button class="close-modal" data-close="submissionsModal" style="background:none; border:none; font-size:1.8rem;">&times;</button></div><div id="submissionsListContainer"></div></div></div>
+<div id="editTestModal" class="modal-overlay"><div class="modal-card"><h3>Edit Test</h3><button class="close-modal" data-close="editTestModal" style="float:right;">&times;</button><form id="editTestFormSubmit" method="POST" action="/api/tests/update"><input type="hidden" name="testId" id="editTestId"><div class="form-group"><label>Title</label><input type="text" name="title" id="editTestTitle" required></div><div class="form-group"><label>Time (min)</label><input type="number" name="timeLimit" id="editTestTime" required></div><div id="editQuestionsContainer"></div><button type="submit" class="btn btn-primary">Save Changes</button></form></div></div>
+<div id="editQuestionModal" class="modal-overlay"><div class="modal-card"><h3>Edit Question</h3><button class="close-modal" data-close="editQuestionModal" style="float:right;">&times;</button><form id="editQuestionForm" method="POST" action="/api/questions/update"><input type="hidden" name="questionId" id="editQuestionId"><div class="form-group"><label>Question</label><textarea name="questionText" id="editQuestionText" rows="2" required></textarea></div><div class="options-row"><input type="text" name="optA" id="editOptA" placeholder="Option A"><input type="text" name="optB" id="editOptB" placeholder="Option B"><input type="text" name="optC" id="editOptC" placeholder="Option C"><input type="text" name="optD" id="editOptD" placeholder="Option D"></div><div style="display:flex; gap:0.8rem;"><span>Correct:</span><select name="correctAnswer" id="editCorrectAnswer"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select><span>Category:</span><select name="category" id="editCategory"><option>Computer Fundamentals</option><option>ADCA/DCA</option><option>CCC</option><option>Tally</option><option>O Level</option><option>Other</option></select></div><button type="submit" class="btn btn-primary">Update Question</button></form></div></div>
+<div id="quizModal" class="modal-overlay"><div class="modal-card"><h3 id="modalTitle">Take Exam</h3><button class="close-modal" data-close="quizModal" style="float:right;">&times;</button><form id="studentQuizForm" method="POST" action="/api/submit-test"><input type="hidden" name="testId" id="quizTestId"><div class="form-group"><input type="text" name="studentName" id="studentName" placeholder="Your full name" required></div><div id="quizQuestionsContainer"></div><div id="quizTimer" class="timer-display"></div><button type="submit" class="btn btn-primary">Submit Test</button><div id="quizResult"></div></form></div></div>
+<div id="toastMsg" class="toast"></div>
+<!-- SUCCESS MODAL -->
+<div id="successModal" class="modal-overlay">
+
+    <div class="modal-card" style="
+        max-width:500px;
+        text-align:center;
+        padding:40px;
+    ">
+
+        <div style="
+            width:90px;
+            height:90px;
+            background:linear-gradient(135deg,#10b981,#059669);
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin:0 auto 25px;
+            color:white;
+            font-size:42px;
+            box-shadow:0 10px 25px rgba(16,185,129,0.3);
+        ">
+            <i class="fas fa-check"></i>
+        </div>
+
+        <h2 style="
+            font-size:2rem;
+            margin-bottom:12px;
+            color:#065f46;
+            font-weight:800;
+        ">
+            Test Submitted
+        </h2>
+
+        <p style="
+            color:#64748b;
+            font-size:1rem;
+            line-height:1.7;
+            margin-bottom:28px;
+        ">
+            Thank you for attending the exam professionally.
+            <br>
+            Your responses have been submitted successfully.
+        </p>
+
+        <button id="closeSuccessBtn" class="btn btn-success" style="
+            padding:12px 30px;
+            font-size:0.95rem;
+        ">
+            Done
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+      // Full Local Storage & Tab Switching Logic with improved smooth behavior
+    let allTests = [], questionBank = [], studentSubmissions = [];
+
+ function saveLocal() {
+    localStorage.setItem("questionBank", JSON.stringify(questionBank));
+}
+
+function loadLocal() {
+    questionBank = JSON.parse(localStorage.getItem("questionBank")) || [];
+}
+    // ✅ MongoDB से Tests लाने का function
+async function loadTests() {
+    try {
+        const res = await fetch('/api/tests');
+        allTests = await res.json();
+
+        renderAllTestCards();
+
+        checkURL();
+
+    } catch (err) {
+        console.error(err);
+        showToast("Failed to load tests");
+    }
+}
+
+    function showToast(msg) { const t = document.getElementById('toastMsg'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2300); }
+    function escapeHtml(str) { return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' })[m]); }
+    
+    function renderBankList() {
+        const container = document.getElementById('bankListContainer');
+        let search = (document.getElementById('bankSearch')?.value || '').toLowerCase();
+        let filtered = questionBank.filter(q => q.category.toLowerCase().includes(search) || q.text.toLowerCase().includes(search));
+        if (!filtered.length) { container.innerHTML = '<div class="card-body">📭 No questions. Add some!</div>'; return; }
+        let html = '';
+        filtered.forEach((q, idx) => {
+            html += `<div class="question-preview"><div style="display:flex; gap:12px;"><input type="checkbox" class="select-q-checkbox" value="${q.id}"><div style="flex:1;"><strong>${idx+1}. ${escapeHtml(q.text)}</strong><div style="font-size:0.8rem;">${escapeHtml(q.options.join(' | '))}</div><span class="category-tag">${escapeHtml(q.category)}</span><div style="margin-top:8px;"><button class="edit-bank-q btn btn-primary btn-sm" data-id="${q.id}"><i class="fas fa-edit"></i> Edit</button> <button class="delete-bank-q btn btn-danger btn-sm" data-id="${q.id}"><i class="fas fa-trash"></i> Del</button></div></div></div></div>`;
+        });
+        container.innerHTML = html;
+        document.querySelectorAll('.edit-bank-q').forEach(btn => btn.addEventListener('click', () => { let q = questionBank.find(x => x.id == parseInt(btn.dataset.id)); if(q) openEditQuestionModal(q); }));
+        document.querySelectorAll('.delete-bank-q').forEach(btn => btn.addEventListener('click', () => { if(confirm("Delete question?")) { let qid = parseInt(btn.dataset.id); questionBank = questionBank.filter(x => x.id !== qid); saveLocal(); renderBankList(); renderAllTestCards(); showToast("Deleted"); } }));
+    }
+    
+    function openEditQuestionModal(q) {
+        document.getElementById('editQuestionId').value = q.id;
+        document.getElementById('editQuestionText').value = q.text;
+        document.getElementById('editOptA').value = q.options[0];
+        document.getElementById('editOptB').value = q.options[1];
+        document.getElementById('editOptC').value = q.options[2];
+        document.getElementById('editOptD').value = q.options[3];
+        document.getElementById('editCorrectAnswer').value = ['A','B','C','D'][q.correctIndex];
+        document.getElementById('editCategory').value = q.category;
+        document.getElementById('editQuestionModal').style.display = 'flex';
+    }
+    
+    /////////////////////////////////////////////////////////////////////// render all tests as cards in the Manage Tests tab
+function renderAllTestCards() {
+    const container = document.getElementById('testsCardsContainer');
+
+    if (!allTests || allTests.length === 0) {
+        container.innerHTML = '<div style="padding:20px">No tests created</div>';
+        return;
+    }
+
+    let html = '';
+
+    allTests.forEach(test => {
+     const shareUrl = `${window.location.origin}${window.location.pathname}?student_test=${test._id}`;
+
+        html += `
+        <div class="test-card">
+            <div style="display:flex; justify-content:space-between;">
+                <h4>${escapeHtml(test.testTitle)}</h4>
+                <span class="category-tag">${test.attempts || 0} attempts</span>
+            </div>
+
+            <div style="margin:10px 0;">
+                <span class="category-tag">⏰ ${test.timeLimit} min</span>
+                <span class="category-tag">❓ ${test.questions.length} Qs</span>
+            </div>
+
+            <div class="share-link-container">
+                <input type="text" readonly value="${shareUrl}">
+                
+                <button class="copy-btn" data-url="${shareUrl}">Copy</button>
+
+                <button class="edit-btn" data-id="${test._id}">
+                    Edit
+                </button>
+
+                <button class="view-btn" data-id="${test._id}">
+                    Subm
+                </button>
+
+                <button class="delete-test-btn" data-id="${test._id}">
+                    Delete
+                </button>
+            </div>
+        </div>`;
+    });
+
+    container.innerHTML = html;
+
+    attachTestCardEvents();
+    function attachTestCardEvents() {
+
+    // COPY
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.onclick = () => {
+            navigator.clipboard.writeText(btn.dataset.url);
+            showToast("✅ Student Link Copied");
+        };
+    });
+
+    // EDIT
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.onclick = () => {
+            const test = allTests.find(t => t._id === btn.dataset.id);
+            if(test) openEditTestModal(test);
+        };
+    });
+
+    // SUBMISSIONS
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.onclick = async () => {
+            const testId = btn.dataset.id;
+
+            const res = await fetch(`/api/submissions/${testId}`);
+            const submissions = await res.json();
+
+            let html = submissions.length
+                ? submissions.map(s => `
+                    <div style="padding:10px;border-bottom:1px solid #eee;">
+                        <strong>${s.studentName}</strong>
+                        <p>Score: ${s.score}</p>
+                    </div>
+                `).join('')
+                : '<p>No submissions yet</p>';
+
+            document.getElementById('submissionsListContainer').innerHTML = html;
+            document.getElementById('submissionsModal').style.display = 'flex';
+        };
+    });
+
+    // DELETE
+    document.querySelectorAll('.delete-test-btn').forEach(btn => {
+        btn.onclick = async () => {
+            if(confirm("Delete this test?")) {
+                await fetch(`/api/tests/${btn.dataset.id}`, {
+                    method: 'DELETE'
+                });
+
+                showToast("Deleted");
+                loadTests();
+            }
+        };
+    });
+}
+}
+
+    //////////////////////////////////////////////////////////////////////////////render
+    function openEditTestModal(test) {
+      document.getElementById('editTestId').value = test._id;
+document.getElementById('editTestTitle').value = test.testTitle;
+        document.getElementById('editTestTime').value = test.timeLimit;
+        let qhtml = '';
+        test.questions.forEach((q, idx) => {
+            qhtml += `<div class="edit-question-block" style="border:1px solid #e2e8f0; border-radius:1rem; padding:1rem; margin-bottom:1rem;"><label>Q${idx+1} Text</label><input type="text" name="questions[${idx}][text]" value="${escapeHtml(q.text)}" class="form-control"><div class="options-row" style="grid-template-columns:repeat(2,1fr);">${q.options.map((opt, oi) => `<input type="text" placeholder="Option ${String.fromCharCode(65+oi)}" value="${escapeHtml(opt)}">`).join('')}</div><div><select name="questions[${idx}][correctIndex]">${q.options.map((_, ci) => `<option value="${ci}" ${q.correctIndex===ci ? 'selected':''}>${String.fromCharCode(65+ci)}</option>`).join('')}</select><input type="text" placeholder="Category" value="${q.category}"><button type="button" class="remove-edit-q btn btn-danger btn-sm">Remove</button></div></div>`;
+        });
+        document.getElementById('editQuestionsContainer').innerHTML = qhtml;
+        document.querySelectorAll('.remove-edit-q').forEach(rm => rm.onclick = e => e.target.closest('.edit-question-block')?.remove());
+        document.getElementById('editTestModal').style.display = 'flex';
+    }
+    
+    // Form handlers
+    document.getElementById('addBankForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const newId = Date.now();
+        const correctMap = { A:0, B:1, C:2, D:3 };
+const newQ = {
+    id: newId,
+    text: fd.get('questionText'),
+    options: [
+        fd.get('optA'),
+        fd.get('optB'),
+        fd.get('optC'),
+        fd.get('optD')
+    ],
+    correctIndex: correctMap[fd.get('correctAnswer')],
+    category: fd.get('category')
+};
+        questionBank.push(newQ);
+        saveLocal();
+        renderBankList();
+        e.target.reset();
+        showToast("✅ Question saved locally | Ready for MongoDB POST");
+    });
+    
+document.getElementById('createTestFromBankForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    let selected = Array.from(document.querySelectorAll('#bankListContainer .select-q-checkbox:checked'))
+     .map(cb => cb.value);
+
+    let title = document.querySelector('[name="testTitle"]').value.trim();
+    let time = parseInt(document.querySelector('[name="timeLimit"]').value);
+
+    if (!title) return showToast("Enter title");
+    if (selected.length === 0) return showToast("Select questions");
+
+    let selectedQs = questionBank.filter(q => selected.includes(String(q.id)));
+
+        // 👇 DEBUG यहाँ लगाओ
+    console.log("Selected:", selected);
+    console.log("SelectedQs:", selectedQs);
+
+    try {
+        const res = await fetch('http://localhost:3000/api/tests', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+    testTitle: title,
+    timeLimit: time,
+    questions: selectedQs   
+})
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message);
+
+        showToast("✅ Test Published");
+
+        await loadTests();   // 👈 VERY IMPORTANT
+        switchTab('tests');  // 👈 अब ये काम करेगा
+
+    } catch (err) {
+        console.error(err);
+        showToast("❌ Error saving test");
+    }
+});
+    /////////////////////////////////////////////////
+    document.getElementById('editQuestionForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const qid = parseInt(document.getElementById('editQuestionId').value);
+        const updated = { text: document.getElementById('editQuestionText').value, optA: document.getElementById('editOptA').value, optB: document.getElementById('editOptB').value, optC: document.getElementById('editOptC').value, optD: document.getElementById('editOptD').value, correctAnswer: document.getElementById('editCorrectAnswer').value, category: document.getElementById('editCategory').value };
+        const idx = questionBank.findIndex(q => q.id === qid);
+        if(idx !== -1) { questionBank[idx] = { id: qid, text: updated.text, options: [updated.optA, updated.optB, updated.optC, updated.optD], correctIndex: { A:0,B:1,C:2,D:3 }[updated.correctAnswer], category: updated.category }; saveLocal(); renderBankList(); }
+        document.getElementById('editQuestionModal').style.display = 'none';
+        showToast("Question updated");
+    });
+    
+    document.getElementById('editTestFormSubmit').addEventListener('submit', (e) => {
+        e.preventDefault();
+       const testId = document.getElementById('editTestId').value;
+        const newTitle = document.getElementById('editTestTitle').value.trim();
+        const newTime = parseInt(document.getElementById('editTestTime').value);
+        let newQs = [];
+        document.querySelectorAll('#editQuestionsContainer .edit-question-block').forEach(block => {
+            let text = block.querySelector('input[type="text"]')?.value;
+            let opts = Array.from(block.querySelectorAll('.options-row input')).map(i => i.value);
+            let correctIdx = parseInt(block.querySelector('select')?.value || 0);
+            let cat = block.querySelectorAll('input[type="text"]')[4]?.value || 'General';
+            if(text && opts.length === 4) newQs.push({ text, options: opts, correctIndex: correctIdx, category: cat });
+        });
+ document.getElementById('editTestFormSubmit').addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+    const testId = document.getElementById('editTestId').value;
+
+    const newTitle = document.getElementById('editTestTitle').value.trim();
+
+    const newTime = parseInt(document.getElementById('editTestTime').value);
+
+    let newQs = [];
+
+    document.querySelectorAll('#editQuestionsContainer .edit-question-block')
+    .forEach(block => {
+
+        let text = block.querySelector('input[type="text"]')?.value;
+
+        let opts = Array.from(
+            block.querySelectorAll('.options-row input')
+        ).map(i => i.value);
+
+        let correctIdx = parseInt(
+            block.querySelector('select')?.value || 0
+        );
+
+        let cat =
+            block.querySelectorAll('input[type="text"]')[5]?.value ||
+            'General';
+
+        if(text && opts.length === 4) {
+
+            newQs.push({
+                text,
+                options: opts,
+                correctIndex: correctIdx,
+                category: cat
+            });
+
+        }
+
+    });
+
+    try {
+
+        const res = await fetch(
+            `http://localhost:3000/api/tests/${testId}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    testTitle: newTitle,
+                    timeLimit: newTime,
+                    questions: newQs
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        if(!res.ok) {
+            throw new Error(data.message);
+        }
+
+        showToast("✅ Test Updated");
+
+        document.getElementById('editTestModal').style.display = 'none';
+
+        await loadTests();
+
+    } catch(err) {
+
+        console.error(err);
+
+        showToast("❌ Update Failed");
+
+    }
+
+});
+//         document.querySelectorAll('.edit-btn').forEach((btn, index) => {
+//     btn.addEventListener('click', () => {
+//         openEditTestModal(allTests[index]);
+//     });
+// });
+        //////////////////////////////////////////////////////
+        document.getElementById('editTestModal').style.display = 'none';
+        showToast("Test updated");
+    });
+    
+    // Student Quiz Handler
+    let currentStudentTest = null, studentAnswers = [], studentTimer = null;
+    window.openStudentTestModal = function(test) {
+        if(studentTimer) clearInterval(studentTimer);
+        currentStudentTest = test;
+        studentAnswers = new Array(test.questions.length).fill(null);
+document.getElementById('modalTitle').innerHTML = `<i class="fas fa-graduation-cap"></i> ${escapeHtml(test.testTitle)}`;
+    document.getElementById('quizTestId').value = test._id;
+        let qhtml = '';
+        test.questions.forEach((q, idx) => {
+            qhtml += `<div><strong>Q${idx+1}. ${escapeHtml(q.text)}</strong>`;
+            q.options.forEach((opt, optIdx) => { qhtml += `<div class="quiz-option" data-qidx="${idx}" data-optidx="${optIdx}"><span>${String.fromCharCode(65+optIdx)}.</span> ${escapeHtml(opt)}</div>`; });
+            qhtml += `</div>`;
+        });
+        document.getElementById('quizQuestionsContainer').innerHTML = qhtml;
+        document.querySelectorAll('.quiz-option').forEach(el => el.addEventListener('click', function () { let qidx = parseInt(this.dataset.qidx), optidx = parseInt(this.dataset.optidx); studentAnswers[qidx] = optidx; document.querySelectorAll(`.quiz-option[data-qidx="${qidx}"]`).forEach(o => o.classList.remove('selected')); this.classList.add('selected'); }));
+        let timeLeft = test.timeLimit * 60;
+        const timerDiv = document.getElementById('quizTimer');
+        const updateTimer = () => { let mins = Math.floor(timeLeft/60), secs = timeLeft%60; timerDiv.innerHTML = `⏰ Time Left: ${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`; if (timeLeft <= 0) { clearInterval(studentTimer); document.querySelector('#studentQuizForm button[type="submit"]').click(); } timeLeft--; };
+        updateTimer(); studentTimer = setInterval(updateTimer, 1000);
+        document.getElementById('quizModal').style.display = 'flex';
+        document.getElementById('quizResult').innerHTML = '';
+    };
+ document.getElementById('studentQuizForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if(studentTimer) clearInterval(studentTimer);
+
+    const studentName = document.getElementById('studentName').value.trim();
+    if(!studentName) return showToast("Enter student name");
+
+    let score = 0;
+
+    currentStudentTest.questions.forEach((q, idx) => {
+        if(studentAnswers[idx] === q.correctIndex) score++;
+    });
+
+    try {
+        const res = await fetch('http://localhost:3000/api/submissions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                testId: currentStudentTest._id,
+                studentName,
+                score
+            })
+        });
+
+        const data = await res.json();
+
+        if(!res.ok) throw new Error(data.message);
+
+        showToast("✅ Test Submitted");
+        // ✅ Mark as submitted
+localStorage.setItem(
+    `submitted_${currentStudentTest._id}`,
+    'true'
+);
+
+        loadTests();
+        // Close quiz modal
+document.getElementById('quizModal').style.display = 'none';
+
+// Reset form
+document.getElementById('studentQuizForm').reset();
+
+// Clear answers
+studentAnswers = [];
+
+// Clear timer
+if(studentTimer) clearInterval(studentTimer);
+
+// Open beautiful success modal
+document.getElementById('successModal').style.display = 'flex';
+
+    // Modal close
+document.getElementById('quizModal').style.display = 'none';
+
+// Form reset
+document.getElementById('studentQuizForm').reset();
+
+// Answers reset
+studentAnswers = [];
+
+// Timer clear
+if(studentTimer) clearInterval(studentTimer);
+
+
+
+    } catch(err) {
+        console.error(err);
+        showToast("❌ Submit Failed");
+    }
+});
+    // IMPROVED SWITCH TAB FUNCTION - Smooth and reliable
+    function switchTab(tab) {
+        // Update display of tab containers
+        document.getElementById('createTab').style.display = tab === 'create' ? 'block' : 'none';
+        document.getElementById('bankTab').style.display = tab === 'bank' ? 'block' : 'none';
+        document.getElementById('testsTab').style.display = tab === 'tests' ? 'block' : 'none';
+        
+        // Update active classes on top tabs and sidebar nav items
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        
+        const activeTabBtn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+        const activeNavItem = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+        if (activeTabBtn) activeTabBtn.classList.add('active');
+        if (activeNavItem) activeNavItem.classList.add('active');
+        
+        // Refresh data if needed
+        if (tab === 'bank') renderBankList();
+        if (tab === 'tests') renderAllTestCards();
+        
+        // Small haptic feedback
+        showToast(`Switched to ${tab === 'create' ? 'Create' : tab === 'bank' ? 'Bank' : 'Tests'} view`);
+    }
+    
+    // Event Listeners for tabs
+    document.querySelectorAll('.tab-btn, .nav-item[data-tab]').forEach(el => {
+        el.addEventListener('click', (e) => {
+            e.preventDefault();
+            const tab = el.getAttribute('data-tab');
+            if (tab) switchTab(tab);
+        });
+    });
+    
+  
+loadLocal();
+renderBankList();
+loadTests();// 👈 MongoDB से data लाएगा
+
+    document.getElementById('bankSearch')?.addEventListener('input', () => renderBankList());
+    document.getElementById('testSearch')?.addEventListener('input', () => renderAllTestCards());
+    document.getElementById('resetBankBtn')?.addEventListener('click', () => { if(confirm("Reset local bank?")) { questionBank = []; saveLocal(); renderBankList(); showToast("Local bank cleared"); } });
+    document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', () => { btn.closest('.modal-overlay').style.display = 'none'; if(studentTimer) clearInterval(studentTimer); }));
+    
+    const menuToggle = document.getElementById('mobileMenuToggle'), sidebar = document.getElementById('sidebar'), overlay = document.getElementById('sidebarOverlay');
+    menuToggle.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('active'); });
+    overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('active'); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 768) { sidebar.classList.remove('open'); overlay.classList.remove('active'); } });
+function checkURL() {
+
+    console.log("CHECK URL RUNNING");
+
+    const params = new URLSearchParams(window.location.search);
+
+    const tid = params.get('student_test');
+
+    console.log("TID:", tid);
+
+    if (!tid) return;
+
+    console.log("ALL TESTS:", allTests);
+
+    const test = allTests.find(t => String(t._id) === String(tid));
+
+    console.log("FOUND TEST:", test);
+    // ✅ Already submitted check
+const alreadySubmitted = localStorage.getItem(`submitted_${tid}`);
+
+if (alreadySubmitted) {
+
+    const sidebar = document.querySelector('.sidebar');
+    const topbar = document.querySelector('.top-tabs-bar');
+    const dashboard = document.querySelector('.dashboard-container');
+    const mainContent = document.querySelector('.main-content');
+
+    if (sidebar) sidebar.style.display = 'none';
+    if (topbar) topbar.style.display = 'none';
+    if (dashboard) {
+        dashboard.style.display = 'block';
+
+        dashboard.innerHTML = `
+            <div style="
+                min-height:100vh;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                padding:20px;
+            ">
+                <div style="
+                    background:white;
+                    padding:40px;
+                    border-radius:25px;
+                    text-align:center;
+                    max-width:500px;
+                    width:100%;
+                    box-shadow:0 15px 40px rgba(0,0,0,0.12);
+                ">
+                    <div style="
+                        width:90px;
+                        height:90px;
+                        margin:auto;
+                        border-radius:50%;
+                        background:linear-gradient(135deg,#10b981,#059669);
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        color:white;
+                        font-size:40px;
+                        margin-bottom:25px;
+                    ">
+                        ✓
+                    </div>
+
+                    <h2 style="
+                        color:#065f46;
+                        margin-bottom:15px;
+                        font-size:2rem;
+                    ">
+                        Test Already Submitted
+                    </h2>
+
+                    <p style="
+                        color:#64748b;
+                        line-height:1.7;
+                    ">
+                        You have already submitted this exam successfully.
+                        <br><br>
+                        Multiple attempts are not allowed.
+                    </p>
+                </div>
+            </div>
+        `;
+    }
+
+    if (mainContent) {
+        mainContent.style.marginLeft = '0';
+        mainContent.style.width = '100%';
+    }
+
+    return;
+}
+
+    if (test) {
+
+        // SAFE CHECKS
+        const sidebar = document.querySelector('.sidebar');
+        const topbar = document.querySelector('.top-tabs-bar');
+        const dashboard = document.querySelector('.dashboard-container');
+        const mainContent = document.querySelector('.main-content');
+
+        if (sidebar) sidebar.style.display = 'none';
+        if (topbar) topbar.style.display = 'none';
+        if (dashboard) dashboard.style.display = 'none';
+
+        if (mainContent) {
+            mainContent.style.marginLeft = '0';
+            mainContent.style.width = '100%';
+        }
+
+        // OPEN TEST
+        openStudentTestModal(test);
+    }
+}
+document.getElementById('closeSuccessBtn')
+.addEventListener('click', () => {
+
+    document.getElementById('successModal').style.display = 'none';
+
+    // OPTIONAL REDIRECT
+    // window.location.href = "/";
+
+});
+</script>
+</body>
+</html>

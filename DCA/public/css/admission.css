@@ -1,0 +1,387 @@
+  
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f0f2f8;
+      font-family: 'Inter', sans-serif;
+      padding: 2rem 1.5rem;
+      color: #1a2634;
+    }
+
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* header section */
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .title-area h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-area h1 i {
+      background: none;
+      color: #2a5298;
+      font-size: 1.8rem;
+    }
+
+    .title-area p {
+      color: #5b6e8c;
+      font-size: 0.9rem;
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    .add-student-btn {
+      background: #1e3c72;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .add-student-btn i {
+      font-size: 1rem;
+    }
+
+    .add-student-btn:hover {
+      background: #0f2b4f;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+    }
+
+    /* stats cards row (optional modern touch) */
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 28px;
+      padding: 1rem 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02), 0 5px 12px rgba(0,0,0,0.03);
+      flex: 1;
+      min-width: 150px;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      background: #eef2ff;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1e3c72;
+      font-size: 1.5rem;
+    }
+
+    .stat-info h3 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1f2b3b;
+    }
+
+    .stat-info p {
+      color: #5f7d9c;
+      font-weight: 500;
+      font-size: 0.8rem;
+    }
+
+    /* table wrapper - responsive */
+    .table-wrapper {
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+      overflow-x: auto;
+      padding: 0px;
+      border: 1px solid #eef2f6;
+    }
+
+    .admission-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 780px;
+    }
+
+    .admission-table th {
+      text-align: left;
+      padding: 1.2rem 1rem;
+      background-color: #f9fafc;
+      font-weight: 600;
+      color: #2c3e58;
+      border-bottom: 1.5px solid #e6edf4;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+    }
+
+    .admission-table td {
+      padding: 1rem 1rem;
+      border-bottom: 1px solid #ecf3f9;
+      vertical-align: middle;
+      color: #1e2f3e;
+      font-weight: 500;
+    }
+
+    .admission-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .admission-table tr:hover td {
+      background-color: #fafcff;
+    }
+
+    /* status badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #eef2ff;
+      padding: 0.3rem 0.9rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    .status-enquired {
+      background: #fff0db;
+      color: #b45f06;
+    }
+    .status-enquired i {
+      color: #e67e22;
+    }
+    .status-enrolled {
+      background: #e0f2e9;
+      color: #1e6f3f;
+    }
+    .status-enrolled i {
+      color: #2e7d32;
+    }
+
+    /* action buttons */
+    .action-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn-approve {
+      background: none;
+      border: 1px solid #cbdde9;
+      background-color: #fefefe;
+      padding: 6px 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #1f6392;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-approve i {
+      font-size: 0.7rem;
+    }
+
+    .btn-approve:hover {
+      background-color: #e9f3fa;
+      border-color: #8bb3d0;
+      transform: scale(0.97);
+    }
+
+    .btn-delete {
+      background: none;
+      border: 1px solid #ffe0e0;
+      background-color: #fff8f8;
+      padding: 6px 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #bc544b;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-delete i {
+      font-size: 0.7rem;
+    }
+
+    .btn-delete:hover {
+      background-color: #ffe6e5;
+      border-color: #f3b3ae;
+    }
+
+    /* modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: all 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .modal-card {
+      background: white;
+      max-width: 500px;
+      width: 90%;
+      border-radius: 32px;
+      padding: 1.8rem 2rem;
+      box-shadow: 0 25px 40px rgba(0,0,0,0.2);
+      transform: translateY(10px);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-card h3 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .modal-card p {
+      color: #6c7f9e;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+      color: #2c3e66;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border-radius: 18px;
+      border: 1px solid #cddfea;
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      transition: 0.2s;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #2a5298;
+      box-shadow: 0 0 0 3px rgba(42,82,152,0.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 1.8rem;
+    }
+
+    .modal-cancel {
+      background: #f0f2f5;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal-submit {
+      background: #1e3c72;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 40px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .empty-row td {
+      text-align: center;
+      padding: 2.5rem;
+      color: #8aa0bc;
+      font-style: italic;
+    }
+
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #8ba0bc;
+    }
+
+    @media (max-width: 680px) {
+      body {
+        padding: 1rem;
+      }
+      .stat-card {
+        padding: 0.7rem 1rem;
+      }
+      .stat-info h3 {
+        font-size: 1.3rem;
+      }
+    }
+  

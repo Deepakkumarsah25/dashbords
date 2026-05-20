@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>RID Tech | Neo Dashboard</title>
+    <!-- Google Fonts + Font Awesome 6 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/slidebar.css">
+
+</head>
+<body>
+<div class="dashboard">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Modern Sidebar - fresh dark slate + cyan/purple glow -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-area">
+            <h2>RID Tech</h2>
+            <p>next‑gen learning hub</p>
+        </div>
+        <div class="nav-menu">
+            <a href="/" class="nav-item active"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
+            <a href="/students" class="nav-item"><i class="fas fa-users"></i><span>Students</span></a>
+            <a href="/courses" class="nav-item"><i class="fas fa-book-open"></i><span>Courses</span></a>
+            <a href="/certificates" class="nav-item"><i class="fas fa-certificate"></i><span>Apply for Certificates</span></a>
+            <a href="/test" class="nav-item"><i class="fas fa-plus-circle"></i><span>Create Test</span></a>
+            <a href="/collection" class="nav-item"><i class="fas fa-database"></i><span>Test Collection</span></a>
+            <a href="/Create_ID" class="nav-item"><i class="fas fa-id-card"></i><span>Create ID card</span></a>
+            <a href="/registrations" class="nav-item"><i class="fas fa-file-alt"></i><span>Apply for Franchises</span></a>
+            <a href="/fees" class="nav-item"><i class="fas fa-rupee-sign"></i><span>Fee Management</span></a>
+            <a href="/Attendence" class="nav-item"><i class="fas fa-calendar-check"></i><span>Attendance</span></a>
+            <a href="/results" class="nav-item"><i class="fas fa-chart-bar"></i><span>Result</span></a>
+            <a href="/settings" class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
+        </div>
+    </aside>
+
+<script>
+    (function() {
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        function openSidebar() { sidebar?.classList.add("open"); overlay?.classList.add("active"); document.body.style.overflow = "hidden"; }
+        function closeSidebar() { sidebar?.classList.remove("open"); overlay?.classList.remove("active"); document.body.style.overflow = ""; }
+        function toggleSidebar() { sidebar?.classList.contains("open") ? closeSidebar() : openSidebar(); }
+        function handleResize() { if (window.innerWidth > 768) { sidebar?.classList.remove("open"); overlay?.classList.remove("active"); document.body.style.overflow = ""; } }
+        menuToggle?.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
+        overlay?.addEventListener('click', closeSidebar);
+        document.querySelectorAll('.nav-item').forEach(link => {
+            link.addEventListener('click', () => { if (window.innerWidth <= 768) closeSidebar(); });
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === "Escape") closeSidebar(); });
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('load', handleResize);
+        handleResize();
+
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-item').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === currentPath || (currentPath === '/' && href === '/')) link.classList.add('active');
+            else link.classList.remove('active');
+        });
+        if (currentPath === '/' || currentPath === '') document.querySelector('.nav-item[href="/"]')?.classList.add('active');
+    })();
+</script>
+</body>
+</html>

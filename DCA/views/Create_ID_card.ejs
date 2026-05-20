@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>RID Tech | ID Card Studio — Complete Responsive Sidebar</title>
+    <!-- Google Fonts + Font Awesome 6 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- QR + html-to-image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(ellipse at 20% 30%, #eef2ff, #e0e7ff);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeSlideRight {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes softGlow {
+            0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(6, 182, 212, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+        }
+
+        /* ========= COMPLETE SIDEBAR STYLES - FULLY RESPONSIVE ========= */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(15, 23, 42, 0.92) 100%);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(6, 182, 212, 0.3);
+            color: #f1f5f9;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            z-index: 1000;
+            box-shadow: 8px 0 32px rgba(0, 0, 0, 0.3);
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            border-radius: 10px;
+        }
+
+        /* Logo Area */
+        .logo-area {
+            text-align: center;
+            padding: 2rem 1rem 1.5rem;
+            border-bottom: 1px solid rgba(6, 182, 212, 0.3);
+            margin-bottom: 1.8rem;
+            animation: fadeSlideUp 0.6s ease;
+        }
+        .logo-area h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #67e8f9, #c084fc);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .logo-area p {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 6px;
+            color: #cbd5e1;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0 1rem 2rem;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            color: #cbd5e6;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-item i {
+            width: 24px;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            transform: scaleY(0);
+            transition: transform 0.2s;
+            border-radius: 0 4px 4px 0;
+        }
+        .nav-item:hover::before {
+            transform: scaleY(1);
+        }
+        .nav-item:hover {
+            background: rgba(6, 182, 212, 0.15);
+            color: white;
+            transform: translateX(6px);
+        }
+        .nav-item:hover i {
+            transform: scale(1.1);
+            color: #67e8f9;
+        }
+        .nav-item.active {
+            background: linear-gradient(95deg, rgba(6, 182, 212, 0.2), rgba(139, 92, 246, 0.2));
+            color: white;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            animation: softGlow 2s infinite;
+        }
+        .nav-item.active i {
+            color: #67e8f9;
+        }
+        .nav-item.active::before {
+            transform: scaleY(1);
+        }
+
+        /* Sidebar Footer / User Info */
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            border-top: 1px solid rgba(6, 182, 212, 0.2);
+            font-size: 0.7rem;
+            text-align: center;
+            color: #94a3b8;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Main layout */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 1.5rem 2rem;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .id-card-wrapper {
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Mobile Toggle Button */
+        .menu-toggle {
+            display: none;
+            background: linear-gradient(115deg, #06b6d4, #8b5cf6);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            gap: 12px;
+            cursor: pointer;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 6px 14px rgba(6, 182, 212, 0.4);
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .menu-toggle:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.5);
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* RESPONSIVE BREAKPOINTS */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            .menu-toggle {
+                display: flex;
+            }
+        }
+        @media (min-width: 769px) {
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+
+        /* ========= ID CARD MAKER STYLES ========= */
+        :root {
+            --accent: #2DD4BF;
+            --accent-deep: #0F766E;
+            --card-bg: #F8FAFE;
+            --text-dark: #0F172A;
+            --border-dim: rgba(45,212,191,0.3);
+        }
+        .topbar-mini {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 12px 20px;
+            margin-bottom: 24px;
+            text-align: center;
+            border: 1px solid rgba(45,212,191,0.4);
+        }
+        .topbar-mini .hex-logo {
+            width: 48px; height: 48px;
+            border-radius: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0F2C3B, #08212E);
+            box-shadow: 0 0 0 2px var(--accent);
+            margin-right: 8px;
+        }
+        .topbar-mini h1 {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #0A192F, #0F766E, #2DD4BF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            max-width: 380px;
+            margin: 16px auto 0;
+            border: 1px solid var(--border-dim);
+            border-radius: 60px;
+            overflow: hidden;
+            background: rgba(10,25,47,0.5);
+        }
+        .tabBtn {
+            flex: 1;
+            padding: 8px 0;
+            background: transparent;
+            border: none;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #1e293b;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .tabBtn.on {
+            background: linear-gradient(95deg,#1C5B57,#2DD4BF);
+            color: #0A192F;
+        }
+        .pane { display: none; animation: fadeSlideUp 0.3s ease; }
+        .pane.on { display: block; }
+
+        .formGrid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        @media(max-width: 780px){
+            .formGrid { grid-template-columns: 1fr; gap: 16px; }
+        }
+        .col2 { grid-column: 1 / -1; }
+        .fgLabel {
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--accent-deep);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .fgInput {
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            border: 1.5px solid var(--border-dim);
+            border-radius: 16px;
+            padding: 12px 16px;
+            color: #0f172a;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .fgInput:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px rgba(45,212,191,0.2); }
+        textarea.fgInput { min-height: 80px; resize: vertical; font-family: inherit; }
+        .photoBox {
+            width: 100%;
+            height: 140px;
+            border: 2px dashed var(--border-dim);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            background: rgba(45,212,191,0.08);
+            transition: all 0.2s;
+        }
+        .photoBox:hover { border-color: var(--accent); background: rgba(45,212,191,0.15); }
+        .photoBox input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .photoBox svg { width: 36px; height: 36px; margin-bottom: 8px; opacity: 0.7; }
+        .photoBox span { font-size: 11px; letter-spacing: 1px; color: #64748b; font-weight: 500; }
+        .photoBox img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
+        .idDisplay {
+            background: rgba(45,212,191,0.12);
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .regenBtn {
+            background: rgba(45,212,191,0.2);
+            border: 1px solid var(--accent);
+            border-radius: 40px;
+            padding: 6px 14px;
+            font-size: 10px;
+            font-weight: 800;
+            color: #0F766E;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .regenBtn:hover { background: var(--accent); color: #0A192F; }
+        .genBtn {
+            display: block;
+            margin: 36px auto 0;
+            padding: 14px 44px;
+            background: linear-gradient(95deg, #0F766E, #2DD4BF);
+            border: none;
+            border-radius: 60px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            font-size: 14px;
+            color: #0A192F;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 12px 24px -10px rgba(45,212,191,0.5);
+            width: 100%;
+        }
+        .genBtn:hover { transform: translateY(-2px); background: linear-gradient(95deg, #2DD4BF, #14B8A6); }
+
+        /* Card Styles */
+        .cardsWrap {
+            display: flex;
+            gap: 50px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 36px;
+        }
+        .cardSlot { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .cardSlotLabel {
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: var(--accent);
+            font-weight: 700;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            padding: 4px 14px;
+            border-radius: 30px;
+        }
+        .card {
+            width: 320px;
+            height: 500px;
+            border-radius: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 40px -12px rgba(0,0,0,0.6), 0 0 0 1px rgba(45,212,191,0.5);
+            background: var(--card-bg);
+        }
+        /* front & back styles (kept compact but complete) */
+        .card.front .fTop { position: absolute; top: 0; left: 0; right: 0; height: 250px; background: linear-gradient(135deg, #0B2F40 0%, #031520 100%); clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%); z-index: 1; }
+        .compHeader { position: absolute; top: 36px; left: 0; right: 0; text-align: center; z-index: 10; }
+        .hexMini { width: 52px; height: 52px; border-radius: 20px; background: #0F2C3B; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px var(--accent); }
+        .compName { font-family: 'Space Grotesk', monospace; font-size: 17px; font-weight: 700; color: #fff; }
+        .compName em { color: var(--accent); font-style: normal; }
+        .compTagline { font-size: 9px; letter-spacing: 3px; color: rgba(210,242,235,0.7); margin-top: 5px; }
+        .photoRing { position: absolute; top: 160px; left: 50%; transform: translateX(-50%); width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent); box-shadow: 0 0 0 6px rgba(45,212,191,0.2); overflow: hidden; z-index: 12; background: #1F3A48; display: flex; align-items: center; justify-content: center; }
+        .photoRing img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .personBlock { position: absolute; top: 295px; left: 0; right: 0; text-align: center; z-index: 10; }
+        .personBlock h2 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; color: var(--text-dark); }
+        .personBlock p { font-size: 11px; letter-spacing: 2px; color: #0F766E; margin-top: 5px; font-weight: 800; background: rgba(45,212,191,0.2); display: inline-block; padding: 3px 12px; border-radius: 40px; }
+        .infoRows { position: absolute; top: 335px; left: 18px; right: 18px; z-index: 10; }
+        .ir { display: flex; align-items: center; gap: 6px; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .ir-key { font-size: 8.5px; font-weight: 800; width: 78px; color: #2c3e50; text-transform: uppercase; }
+        .ir-val { font-size: 9px; font-weight: 600; color: var(--text-dark); flex: 1; }
+        .fBtmDark { position: absolute; bottom: 0; left: 0; right: 0; height: 58px; background: linear-gradient(105deg, #08222F 0%, #03121C 100%); clip-path: polygon(0 45%, 100% 0, 100% 100%, 0 100%); z-index: 5; }
+        .fWebsite { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); font-size: 9px; color: rgba(45,212,191,0.8); white-space: nowrap; font-weight: 600; }
+        .card.back .bTop { position: absolute; top: 0; left: 0; right: 0; height: 236px; background: linear-gradient(135deg, #0B2F40 0%, #031520 100%); z-index: 1; }
+        .termsTitle { position: absolute; top: 34px; left: 0; right: 0; text-align: center; z-index: 10; }
+        .termsTitle h3 { font-family: 'Space Grotesk', monospace; font-size: 14px; font-weight: 800; color: var(--accent); }
+        .termsItems { position: absolute; top: 104px; left: 20px; right: 20px; z-index: 10; }
+        .tItem { display: flex; gap: 12px; margin-bottom: 16px; }
+        .tCheck { width: 20px; height: 20px; background: linear-gradient(135deg, #0F766E, #2DD4BF); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #0A192F; }
+        .tText { font-size: 9px; line-height: 1.6; color: rgba(255,255,255,0.85); }
+        .contactRows { position: absolute; top: 245px; left: 20px; right: 20px; z-index: 10; }
+        .cr { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+        .cr-icon { font-size: 13px; width: 18px; color: #0F766E; }
+        .qrBox { position: absolute; right: 18px; top: 248px; width: 84px; height: 84px; border: 2px solid var(--accent); background: #fff; padding: 5px; border-radius: 18px; display: flex; align-items: center; justify-content: center; z-index: 12; }
+        #qrCanvas canvas { width: 70px!important; height: 70px!important; }
+        .bBtmDark { position: absolute; bottom: 0; left: 0; right: 0; height: 128px; background: linear-gradient(105deg, #08222F 0%, #03121C 100%); clip-path: polygon(0 35%, 100% 0, 100% 100%, 0 100%); z-index: 5; }
+        .sigBlock { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); text-align: center; white-space: nowrap; z-index: 10; }
+        .sigText { font-family: 'Space Grotesk', cursive; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.9); }
+        .sigLine { width: 140px; height: 1px; background: linear-gradient(90deg,transparent,var(--accent),transparent); margin: 5px 0; }
+        .sigLabel { font-size: 7px; letter-spacing: 2px; color: rgba(45,212,191,0.7); }
+        .dlBtns { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+        .dlBtn { padding: 12px 32px; border-radius: 40px; font-size: 11px; font-weight: 800; letter-spacing: 2px; cursor: pointer; }
+        .dlBtn.prim { background: linear-gradient(95deg,#0F766E,#2DD4BF); color:#0A192F; border: none; box-shadow: 0 6px 14px rgba(45,212,191,0.4); }
+        .dlBtn.sec { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .backBtn { display: block; margin: 0 auto 28px; padding: 10px 28px; border-radius: 60px; background: transparent; border: 1px solid var(--border-dim); color: var(--accent); cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <!-- COMPLETE SIDEBAR WITH FULL STYLES -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-area">
+            <h2>RID Tech</h2>
+            <p>ID Card Studio</p>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item active" id="navFormSide">
+                <i class="fas fa-id-card"></i>
+                <span>Create ID Card</span>
+            </div>
+            <div class="nav-item" id="navPreviewSide">
+                <i class="fas fa-eye"></i>
+                <span>Preview Card</span>
+            </div>
+            <div class="nav-item" id="navHelp">
+                <i class="fas fa-question-circle"></i>
+                <span>Help Guide</span>
+            </div>
+            <div class="nav-item" id="navSettings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <i class="fas fa-shield-alt"></i> Secure ID Management v2.0
+        </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i> Open Menu</button>
+
+        <div class="id-card-wrapper">
+            <div class="topbar-mini">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                    <div class="hex-logo"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF"><rect x="2" y="3" width="20" height="14" rx="2"/></svg></div>
+                    <h1>🖥️ AVON COMPUTER ACADEMY • STUDENT ID MAKER</h1>
+                </div>
+                <div class="tabs">
+                    <button class="tabBtn on" id="tabFormBtn">📘 STUDENT DETAILS</button>
+                    <button class="tabBtn" id="tabPreviewBtn">🪪 SMART ID CARD</button>
+                </div>
+            </div>
+
+            <div class="pane on" id="paneForm">
+                <div class="formGrid">
+                    <div style="grid-column:1/-1">
+                        <label class="fgLabel">📸 STUDENT PHOTO (CIRCULAR)</label>
+                        <div class="photoBox" id="photoBox">
+                            <input type="file" accept="image/*" id="photoUpload">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2DD4BF"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                            <span>UPLOAD PASSPORT PHOTO</span>
+                            <img id="photoPreview" style="display:none">
+                        </div>
+                    </div>
+                    <div><label class="fgLabel">FIRST NAME</label><input class="fgInput" id="f_first" value="ANANYA"></div>
+                    <div><label class="fgLabel">LAST NAME</label><input class="fgInput" id="f_last" value="SHARMA"></div>
+                    <div class="col2"><label class="fgLabel">💻 COURSE</label><input class="fgInput" id="f_role" value="Full Stack Web Dev"></div>
+                    <div class="col2"><label class="fgLabel">🔖 STUDENT ID</label><div class="idDisplay"><span id="autoIdDisplay">AVON-2026-7XK9P2</span><button class="regenBtn" id="regenIdBtn">⟳ REGENERATE</button></div><input type="hidden" id="f_id"></div>
+                    <div class="col2"><label class="fgLabel">📧 EMAIL</label><input class="fgInput" id="f_email" value="ananya.sharma@avonacademy.in"></div>
+                    <div><label class="fgLabel">📞 MOBILE</label><input class="fgInput" id="f_phone" value="9876543210"></div>
+                    <div><label class="fgLabel">📅 ENROLLMENT</label><input class="fgInput" type="date" id="f_join" value="2026-05-01"></div>
+                    <div><label class="fgLabel">📆 VALID TILL</label><input class="fgInput" type="date" id="f_exp" value="2027-05-01"></div>
+                    <div><label class="fgLabel">🏛️ INSTITUTE</label><input class="fgInput" id="f_comp" value="AVON COMPUTER ACADEMY"></div>
+                    <div><label class="fgLabel">⭐ TAGLINE</label><input class="fgInput" id="f_tag" value="Empowering Digital Future"></div>
+                    <div><label class="fgLabel">🌐 WEBSITE</label><input class="fgInput" id="f_web" value="www.avonacademy.in"></div>
+                    <div><label class="fgLabel">📞 INST PHONE</label><input class="fgInput" id="f_cph" value="+91 755 496 7800"></div>
+                    <div><label class="fgLabel">✉️ INST EMAIL</label><input class="fgInput" id="f_cem" value="contact@avonacademy.in"></div>
+                    <div class="col2"><label class="fgLabel">📍 ADDRESS</label><textarea class="fgInput" id="f_addr" rows="3">Avon Tower, 2nd Floor, Bhopal - 462011</textarea></div>
+                    <div class="col2"><textarea class="fgInput" id="f_t1" readonly>📜 ID card must be visible at all times in lab & library.</textarea></div>
+                    <div class="col2"><textarea class="fgInput" id="f_t2" readonly>🔐 Non-transferable · Report loss to admin immediately.</textarea></div>
+                </div>
+                <button class="genBtn" id="generateCardBtn">⚡ GENERATE SMART CARD ⚡</button>
+            </div>
+
+            <div class="pane" id="panePreview">
+                <button class="backBtn" id="backToFormBtn">← EDIT DETAILS</button>
+                <div class="cardsWrap">
+                    <div class="cardSlot"><div class="cardSlotLabel">FRONT</div><div class="card front" id="cardFront"><div class="fTop"></div><div class="compHeader"><div class="hexMini"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF"><rect x="3" y="3" width="18" height="14" rx="2"/></svg></div><div class="compName" id="cName">AVON COMPUTER <em>ACADEMY</em></div><div class="compTagline" id="cTagline">Empowering Digital Future</div></div><div class="photoRing" id="photoRing"><div class="noPhoto">🧑‍🎓</div></div><div class="personBlock"><h2 id="cFirstName">ANANYA <span id="cLastName">SHARMA</span></h2><p id="cRole">FULL STACK WEB DEV</p></div><div class="infoRows"><div class="ir"><div class="ir-key">ID</div><div class="ir-val" id="cIdNo">AVON-2026-7XK9P2</div></div><div class="ir"><div class="ir-key">EMAIL</div><div class="ir-val" id="cEmail">ananya.sharma@avonacademy.in</div></div><div class="ir"><div class="ir-key">MOBILE</div><div class="ir-val" id="cPhone">9876543210</div></div><div class="ir"><div class="ir-key">ENROLL</div><div class="ir-val" id="cJoin">01-05-2026</div></div><div class="ir"><div class="ir-key">VALID</div><div class="ir-val" id="cExp">01-05-2027</div></div></div><div class="fBtmDark"></div><div class="fWebsite" id="cWeb">www.avonacademy.in</div></div></div>
+                    <div class="cardSlot"><div class="cardSlotLabel">BACK</div><div class="card back" id="cardBack"><div class="bTop"></div><div class="termsTitle"><h3>⧫ ACADEMY CODE ⧫</h3></div><div class="termsItems"><div class="tItem"><div class="tCheck">✓</div><div class="tText" id="bT1">ID card must be visible at all times.</div></div><div class="tItem"><div class="tCheck">✓</div><div class="tText" id="bT2">Non-transferable · Report loss.</div></div></div><div class="contactRows"><div class="cr"><div class="cr-icon">📍</div><div><span class="cr-name" id="bComp">AVON COMPUTER ACADEMY</span><span class="cr-detail" id="bAddr">Avon Tower, Bhopal</span></div></div><div class="cr"><div class="cr-icon">📞</div><span class="cr-detail" id="bCph">+91 755 496 7800</span></div><div class="cr"><div class="cr-icon">🌐</div><span class="cr-detail" id="bWeb">www.avonacademy.in</span></div><div class="cr"><div class="cr-icon">✉️</div><span class="cr-detail" id="bCem">contact@avonacademy.in</span></div></div><div class="qrBox"><div id="qrCanvas"></div></div><div class="bBtmDark"></div><div class="sigBlock"><span class="sigText" id="bSig">Dir. Avon Academy</span><div class="sigLine"></div><div class="sigLabel">AUTHORIZED</div></div></div></div>
+                </div>
+                <div class="dlBtns"><button class="dlBtn prim" id="dlFrontBtn">⬇ FRONT</button><button class="dlBtn prim" id="dlBackBtn">⬇ BACK</button><button class="dlBtn sec" id="dlBothBtn">⬇ BOTH</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sidebar Toggle & Responsive Logic
+    (function() {
+        const toggleBtn = document.getElementById('menuToggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
+        if(toggleBtn) toggleBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.contains('open') ? closeSidebar() : openSidebar(); });
+        if(overlay) overlay.addEventListener('click', closeSidebar);
+        window.addEventListener('resize', () => { if(window.innerWidth > 768) { sidebar?.classList.remove('open'); overlay?.classList.remove('active'); document.body.style.overflow = ''; } });
+        
+        const navForm = document.getElementById('navFormSide');
+        const navPreview = document.getElementById('navPreviewSide');
+        const navHelp = document.getElementById('navHelp');
+        const navSettings = document.getElementById('navSettings');
+        
+        function goTab(t) {
+            document.getElementById('paneForm').classList.toggle('on', t === 'form');
+            document.getElementById('panePreview').classList.toggle('on', t === 'preview');
+            document.getElementById('tabFormBtn').classList.toggle('on', t === 'form');
+            document.getElementById('tabPreviewBtn').classList.toggle('on', t === 'preview');
+            // Update sidebar active states
+            if(navForm) navForm.classList.toggle('active', t === 'form');
+            if(navPreview) navPreview.classList.toggle('active', t === 'preview');
+        }
+        
+        if(navForm) navForm.addEventListener('click', () => goTab('form'));
+        if(navPreview) navPreview.addEventListener('click', () => goTab('preview'));
+        if(navHelp) navHelp.addEventListener('click', () => alert("📘 Help Guide: Fill all student details, upload a passport photo, then click 'Generate Smart Card'. You can download front, back, or both sides as PNG images."));
+        if(navSettings) navSettings.addEventListener('click', () => alert("⚙️ Settings: Customize ID card layout coming soon. Stay tuned!"));
+        
+        window.goTabGlobal = goTab;
+    })();
+
+    // ID Card Logic
+    let photoSrc = null;
+    function generateUniqueId() {
+        const year = new Date().getFullYear();
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+        let suffix = '';
+        for (let i=0;i<6;i++) suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+        return `AVON-${year}-${suffix}`;
+    }
+    function regenId() { const newId = generateUniqueId(); document.getElementById('autoIdDisplay').textContent = newId; document.getElementById('f_id').value = newId; }
+    document.getElementById('regenIdBtn')?.addEventListener('click', regenId);
+    window.addEventListener('DOMContentLoaded', () => regenId());
+
+    document.getElementById('tabFormBtn')?.addEventListener('click', () => window.goTabGlobal('form'));
+    document.getElementById('tabPreviewBtn')?.addEventListener('click', () => window.goTabGlobal('preview'));
+    document.getElementById('backToFormBtn')?.addEventListener('click', () => window.goTabGlobal('form'));
+
+    function loadPhotoFromInput(file) {
+        if (!file) return;
+        const r = new FileReader();
+        r.onload = e => { photoSrc = e.target.result; const img = document.getElementById('photoPreview'); img.src = photoSrc; img.style.display = 'block'; const box = document.querySelector('.photoBox'); if(box) { const svg = box.querySelector('svg'); if(svg) svg.style.display = 'none'; const span = box.querySelector('span'); if(span) span.style.display = 'none'; } };
+        r.readAsDataURL(file);
+    }
+    document.getElementById('photoUpload')?.addEventListener('change', function(e) { if(e.target.files[0]) loadPhotoFromInput(e.target.files[0]); });
+
+    function fmtDate(v) { if (!v) return ''; const d = new Date(v); return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; }
+
+    function generateCard() {
+        const fn = (document.getElementById('f_first').value || 'STUDENT').toUpperCase();
+        const ln = (document.getElementById('f_last').value || '').toUpperCase();
+        const role = document.getElementById('f_role').value || 'COURSE';
+        const id = document.getElementById('f_id').value || generateUniqueId();
+        const em = document.getElementById('f_email').value;
+        const ph = document.getElementById('f_phone').value;
+        const jn = fmtDate(document.getElementById('f_join').value);
+        const ex = fmtDate(document.getElementById('f_exp').value);
+        const comp = document.getElementById('f_comp').value;
+        const tag = document.getElementById('f_tag').value;
+        const web = document.getElementById('f_web').value;
+        const cph = document.getElementById('f_cph').value;
+        const cem = document.getElementById('f_cem').value;
+        let addr = document.getElementById('f_addr').value.trim() || 'Avon Tower, Bhopal';
+        const t1 = document.getElementById('f_t1').value;
+        const t2 = document.getElementById('f_t2').value;
+
+        const parts = comp.trim().split(' ');
+        const c1 = parts.slice(0, -1).join(' ') || comp;
+        const c2 = parts[parts.length-1] || '';
+        document.getElementById('cName').innerHTML = `${c1} <em>${c2}</em>`;
+        document.getElementById('cTagline').textContent = tag;
+        document.getElementById('cFirstName').childNodes[0].nodeValue = fn + ' ';
+        document.getElementById('cLastName').textContent = ln;
+        document.getElementById('cRole').textContent = role;
+        document.getElementById('cIdNo').textContent = id;
+        document.getElementById('cEmail').textContent = em;
+        document.getElementById('cPhone').textContent = ph;
+        document.getElementById('cJoin').textContent = jn;
+        document.getElementById('cExp').textContent = ex;
+        document.getElementById('cWeb').textContent = web;
+
+        const ring = document.getElementById('photoRing');
+        if (photoSrc) ring.innerHTML = `<img src="${photoSrc}" style="border-radius:50%; width:100%; height:100%; object-fit:cover;">`;
+        else ring.innerHTML = `<div class="noPhoto">🧑‍🎓</div>`;
+
+        document.getElementById('bT1').textContent = t1;
+        document.getElementById('bT2').textContent = t2;
+        document.getElementById('bComp').textContent = comp;
+        document.getElementById('bAddr').innerHTML = addr.replace(/\n/g, '<br>');
+        document.getElementById('bCph').textContent = cph;
+        document.getElementById('bWeb').textContent = web;
+        document.getElementById('bCem').textContent = cem;
+
+        const qd = document.getElementById('qrCanvas');
+        qd.innerHTML = '';
+        new QRCode(qd, { text: `Student:${fn} ${ln} | ID:${id} | Course:${role}`, width: 70, height: 70, colorDark: '#0F172A', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+        window.goTabGlobal('preview');
+    }
+    document.getElementById('generateCardBtn')?.addEventListener('click', generateCard);
+
+    async function dl(elId, fname) { const el = document.getElementById(elId); try { const dataUrl = await htmlToImage.toPng(el, { cacheBust: true, pixelRatio: 3 }); const a = document.createElement('a'); a.download = fname; a.href = dataUrl; a.click(); } catch(e) { alert("Download error"); } }
+    async function dlBoth() { const front = document.getElementById('cardFront'), back = document.getElementById('cardBack'); try { const fImg = await htmlToImage.toPng(front, { cacheBust: true, pixelRatio: 3 }), bImg = await htmlToImage.toPng(back, { cacheBust: true, pixelRatio: 3 }); const download=(data,name)=>{ const a=document.createElement('a'); a.href=data; a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a); }; download(fImg,'avon-front.png'); setTimeout(()=>download(bImg,'avon-back.png'),600); } catch(e) { alert("Both download failed"); } }
+    document.getElementById('dlFrontBtn')?.addEventListener('click', () => dl('cardFront', 'avon-front.png'));
+    document.getElementById('dlBackBtn')?.addEventListener('click', () => dl('cardBack', 'avon-back.png'));
+    document.getElementById('dlBothBtn')?.addEventListener('click', dlBoth);
+    regenId();
+</script>
+</body>
+</html>

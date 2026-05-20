@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>RID Tech | Fee Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/slidebar.css">
+  <link rel="stylesheet" href="/css/fees.css">
+    
+</head>
+<body>
+    <%- include('partials/sidebar') %>
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-content">
+        <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
+        <div class="fee-container">
+            <div class="header-section">
+                <div class="title-badge"><i class="fas fa-wallet"></i><h2>Fee Management</h2></div>
+                <div class="btn-group-header">
+                    <button class="add-fee-btn" id="openAddModalBtn"><i class="fas fa-plus-circle"></i> Add Payment</button>
+                    <button class="export-csv-btn" id="exportCSVBtn"><i class="fas fa-download"></i> Export CSV</button>
+                </div>
+            </div>
+            <div class="stats-search-bar">
+                <div class="stats-mini">
+                    <div class="stat-pill"><i class="fas fa-users"></i> Total Students: <span id="totalRecords">0</span></div>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search by student or course...">
+                    <i class="fas fa-times-circle clear-search" id="clearSearch"></i>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table class="fee-table">
+                    <thead><tr><th>👤 Student</th><th>📘 Course</th><th>💰 Amount</th><th>📅 Payment Date</th><th>🏷️ Status</th><th>⚙️ Actions</th></tr></thead>
+                    <tbody id="feeTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal -->
+<div id="feeModal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="close-modal-icon" id="closeModalBtn"><i class="fas fa-times-circle"></i></div>
+        <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> Payment Details</h3>
+        <form id="feeForm">
+            <input type="text" id="studentName" placeholder="Full Student Name *" required>
+            <input type="text" id="courseName" placeholder="Course / Program *" required>
+            <input type="number" id="amount" placeholder="Amount (₹) *" step="1" required>
+            <input type="date" id="paymentDate" required>
+            <select id="statusSelect">
+                <option value="Paid">✅ Paid - Completed</option>
+                <option value="Pending">⏳ Pending - Due</option>
+            </select>
+            <input type="hidden" id="editId" value="">
+            <button type="submit">💾 Save Payment</button>
+        </form>
+    </div>
+</div>
+<div id="toastMsg" class="toast-msg">✨ Action completed</div>
+
+<script>
+    // ---------- DATA (persistent, deleted records stay deleted) ----------
+    let fees = [];
+    let nextId = 1;
+    let searchQuery = "";
+
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = msg;
+        toast.style.background = isError ? '#b91c1c' : '#0f2f42';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    function formatINR(amt) { return '₹' + amt.toLocaleString('en-IN'); }
+
+    function persistToLocal() {
+        localStorage.setItem('rid_fees_data', JSON.stringify(fees));
+        localStorage.setItem('rid_fees_nextId', nextId);
+    }
+
+    function loadFromLocal() {
+        const stored = localStorage.getItem('rid_fees_data');
+        const storedNextId = localStorage.getItem('rid_fees_nextId');
+        if (stored) {
+            fees = JSON.parse(stored);
+            nextId = storedNextId ? parseInt(storedNextId) : (fees.length ? Math.max(...fees.map(f => f.id)) + 1 : 1);
+        } else {
+            // Seed demo data (only first time)
+            fees = [
+                { id: 1, student: "Priya Sharma", course: "Full Stack Development", amount: 26250, date: "2026-03-01", status: "Paid" },
+                { id: 2, student: "Anjali Verma", course: "ADCA", amount: 11250, date: "2026-03-05", status: "Paid" },
+                { id: 3, student: "Rahul Mehta", course: "Data Science Pro", amount: 45000, date: "2026-03-12", status: "Paid" },
+                { id: 4, student: "Neha Gupta", course: "CCC Course", amount: 6000, date: "2026-03-10", status: "Pending" },
+                { id: 5, student: "Rohan Kumar", course: "Tally ERP9", amount: 11000, date: "2026-03-18", status: "Paid" },
+                { id: 6, student: "Sneha Reddy", course: "Python Programming", amount: 12375, date: "2026-03-20", status: "Pending" },
+                { id: 7, student: "Vikram Singh", course: "Web Design", amount: 18500, date: "2026-03-22", status: "Paid" },
+                { id: 8, student: "Kavita Joshi", course: "Digital Marketing", amount: 22000, date: "2026-03-25", status: "Pending" },
+                { id: 9, student: "Amit Patel", course: "Cloud Computing", amount: 32000, date: "2026-03-28", status: "Paid" },
+                { id: 10, student: "Sunita Rawat", course: "Graphic Design", amount: 15750, date: "2026-04-01", status: "Paid" },
+                { id: 11, student: "Manish Tiwari", course: "Cyber Security", amount: 28000, date: "2026-04-02", status: "Pending" },
+                { id: 12, student: "Deepika Nair", course: "AI & ML", amount: 41000, date: "2026-04-05", status: "Paid" }
+            ];
+            nextId = 13;
+            persistToLocal();
+        }
+    }
+
+    function updateTotalCount() {
+        document.getElementById("totalRecords").innerText = fees.length;
+    }
+
+    function getFiltered() {
+        if (!searchQuery.trim()) return fees;
+        const q = searchQuery.trim().toLowerCase();
+        return fees.filter(f => f.student.toLowerCase().includes(q) || f.course.toLowerCase().includes(q));
+    }
+
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    function escapeRegex(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    // ---------- RESPECT DL (download respect receipt) ----------
+    function downloadRespectReceipt(fee) {
+        const amountFormatted = formatINR(fee.amount);
+        const statusEmoji = fee.status === "Paid" ? "✅ PAID" : "⏳ PENDING";
+        const receiptText = `
+============================================
+          RID TECH INSTITUTE
+      Official Fee Acknowledgment Receipt
+============================================
+
+We hereby express our sincere respect and gratitude to:
+
+🎓 Student Name   : ${fee.student}
+📚 Course         : ${fee.course}
+💰 Amount         : ${amountFormatted}
+📅 Payment Date   : ${fee.date}
+🏷️ Status         : ${statusEmoji}
+
+------------------------------------------------
+"Your dedication to learning and timely contribution
+is highly valued. Thank you for being part of RID Tech."
+
+Issued by: RID Tech Management
+Downloaded on: ${new Date().toLocaleString()}
+============================================
+        `;
+        const blob = new Blob([receiptText], { type: "text/plain;charset=utf-8" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        const safeName = fee.student.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        link.download = `Respect_Receipt_${safeName}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast(`📄 Respect receipt saved for ${fee.student}`);
+    }
+
+    function renderTable() {
+        const filtered = getFiltered();
+        const tbody = document.getElementById("feeTableBody");
+        if (!filtered.length) {
+            tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-search"></i><br/>No fee records found</td></tr>`;
+            updateTotalCount();
+            return;
+        }
+        let html = "";
+        filtered.forEach(fee => {
+            const statusClass = fee.status === "Paid" ? "status-paid" : "status-pending";
+            let displayStudent = escapeHtml(fee.student);
+            let displayCourse = escapeHtml(fee.course);
+            if (searchQuery.trim()) {
+                const regex = new RegExp(`(${escapeRegex(searchQuery.trim())})`, 'gi');
+                displayStudent = displayStudent.replace(regex, `<mark>$1</mark>`);
+                displayCourse = displayCourse.replace(regex, `<mark>$1</mark>`);
+            }
+            html += `
+                <tr>
+                    <td><strong>${displayStudent}</strong></td>
+                    <td>${displayCourse}</td>
+                    <td><strong>${formatINR(fee.amount)}</strong></td>
+                    <td>${fee.date}</td>
+                    <td><span class="status-badge ${statusClass}">${fee.status}</span></td>
+                    <td class="action-group">
+                        <button class="edit-btn" data-id="${fee.id}"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn" data-id="${fee.id}"><i class="fas fa-trash-alt"></i> Del</button>
+                        <button class="respect-btn" data-id="${fee.id}"><i class="fas fa-download"></i> Respect DL</button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+
+        // Attach event listeners
+        document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', () => editFee(parseInt(btn.dataset.id))));
+        document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', () => deleteFee(parseInt(btn.dataset.id))));
+        document.querySelectorAll('.respect-btn').forEach(btn => btn.addEventListener('click', () => {
+            const id = parseInt(btn.dataset.id);
+            const fee = fees.find(f => f.id === id);
+            if (fee) downloadRespectReceipt(fee);
+            else showToast("Record not found", true);
+        }));
+        updateTotalCount();
+    }
+
+    function deleteFee(id) {
+        const fee = fees.find(f => f.id === id);
+        if (!fee) return;
+        if (confirm(`⚠️ Permanently delete fee record for ${fee.student} (${formatINR(fee.amount)})?`)) {
+            fees = fees.filter(f => f.id !== id);
+            persistToLocal();
+            renderTable();
+            showToast(`🗑️ Deleted ${fee.student}'s payment permanently`);
+        }
+    }
+
+    function openAddModal() {
+        document.getElementById("editId").value = "";
+        document.getElementById("modalTitle").innerHTML = '<i class="fas fa-plus-circle"></i> Add New Payment';
+        document.getElementById("studentName").value = "";
+        document.getElementById("courseName").value = "";
+        document.getElementById("amount").value = "";
+        document.getElementById("paymentDate").value = new Date().toISOString().slice(0,10);
+        document.getElementById("statusSelect").value = "Paid";
+        document.getElementById("feeModal").style.display = "flex";
+    }
+
+    function editFee(id) {
+        const fee = fees.find(f => f.id === id);
+        if (fee) {
+            document.getElementById("editId").value = fee.id;
+            document.getElementById("studentName").value = fee.student;
+            document.getElementById("courseName").value = fee.course;
+            document.getElementById("amount").value = fee.amount;
+            document.getElementById("paymentDate").value = fee.date;
+            document.getElementById("statusSelect").value = fee.status;
+            document.getElementById("modalTitle").innerHTML = '<i class="fas fa-pen"></i> Edit Payment Record';
+            document.getElementById("feeModal").style.display = "flex";
+        }
+    }
+
+    function closeModal() {
+        document.getElementById("feeModal").style.display = "none";
+        document.getElementById("editId").value = "";
+    }
+
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        const student = document.getElementById("studentName").value.trim();
+        const course = document.getElementById("courseName").value.trim();
+        const amount = parseFloat(document.getElementById("amount").value);
+        const date = document.getElementById("paymentDate").value;
+        const status = document.getElementById("statusSelect").value;
+        const editId = document.getElementById("editId").value;
+
+        if (!student) return showToast("Student name required", true);
+        if (!course) return showToast("Course required", true);
+        if (isNaN(amount) || amount <= 0) return showToast("Valid positive amount required", true);
+        if (!date) return showToast("Date required", true);
+
+        if (editId) {
+            const index = fees.findIndex(f => f.id == editId);
+            if (index !== -1) {
+                fees[index] = { id: parseInt(editId), student, course, amount, date, status };
+                showToast(`✏️ Updated record for ${student}`);
+            } else {
+                showToast("Record not found", true);
+                closeModal();
+                return;
+            }
+        } else {
+            const newId = nextId++;
+            fees.push({ id: newId, student, course, amount, date, status });
+            showToast(`✅ Added payment for ${student}`);
+        }
+        persistToLocal();
+        renderTable();
+        closeModal();
+    }
+
+    function exportToCSV() {
+        if (!fees.length) {
+            showToast("No data to export", true);
+            return;
+        }
+        const headers = ["Student Name", "Course", "Amount (₹)", "Payment Date", "Status"];
+        const rows = fees.map(f => [f.student, f.course, f.amount, f.date, f.status]);
+        const csvContent = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+        const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = "rid_fee_records.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast("📎 CSV export complete");
+    }
+
+    function handleSearch() {
+        searchQuery = document.getElementById("searchInput").value;
+        renderTable();
+    }
+    function clearSearch() {
+        document.getElementById("searchInput").value = "";
+        searchQuery = "";
+        renderTable();
+        showToast("🔍 Search cleared");
+    }
+
+    function initSidebar() {
+        const menuBtn = document.getElementById("menuToggleBtn");
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("sidebarOverlay");
+        if (menuBtn) {
+            menuBtn.addEventListener("click", () => {
+                sidebar.classList.toggle("open");
+                overlay.style.display = "block";
+                overlay.classList.add("active");
+            });
+        }
+        if (overlay) {
+            overlay.addEventListener("click", () => {
+                sidebar.classList.remove("open");
+                overlay.style.display = "none";
+                overlay.classList.remove("active");
+            });
+        }
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener("click", () => {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                const navType = item.getAttribute('data-nav');
+                if (navType === 'fees') showToast("💰 Fee Management Dashboard");
+                else if (navType === 'reports') {
+                    const collected = fees.filter(f => f.status === 'Paid').reduce((s, f) => s + f.amount, 0);
+                    const pending = fees.filter(f => f.status === 'Pending').reduce((s, f) => s + f.amount, 0);
+                    showToast(`📊 Analytics: Collected ${formatINR(collected)} | Pending ${formatINR(pending)}`);
+                } else showToast("ℹ️ RID Tech Support - Contact admin");
+            });
+        });
+    }
+
+    function init() {
+        loadFromLocal();
+        renderTable();
+        initSidebar();
+        document.getElementById("openAddModalBtn").addEventListener("click", openAddModal);
+        document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+        document.getElementById("exportCSVBtn").addEventListener("click", exportToCSV);
+        document.getElementById("feeForm").addEventListener("submit", handleFormSubmit);
+        document.getElementById("searchInput").addEventListener("input", handleSearch);
+        document.getElementById("clearSearch").addEventListener("click", clearSearch);
+        window.onclick = (e) => { if (e.target === document.getElementById("feeModal")) closeModal(); };
+    }
+    init();
+</script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>📊 RID Tech | Student Performance Analytics Dashboard</title>
+    <!-- Google Fonts + Font Awesome 6 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/slidebar.css">
+    <link rel="stylesheet" href="/css/results.css">
+    
+</head>
+<body>
+     <%- include('partials/sidebar') %>
+<div class="dashboard-layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <!-- SIDEBAR -->
+    
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i> </button>
+        
+        <!-- <div class="top-bar">
+            <div class="date-badge" id="liveDate"><i class="far fa-calendar-alt"></i> </div>
+            <div class="weather-badge"><i class="fas fa-chart-line"></i> </div>
+        </div> -->
+
+        <div class="results-container">
+            <div class="header-section">
+                <div class="title-badge">
+                    <i class="fas fa-chart-line"></i>
+                    <h2>📊 Student Results Dashboard</h2>
+                </div>
+                <div class="date-badge">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span id="currentDate"></span>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3>Total Students</h3>
+                        <div class="stat-number" id="totalStudents">0</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="stat-info">
+                        <h3>Pass Percentage</h3>
+                        <div class="stat-number" id="passPercentage">0%</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-star"></i></div>
+                    <div class="stat-info">
+                        <h3>Average Score</h3>
+                        <div class="stat-number" id="avgScore">0%</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-medal"></i></div>
+                    <div class="stat-info">
+                        <h3>Top Performer</h3>
+                        <div class="stat-number" id="topPerformer">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="search-filter-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search by student name..." autocomplete="off">
+                    <i class="fas fa-times-circle clear-search" id="clearSearchBtn"></i>
+                </div>
+                <div class="filter-group">
+                    <select id="courseFilter" class="filter-select">
+                        <option value="all">📚 All Courses</option>
+                        <option value="DCA">💻 DCA</option>
+                        <option value="ADCA">📘 ADCA</option>
+                        <option value="Tally">💰 Tally ERP9</option>
+                        <option value="Computer Fundamentals">🖥️ Computer Fundamentals</option>
+                        <option value="Full Stack Dev">🌐 Full Stack Dev</option>
+                        <option value="Python Programming">🐍 Python Programming</option>
+                        <option value="Data Science">📊 Data Science</option>
+                        <option value="Web Design">🎨 Web Design</option>
+                        <option value="Digital Marketing">📢 Digital Marketing</option>
+                    </select>
+                    <select id="gradeFilter" class="filter-select">
+                        <option value="all">🏅 All Grades</option>
+                        <option value="A">🌟 A Grade (80-100%)</option>
+                        <option value="B">⭐ B Grade (60-79%)</option>
+                        <option value="C">🟡 C Grade (45-59%)</option>
+                        <option value="D">🟠 D Grade (35-44%)</option>
+                        <option value="F">🔴 F Grade (Below 35%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="table-wrapper">
+                <table class="results-table">
+                    <thead>
+                        <tr><th><i class="fas fa-user-graduate"></i> Student</th><th><i class="fas fa-book"></i> Course</th><th><i class="fas fa-pen-fancy"></i> Marks</th><th><i class="fas fa-percent"></i> %</th><th><i class="fas fa-flag-checkered"></i> Grade</th><th><i class="fas fa-ranking-star"></i> Rank</th></tr>
+                    </thead>
+                    <tbody id="resultsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="toast" class="toast-message"></div>
+
+<script>
+    // ---------- ENHANCED STUDENT RESULTS DATA (22+ records for rich demo) ----------
+    const studentResults = [
+        { name: "Amit Sharma", course: "DCA", marks: 85, totalMarks: 100, percentage: 85, grade: "A" },
+        { name: "Pooja Verma", course: "ADCA", marks: 68, totalMarks: 100, percentage: 68, grade: "B" },
+        { name: "Rajesh Kumar", course: "Tally", marks: 92, totalMarks: 100, percentage: 92, grade: "A" },
+        { name: "Neha Gupta", course: "Computer Fundamentals", marks: 78, totalMarks: 100, percentage: 78, grade: "B" },
+        { name: "Vikram Singh", course: "Full Stack Dev", marks: 45, totalMarks: 100, percentage: 45, grade: "C" },
+        { name: "Sneha Patel", course: "Python Programming", marks: 88, totalMarks: 100, percentage: 88, grade: "A" },
+        { name: "Rahul Mehta", course: "Data Science", marks: 38, totalMarks: 100, percentage: 38, grade: "D" },
+        { name: "Anjali Sharma", course: "DCA", marks: 72, totalMarks: 100, percentage: 72, grade: "B" },
+        { name: "Kunal Verma", course: "ADCA", marks: 55, totalMarks: 100, percentage: 55, grade: "C" },
+        { name: "Priya Singh", course: "Tally", marks: 28, totalMarks: 100, percentage: 28, grade: "F" },
+        { name: "Rohit Kumar", course: "Full Stack Dev", marks: 82, totalMarks: 100, percentage: 82, grade: "A" },
+        { name: "Kavita Gupta", course: "Computer Fundamentals", marks: 65, totalMarks: 100, percentage: 65, grade: "B" },
+        { name: "Tarun Mehta", course: "Web Design", marks: 91, totalMarks: 100, percentage: 91, grade: "A" },
+        { name: "Divya Nair", course: "Digital Marketing", marks: 73, totalMarks: 100, percentage: 73, grade: "B" },
+        { name: "Saurav Yadav", course: "Data Science", marks: 58, totalMarks: 100, percentage: 58, grade: "C" },
+        { name: "Isha Kapoor", course: "Python Programming", marks: 96, totalMarks: 100, percentage: 96, grade: "A" },
+        { name: "Manish Tiwari", course: "ADCA", marks: 42, totalMarks: 100, percentage: 42, grade: "D" },
+        { name: "Ritu Agarwal", course: "Full Stack Dev", marks: 79, totalMarks: 100, percentage: 79, grade: "B" },
+        { name: "Akash Verma", course: "Tally", marks: 88, totalMarks: 100, percentage: 88, grade: "A" },
+        { name: "Swati Mishra", course: "Computer Fundamentals", marks: 35, totalMarks: 100, percentage: 35, grade: "D" },
+        { name: "Deepak Rawat", course: "Web Design", marks: 94, totalMarks: 100, percentage: 94, grade: "A" },
+        { name: "Neeraj Bansal", course: "Digital Marketing", marks: 67, totalMarks: 100, percentage: 67, grade: "B" }
+    ];
+
+    let searchQuery = "";
+    let selectedCourse = "all";
+    let selectedGrade = "all";
+
+    function getGradeClass(grade) {
+        const classes = { 'A': 'grade-A', 'B': 'grade-B', 'C': 'grade-C', 'D': 'grade-D', 'F': 'grade-F' };
+        return classes[grade] || 'grade-F';
+    }
+
+    function getFilteredResults() {
+        let filtered = [...studentResults];
+        if (searchQuery.trim()) {
+            const q = searchQuery.trim().toLowerCase();
+            filtered = filtered.filter(s => s.name.toLowerCase().includes(q));
+        }
+        if (selectedCourse !== "all") {
+            filtered = filtered.filter(s => s.course === selectedCourse);
+        }
+        if (selectedGrade !== "all") {
+            filtered = filtered.filter(s => s.grade === selectedGrade);
+        }
+        // sort by percentage descending for rank
+        filtered.sort((a, b) => b.percentage - a.percentage);
+        filtered.forEach((s, idx) => { s.displayRank = idx + 1; });
+        return filtered;
+    }
+
+    function updateStatistics() {
+        const total = studentResults.length;
+        const passed = studentResults.filter(s => s.percentage >= 35).length;
+        const passPercent = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
+        const avgPercent = total > 0 ? (studentResults.reduce((sum, s) => sum + s.percentage, 0) / total).toFixed(1) : 0;
+        const topStudent = studentResults.reduce((top, s) => s.percentage > (top?.percentage || 0) ? s : top, null);
+        
+        document.getElementById("totalStudents").innerText = total;
+        document.getElementById("passPercentage").innerText = `${passPercent}%`;
+        document.getElementById("avgScore").innerText = `${avgPercent}%`;
+        
+        let topName = topStudent ? topStudent.name : "—";
+        if (topName.length > 14 && window.innerWidth <= 550) topName = topName.split(' ')[0];
+        document.getElementById("topPerformer").innerHTML = `<i class="fas fa-crown" style="font-size:0.8rem;"></i> ${topName}`;
+    }
+
+    function escapeHtml(str) { if (!str) return ""; return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+    function escapeRegex(str) { return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    function renderTable() {
+        const filtered = getFilteredResults();
+        const tbody = document.getElementById("resultsTableBody");
+        
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-chart-simple fa-2x"></i><br/>No matching results found</td></tr>`;
+            updateStatistics();
+            return;
+        }
+        
+        let html = "";
+        filtered.forEach((student, idx) => {
+            let displayName = escapeHtml(student.name);
+            if (searchQuery.trim()) {
+                const regex = new RegExp(`(${escapeRegex(searchQuery.trim())})`, 'gi');
+                displayName = displayName.replace(regex, `<mark>$1</mark>`);
+            }
+            const gradeClass = getGradeClass(student.grade);
+            const rankDisplay = student.displayRank <= 3 ? 
+                `<span class="rank-badge"><i class="fas fa-trophy"></i> #${student.displayRank}</span>` : 
+                `<span class="rank-number">#${student.displayRank}</span>`;
+            
+            html += `<tr style="animation-delay: ${idx * 0.02}s">
+                        <td><i class="fas fa-user-circle" style="color:#4f46e5; margin-right:6px;"></i> ${displayName}</td>
+                        <td><i class="fas fa-book-open" style="color:#6b7280; margin-right:6px;"></i> ${escapeHtml(student.course)}</td>
+                        <td><strong>${student.marks}/${student.totalMarks}</strong></td>
+                        <td class="percentage">${student.percentage}%</td>
+                        <td><span class="grade-badge ${gradeClass}">${student.grade}</span></td>
+                        <td>${rankDisplay}</td>
+                    </tr>`;
+        });
+        tbody.innerHTML = html;
+        updateStatistics();
+    }
+
+    function showToast(msg, isErr = false) {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.style.background = isErr ? '#b91c1c' : '#0f172a';
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function handleSearch() {
+        searchQuery = document.getElementById("searchInput").value;
+        renderTable();
+    }
+    
+    function clearSearch() {
+        document.getElementById("searchInput").value = "";
+        searchQuery = "";
+        document.getElementById("courseFilter").value = "all";
+        document.getElementById("gradeFilter").value = "all";
+        selectedCourse = "all";
+        selectedGrade = "all";
+        renderTable();
+        showToast("🔍 Search & filters cleared, showing all results");
+    }
+    
+    function handleCourseFilter() {
+        selectedCourse = document.getElementById("courseFilter").value;
+        renderTable();
+    }
+    
+    function handleGradeFilter() {
+        selectedGrade = document.getElementById("gradeFilter").value;
+        renderTable();
+    }
+
+    function setCurrentDate() {
+        const today = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const formatted = today.toLocaleDateString('en-IN', options);
+        document.getElementById("currentDate").innerText = formatted;
+        //document.getElementById("liveDate").innerHTML = `<i class="far fa-calendar-alt"></i> ${formatted}`;
+    }
+
+    // Event Listeners
+    document.getElementById("searchInput").addEventListener("input", handleSearch);
+    document.getElementById("clearSearchBtn").addEventListener("click", clearSearch);
+    document.getElementById("courseFilter").addEventListener("change", handleCourseFilter);
+    document.getElementById("gradeFilter").addEventListener("change", handleGradeFilter);
+
+    // Sidebar Navigation with toast feedback
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            item.classList.add('active');
+            const navText = item.innerText.trim();
+            if (navText.includes('Results')) showToast("📊 Viewing Results Dashboard");
+            else if (navText.includes('Analytics')) showToast("📈 Analytics: Average Score " + (studentResults.reduce((a,b)=>a+b.percentage,0)/studentResults.length).toFixed(1) + "%");
+            else showToast("ℹ️ RID Tech Support - Contact admin");
+            if(window.innerWidth <= 1000) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+        });
+    });
+
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menuToggleBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if(menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+    }
+
+    setCurrentDate();
+    renderTable();
+</script>
+</body>
+</html>

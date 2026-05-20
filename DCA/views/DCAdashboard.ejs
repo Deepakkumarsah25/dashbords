@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
+  <title>RID Tech Institute | Smart Dashboard · Fully Responsive</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/css/slidebar.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+ 
+</head>
+<body>
+    <%- include('partials/sidebar') %>
+<div class="app">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <main class="main">
+    <div class="topbar">
+      <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
+      <div class="search"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Search student, course..."></div>
+      <div class="top-actions">
+        <div class="notification-wrapper">
+          <div class="icon-btn" id="bellIcon"><i class="far fa-bell"></i><span class="badge" id="notifCount">3</span></div>
+          <div class="notif-dropdown" id="notifDropdown"><div class="notif-header">🔔 Notifications</div><div class="notif-list" id="notifList"></div></div>
+        </div>
+        <div class="profile-wrap" id="profileBtn">
+          <img class="avatar-img" id="profileAvatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="avatar">
+          <div><div class="profile-name" id="topbarProfileName">Rahul Mehta</div><div class="profile-role" id="topbarProfileRole">Admin</div></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="page-head">
+      <div><h2>Dashboard</h2><p>Welcome back, <span id="welcomeName">Admin</span> 👋 Real-time insights</p></div>
+      <div class="quick-actions">
+       <a href="/students"><button class="btn blue"><i class="fas fa-plus"></i> Add Student</button></a>
+        <a href="/fees"><button class="btn green"><i class=""></i> Collect Fees</button></a>
+        <a href="/test"><button class="btn purple"><i class="fas fa-pen"></i> Create Test</button></a>
+        <a href="/Attendence"><button class="btn orange"><i class="fas fa-user-check"></i> Mark Attendance</button></a>
+      </div>
+    </section>
+
+    <section class="stats" id="statsSection"></section>
+    <section class="grid"><div class="panel"><div class="panel-head"><h3>Student Enrollment Trend</h3><span style="font-size:12px;">This Year</span></div><div class="chart-wrap"><canvas id="enrollmentChart"></canvas></div></div>
+    <div class="panel"><div class="panel-head"><h3>Fee Collection Overview</h3><span>Monthly</span></div><div class="chart-wrap"><canvas id="feeChart"></canvas></div></div>
+    <div class="panel"><div class="panel-head"><h3>Course Popularity</h3></div><div class="chart-wrap"><canvas id="courseChart"></canvas></div></div></section>
+    <section class="middle-grid"><div class="panel"><div class="panel-head"><h3>📅 Today’s Schedule</h3></div><div id="scheduleList"></div><button class="view-btn">View Full Timetable</button></div>
+    <div class="panel"><div class="panel-head"><h3>Recent Registrations</h3></div><div style="overflow-x:auto;"><table id="recentTable"><thead><tr><th>Student Name</th><th>Course</th><th>Batch</th><th>Fee Status</th></tr></thead><tbody id="recentTbody"></tbody></table></div></div>
+    <div class="panel"><div class="panel-head"><h3>Important Alerts</h3></div><div id="alertsList"></div></div></section>
+    <section class="bottom-stats" id="bottomStats"></section>
+  </main>
+</div>
+
+<!-- FULLY WORKING PROFILE MODAL - EDITABLE & SYNCED -->
+<div id="profileModal" class="modal-overlay">
+  <div class="profile-modal">
+    <div class="modal-header"><h3><i class="fas fa-id-card"></i> </h3></div>
+    <div class="modal-avatar" id="modalAvatarTrigger">
+      <img id="modalAvatarImg" src="images/imag.jpeg" alt="avatar">
+      <div class="avatar-edit-icon"><i class="fas fa-camera"></i></div>
+    </div>
+    <div class="modal-body" id="profileModalBody">
+      <!-- VIEW MODE -->
+      <div id="profileViewMode">
+        <div class="info-row"><i class="fas fa-user"></i><div class="view-field"><strong>Full Name</strong><br><span id="profileName">Rahul Mehta</span></div></div>
+        <div class="info-row"><i class="fas fa-envelope"></i><div class="view-field"><strong>Email Address</strong><br><span id="profileEmail">rahul@ridtech.edu</span></div></div>
+        <div class="info-row"><i class="fas fa-phone"></i><div class="view-field"><strong>Phone Number</strong><br><span id="profilePhone">+91 98765 43210</span></div></div>
+        <div class="info-row"><i class="fas fa-user-tag"></i><div class="view-field"><strong>Role</strong><br><span id="profileRole">Super Admin</span></div></div>
+        <div class="profile-actions"><button id="editProfileBtn" class="btn blue btn-sm"><i class="fas fa-edit"></i> Edit Profile</button><button id="closeProfileBtn" class="btn btn-sm" style="background:#eef2ff;">Close</button></div>
+      </div>
+      <!-- EDIT MODE (hidden by default) -->
+      <div id="profileEditMode" style="display: none;">
+        <div class="info-row"><i class="fas fa-user"></i><div class="edit-field"><input type="text" id="editName" placeholder="Full Name"></div></div>
+        <div class="info-row"><i class="fas fa-envelope"></i><div class="edit-field"><input type="email" id="editEmail" placeholder="Email"></div></div>
+        <div class="info-row"><i class="fas fa-phone"></i><div class="edit-field"><input type="tel" id="editPhone" placeholder="Phone"></div></div>
+        <div class="info-row"><i class="fas fa-user-tag"></i><div class="edit-field"><input type="text" id="editRole" placeholder="Role"></div></div>
+        <div class="avatar-preview-area"><strong>Profile Picture</strong><div class="avatar-upload-btns"><label class="file-input-label"><i class="fas fa-upload"></i> Upload Image<input type="file" id="avatarUploadInput" accept="image/*" style="display:none;"></label><button id="resetAvatarBtn" class="file-input-label"><i class="fas fa-undo-alt"></i> Reset</button></div><small style="display:block; margin-top:6px;">Click on avatar to upload as well</small></div>
+        <div class="profile-actions"><button id="saveProfileBtn" class="btn green btn-sm"><i class="fas fa-save"></i> Save Changes</button><button id="cancelEditBtn" class="btn btn-sm" style="background:#f1f5f9;">Cancel</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toastMsg" class="toast-msg"></div>
+
+<script>
+  // ---------- DASHBOARD CORE DATA & FUNCTIONS (unchanged logic) ----------
+  const statsData = [
+    { title: "Total Students", value: "256", icon: "fas fa-users", trend: "↑12 this month", bg: "#eef6ff", color: "#2f80ed" },
+    { title: "Fees Collected Today", value: "₹18,500", icon: "fas fa-rupee-sign", trend: "↑8% vs yesterday", bg: "#ecfdf3", color: "#16a34a" },
+    { title: "Pending Fees", value: "₹1200", icon: "fas fa-exclamation-triangle", trend: "23 Students", bg: "#fff7ed", color: "#f59e0b" },
+    { title: "Active Courses", value: "8", icon: "fas fa-book-open", trend: "All Running", bg: "#f5f3ff", color: "#7c5cff" },
+    { title: "Upcoming Tests", value: "3", icon: "fas fa-calendar-alt", trend: "This Week", bg: "#fff1f2", color: "#ec4899" },
+    { title: "Today Attendance", value: "86%", icon: "fas fa-chart-line", trend: "Average", bg: "#ecfeff", color: "#06b6d4" }
+  ];
+  const scheduleItems = [
+    { time: "10:00 AM", title: "DCA Batch (Morning)", details: "Room 1 • Raj Sir" },
+    { time: "01:00 PM", title: "Python Batch", details: "Room 2 • Amit Sir" },
+    { time: "03:00 PM", title: "Tally Batch", details: "Room 1 • Neha Ma'am" },
+    { time: "05:00 PM", title: "Web Development", details: "Room 3 • Rohit Sir" }
+  ];
+  let studentsList = [
+    { name: "Aman Kumar", course: "DCA", batch: "DCA-M1", status: "Paid", class: "paid" },
+    { name: "Pooja Singh", course: "ADCA", batch: "ADCA-E1", status: "Partial", class: "partial" },
+    { name: "Rahul Verma", course: "Tally", batch: "TALLY-E2", status: "Pending", class: "pending" },
+    { name: "Neha Gupta", course: "Python", batch: "PY-M1", status: "Paid", class: "paid" },
+    { name: "Vikash Yadav", course: "Web Dev", batch: "WD-E1", status: "Pending", class: "pending" }
+  ];
+  const alertsData = [
+    { title: "Fees Overdue", desc: "23 students have pending fees", color: "#dc2626" },
+    { title: "Certificate Pending", desc: "12 certificates are pending", color: "#d97706" },
+    { title: "New Admission", desc: "5 new students this week", color: "#16a34a" },
+    { title: "Tests Scheduled", desc: "3 tests scheduled this week", color: "#2563eb" }
+  ];
+  const bottomStatsData = [
+    { icon: "fas fa-th", label: "Total Batches", value: "12" },
+    { icon: "fas fa-user-friends", label: "Total Teachers", value: "6" },
+    { icon: "fas fa-chalkboard", label: "Total Classrooms", value: "3" },
+    { icon: "fas fa-certificate", label: "Total Certificates", value: "156" },
+    { icon: "fas fa-book", label: "Library Books", value: "245" }
+  ];
+  let notifications = [
+    { id: 1, text: "📘 New student registration: Vikram Singh (Full Stack)", time: "2 min ago", cross: false, seen: false },
+    { id: 2, text: "💰 Fee reminder: 3 students pending fee from DCA batch", time: "1 hour ago", cross: false, seen: false },
+    { id: 3, text: "✅ Certificates generated for 5 students", time: "3 hours ago", cross: false, seen: false }
+  ];
+
+  function showToast(msg) { const toast = document.getElementById("toastMsg"); toast.innerText = msg; toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 2800); }
+  function updateNotifUI() { const container = document.getElementById("notifList"); if(!container) return; const unreadCount = notifications.filter(n => !n.seen).length; document.getElementById("notifCount").innerText = unreadCount; container.innerHTML = notifications.map(n => `<div class="notif-item"><i class="fas fa-bell"></i> ${n.text}<div class="time" style="font-size:10px;">${n.time}</div></div>`).join(''); }
+  function markAllSeen() { notifications.forEach(n => n.seen = true); updateNotifUI(); }
+  function renderStats() { document.getElementById("statsSection").innerHTML = statsData.map(s => `<div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:${s.bg}; color:${s.color}"><i class="${s.icon}"></i></div><div><div class="stat-title">${s.title}</div><div class="stat-value">${s.value}</div></div></div><div class="stat-sub">${s.trend}</div></div>`).join(''); }
+  function renderSchedule() { document.getElementById("scheduleList").innerHTML = scheduleItems.map(s => `<div class="schedule-item"><div><div class="time">${s.time}</div><div><strong>${s.title}</strong><div class="sub">${s.details}</div></div></div></div>`).join(''); }
+  function renderRecentTable(filter = "") { const tbody = document.getElementById("recentTbody"); let filtered = studentsList.filter(s => s.name.toLowerCase().includes(filter) || s.course.toLowerCase().includes(filter)); tbody.innerHTML = filtered.map(s => `<tr><td>${s.name}</td><td>${s.course}</td><td>${s.batch}</td><td><span class="status ${s.class}">${s.status}</span></td></tr>`).join(''); }
+  function renderAlerts() { document.getElementById("alertsList").innerHTML = alertsData.map(a => `<div class="alert-item"><div><strong style="color:${a.color}">${a.title}</strong><div class="sub">${a.desc}</div></div><i class="fas fa-arrow-right"></i></div>`).join(''); }
+  function renderBottomStats() { document.getElementById("bottomStats").innerHTML = bottomStatsData.map(b => `<div class="mini-card"><div class="mini-ico"><i class="${b.icon}"></i></div><div><strong>${b.value}</strong><span> ${b.label}</span></div></div>`).join(''); }
+  let enrollmentChart, feeChart, courseChart;
+  function initCharts() {
+    const enrollCtx = document.getElementById('enrollmentChart')?.getContext('2d');
+    if(enrollCtx) { if(enrollmentChart) enrollmentChart.destroy(); enrollmentChart = new Chart(enrollCtx, { type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], datasets: [{ label: 'Students', data: [50,72,74,79,120,130,150,165,180,195,220,260], borderColor: '#2f80ed', backgroundColor: 'rgba(47,128,237,.12)', fill: true, tension: 0.35 }] }, options: { responsive: true, maintainAspectRatio: false } }); }
+    const feeCtx = document.getElementById('feeChart')?.getContext('2d'); if(feeCtx) { if(feeChart) feeChart.destroy(); feeChart = new Chart(feeCtx, { type: 'bar', data: { labels: ['Week 1','Week 2','Week 3','Week 4','Week 5'], datasets: [{ label: 'Paid (₹K)', data: [35,42,37,48,39], backgroundColor: '#22c55e' }, { label: 'Pending (₹K)', data: [18,15,10,18,16], backgroundColor: '#f59e0b' }] }, options: { responsive: true } }); }
+    const courseCtx = document.getElementById('courseChart')?.getContext('2d'); if(courseCtx) { if(courseChart) courseChart.destroy(); courseChart = new Chart(courseCtx, { type: 'doughnut', data: { labels: ['DCA','ADCA','Tally','Python','Web Dev'], datasets: [{ data: [30,20,15,20,15], backgroundColor: ['#3b82f6','#22c55e','#f59e0b','#8b5cf6','#f472b6'], borderWidth: 0 }] }, options: { responsive: true, cutout: '62%' } }); }
+  }
+  function addCrossDashboardNotif() { notifications.unshift({ id: Date.now(), text: "🏛️ [ACCOUNTS DASHBOARD] Fee collection updated: ₹5,200 received from Web Dev batch", time: "Just now", cross: true, seen: false }); if(notifications.length>8) notifications.pop(); updateNotifUI(); showToast("🔔 New notification from Finance Dashboard"); }
+  setInterval(addCrossDashboardNotif, 14000);
+  
+  // SIDEBAR LOGIC
+  const sidebar = document.getElementById("sidebar"), overlay = document.getElementById("sidebarOverlay"), menuToggle = document.getElementById("menuToggleBtn");
+  function closeSidebar() { sidebar.classList.remove("open"); overlay.classList.remove("active"); document.body.style.overflow = ""; }
+  function openSidebar() { sidebar.classList.add("open"); overlay.classList.add("active"); document.body.style.overflow = "hidden"; }
+  if(menuToggle) menuToggle.addEventListener("click", (e) => { e.stopPropagation(); sidebar.classList.contains("open") ? closeSidebar() : openSidebar(); });
+  overlay?.addEventListener("click", closeSidebar);
+  document.querySelectorAll(".nav-item").forEach(item => { item.addEventListener("click", () => { if(window.innerWidth <= 768) closeSidebar(); showToast(`📌 ${item.innerText} section (demo)`); }); });
+  document.getElementById("searchInput")?.addEventListener("input", (e) => renderRecentTable(e.target.value.toLowerCase().trim()));
+  const bell = document.getElementById("bellIcon"), notifDrop = document.getElementById("notifDropdown"); if(bell && notifDrop) { bell.addEventListener("click", (e) => { e.stopPropagation(); notifDrop.classList.toggle("show"); markAllSeen(); }); document.addEventListener("click", (e) => { if(!bell.contains(e.target)) notifDrop.classList.remove("show"); }); }
+  document.querySelectorAll(".quick-actions .btn, .view-btn").forEach(btn => btn.addEventListener("click", () => showToast(`✨ ${btn.innerText.trim()} (demo action)`)));
+  
+  // ---------- FULLY WORKING PROFILE SYSTEM (EDIT, SAVE, AVATAR, PERSIST) ----------
+  let currentProfile = {
+    name: "Rahul Mehta",
+    email: "rahul@ridtech.edu",
+    phone: "+91 98765 43210",
+    role: "Super Admin",
+    avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+  };
+  function loadProfileFromStorage() { const saved = localStorage.getItem("ridtech_profile"); if(saved) { const p = JSON.parse(saved); currentProfile = { ...currentProfile, ...p }; } applyProfileToUI(); }
+  function saveProfileToStorage() { localStorage.setItem("ridtech_profile", JSON.stringify(currentProfile)); }
+  function applyProfileToUI() {
+    document.getElementById("profileName").innerText = currentProfile.name;
+    document.getElementById("profileEmail").innerText = currentProfile.email;
+    document.getElementById("profilePhone").innerText = currentProfile.phone;
+    document.getElementById("profileRole").innerText = currentProfile.role;
+    const topbarName = document.getElementById("topbarProfileName"); if(topbarName) topbarName.innerText = currentProfile.name;
+    const topbarRole = document.getElementById("topbarProfileRole"); if(topbarRole) topbarRole.innerText = currentProfile.role.split(' ')[0];
+    const welcomeSpan = document.getElementById("welcomeName"); if(welcomeSpan) welcomeSpan.innerText = currentProfile.name.split(' ')[0];
+    const avatarImgs = [document.getElementById("profileAvatar"), document.getElementById("modalAvatarImg")];
+    avatarImgs.forEach(img => { if(img) img.src = currentProfile.avatar; });
+  }
+  function openEditMode() {
+    document.getElementById("profileViewMode").style.display = "none";
+    document.getElementById("profileEditMode").style.display = "block";
+    document.getElementById("editName").value = currentProfile.name;
+    document.getElementById("editEmail").value = currentProfile.email;
+    document.getElementById("editPhone").value = currentProfile.phone;
+    document.getElementById("editRole").value = currentProfile.role;
+  }
+  function closeEditMode() { document.getElementById("profileViewMode").style.display = "block"; document.getElementById("profileEditMode").style.display = "none"; }
+  function saveProfileChanges() {
+    const newName = document.getElementById("editName").value.trim();
+    const newEmail = document.getElementById("editEmail").value.trim();
+    const newPhone = document.getElementById("editPhone").value.trim();
+    const newRole = document.getElementById("editRole").value.trim();
+    if(!newName || !newEmail) { showToast("❌ Name and Email cannot be empty"); return; }
+    currentProfile.name = newName; currentProfile.email = newEmail; currentProfile.phone = newPhone || currentProfile.phone; currentProfile.role = newRole || currentProfile.role;
+    saveProfileToStorage(); applyProfileToUI(); closeEditMode(); showToast("✅ Profile updated successfully!");
+  }
+  function updateAvatar(imageDataUrl) { currentProfile.avatar = imageDataUrl; saveProfileToStorage(); applyProfileToUI(); showToast("🖼️ Profile picture updated"); }
+  function resetAvatar() { currentProfile.avatar = "https://randomuser.me/api/portraits/men/32.jpg"; saveProfileToStorage(); applyProfileToUI(); showToast("🔄 Avatar reset to default"); }
+  function handleFileUpload(file) { if(file && file.type.startsWith("image/")) { const reader = new FileReader(); reader.onload = (e) => updateAvatar(e.target.result); reader.readAsDataURL(file); } else showToast("⚠️ Please select an image file"); }
+  document.getElementById("editProfileBtn")?.addEventListener("click", openEditMode);
+  document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfileChanges);
+  document.getElementById("cancelEditBtn")?.addEventListener("click", closeEditMode);
+  document.getElementById("closeProfileBtn")?.addEventListener("click", () => document.getElementById("profileModal")?.classList.remove("active"));
+  const profileBtn = document.getElementById("profileBtn"), profileModalElem = document.getElementById("profileModal");
+  if(profileBtn && profileModalElem) profileBtn.addEventListener("click", () => { profileModalElem.classList.add("active"); closeEditMode(); });
+  window.addEventListener("click", (e) => { if(e.target === profileModalElem) profileModalElem.classList.remove("active"); });
+  const avatarUploadInput = document.getElementById("avatarUploadInput");
+  document.getElementById("avatarUploadInput")?.parentElement?.addEventListener("click", () => avatarUploadInput.click());
+  avatarUploadInput?.addEventListener("change", (e) => { if(e.target.files && e.target.files[0]) handleFileUpload(e.target.files[0]); });
+  document.getElementById("resetAvatarBtn")?.addEventListener("click", resetAvatar);
+  document.getElementById("modalAvatarTrigger")?.addEventListener("click", () => { if(avatarUploadInput) avatarUploadInput.click(); });
+  // sync initial load
+  loadProfileFromStorage();
+  renderStats(); renderSchedule(); renderRecentTable(""); renderAlerts(); renderBottomStats(); initCharts(); updateNotifUI();
+  showToast("✅ Profile fully interactive · Edit & save changes");
+  setTimeout(() => addCrossDashboardNotif(), 3000);
+</script>
+</body>
+</html>

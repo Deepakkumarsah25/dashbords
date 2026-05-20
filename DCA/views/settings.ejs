@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>⚙️ Full Screen Settings | RID Tech</title>
+    <!-- Google Fonts + Font Awesome 6 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/slidebar.css">
+    <link rel="stylesheet" href="/css/settings.css">
+   
+</head>
+<body>
+
+ <%- include('partials/sidebar') %>
+<div class="dashboard-layout">
+    <!-- SIDEBAR (Full navigation) -->
+ 
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- MAIN CONTENT - FULL SCREEN FLEX -->
+    <main class="main-content">
+        <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
+        
+        <div class="top-bar">
+            <div class="date-badge" id="liveDate"><i class="far fa-calendar-alt"></i> Loading...</div>
+        </div>
+
+        <div class="settings-container">
+            <div class="header-section">
+                <div class="title-badge">
+                    <i class="fas fa-cog"></i>
+                    <h2>System Settings</h2>
+                </div>
+                <div class="date-badge">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span id="currentDate"></span>
+                </div>
+            </div>
+
+            <div class="settings-layout">
+                <!-- Settings Tabs (General & Security only) -->
+                <div class="settings-sidebar">
+                    <div class="settings-tab active" data-tab="general">
+                        <i class="fas fa-building"></i> General
+                    </div>
+                    <div class="settings-tab" data-tab="security">
+                        <i class="fas fa-shield-alt"></i> Security
+                    </div>
+                </div>
+
+                <!-- Settings Content Panels -->
+                <div class="settings-content">
+                    <!-- General Panel -->
+                    <div class="settings-panel active-panel" id="panel-general">
+                        <div class="panel-title">
+                            <i class="fas fa-building"></i> Institute Settings
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-store"></i> Institute Name</label>
+                            <input type="text" id="instituteName" placeholder="Enter institute name" value="RID Tech Academy">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Current Session</label>
+                                <select id="session">
+                                    <option>2024-25</option>
+                                    <option selected>2025-26</option>
+                                    <option>2026-27</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-phone"></i> Contact Number</label>
+                                <input type="tel" id="contactNumber" placeholder="Contact number" value="+91 98765 43210">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Email Address</label>
+                                <input type="email" id="email" placeholder="Email address" value="info@ridtech.edu">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-map-marker-alt"></i> Address</label>
+                                <input type="text" id="address" placeholder="Institute address" value="New Delhi, India">
+                            </div>
+                        </div>
+                        <button class="save-btn" id="saveGeneralBtn">
+                            <i class="fas fa-save"></i> Save General Settings
+                        </button>
+                        <div class="info-card">
+                            <i class="fas fa-info-circle"></i>
+                            <p>These details will appear on certificates, invoices, and official communications.</p>
+                        </div>
+                    </div>
+
+                    <!-- Security Panel -->
+                    <div class="settings-panel" id="panel-security">
+                        <div class="panel-title">
+                            <i class="fas fa-shield-alt"></i> Security Settings
+                        </div>
+                        <!-- Hidden field to store userId (simulate login system) -->
+                        <input type="hidden" id="userId" value="demo_rid_admin_001">
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" id="currentPassword" placeholder="Enter current password">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" id="newPassword" placeholder="Enter new password">
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm Password</label>
+                                <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                            </div>
+                        </div>
+                        <div class="toggle-switch">
+                            <div>
+                                <div class="toggle-label">Two-Factor Authentication</div>
+                                <div class="toggle-desc">Add extra security to your account</div>
+                            </div>
+                            <div class="toggle-btn" id="twoFactorToggle"></div>
+                        </div>
+                        <button class="save-btn" id="saveSecurityBtn">
+                            <i class="fas fa-save"></i> Update Security
+                        </button>
+                        <div class="info-card" id="securityInfoCard">
+                            <i class="fas fa-shield-alt"></i>
+                            <p>Last password change: 45 days ago. For better security, use a strong password.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="toast" class="toast-message"></div>
+
+<script>
+    (function() {
+        // DOM elements
+        const generalPanel = document.getElementById('panel-general');
+        const securityPanel = document.getElementById('panel-security');
+        const settingsTabs = document.querySelectorAll('.settings-tab');
+        const saveGeneralBtn = document.getElementById('saveGeneralBtn');
+        const saveSecurityBtn = document.getElementById('saveSecurityBtn');
+        const twoFactorToggle = document.getElementById('twoFactorToggle');
+        
+        // General inputs
+        const instituteName = document.getElementById('instituteName');
+        const sessionSelect = document.getElementById('session');
+        const contactNumber = document.getElementById('contactNumber');
+        const email = document.getElementById('email');
+        const address = document.getElementById('address');
+        
+        // Security inputs
+        const currentPassword = document.getElementById('currentPassword');
+        const newPassword = document.getElementById('newPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const userIdInput = document.getElementById('userId');   // 🔥 from login system (hidden)
+        
+        // 2FA state
+        let twoFactorEnabled = false;
+        
+        // Toast helper
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.background = isError ? '#b91c1c' : '#0f172a';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        // Set current date
+        function setCurrentDate() {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formatted = today.toLocaleDateString('en-IN', options);
+            document.getElementById('currentDate').innerText = formatted;
+            document.getElementById('liveDate').innerHTML = `<i class="far fa-calendar-alt"></i> ${formatted}`;
+        }
+        setCurrentDate();
+        
+        // ---------- LocalStorage Persistence (General + 2FA) ----------
+        function loadGeneralSettings() {
+            if (localStorage.getItem('gen_institute')) instituteName.value = localStorage.getItem('gen_institute');
+            if (localStorage.getItem('gen_session')) sessionSelect.value = localStorage.getItem('gen_session');
+            if (localStorage.getItem('gen_contact')) contactNumber.value = localStorage.getItem('gen_contact');
+            if (localStorage.getItem('gen_email')) email.value = localStorage.getItem('gen_email');
+            if (localStorage.getItem('gen_address')) address.value = localStorage.getItem('gen_address');
+        }
+        
+        function saveGeneralToStorage() {
+            localStorage.setItem('gen_institute', instituteName.value);
+            localStorage.setItem('gen_session', sessionSelect.value);
+            localStorage.setItem('gen_contact', contactNumber.value);
+            localStorage.setItem('gen_email', email.value);
+            localStorage.setItem('gen_address', address.value);
+        }
+        
+        function loadTwoFactorState() {
+            const stored = localStorage.getItem('sec_twofactor');
+            twoFactorEnabled = (stored === 'true');
+            if (twoFactorEnabled) twoFactorToggle.classList.add('active');
+            else twoFactorToggle.classList.remove('active');
+        }
+        
+        function saveTwoFactorState() {
+            localStorage.setItem('sec_twofactor', twoFactorEnabled);
+        }
+        
+        // Toggle click handler (visual only, actual save occurs in security button)
+        if (twoFactorToggle) {
+            twoFactorToggle.addEventListener('click', function(e) {
+                twoFactorEnabled = !twoFactorEnabled;
+                if (twoFactorEnabled) this.classList.add('active');
+                else this.classList.remove('active');
+                showToast(`2FA will be ${twoFactorEnabled ? 'enabled' : 'disabled'} after saving`, false);
+            });
+        }
+        
+        // ---------- Tab Switching (General / Security) ----------
+        function switchToPanel(panelId) {
+            settingsTabs.forEach(tab => {
+                const tabTarget = tab.getAttribute('data-tab');
+                if (tabTarget === panelId) tab.classList.add('active');
+                else tab.classList.remove('active');
+            });
+            if (panelId === 'general') {
+                generalPanel.classList.add('active-panel');
+                securityPanel.classList.remove('active-panel');
+            } else if (panelId === 'security') {
+                securityPanel.classList.add('active-panel');
+                generalPanel.classList.remove('active-panel');
+            }
+        }
+        
+        settingsTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-tab');
+                if (target === 'general') switchToPanel('general');
+                else if (target === 'security') switchToPanel('security');
+            });
+        });
+        
+        // ---------- Save General (unchanged) ----------
+        saveGeneralBtn.addEventListener('click', () => {
+            if (!instituteName.value.trim()) {
+                showToast("❌ Institute name is required", true);
+                return;
+            }
+            if (!contactNumber.value.trim()) {
+                showToast("❌ Contact number is required", true);
+                return;
+            }
+            if (!email.value.trim() || !email.value.includes('@')) {
+                showToast("❌ Valid email address is required", true);
+                return;
+            }
+            saveGeneralToStorage();
+            showToast(`✅ General settings saved! Institute: ${instituteName.value}`);
+        });
+        
+        // ---------- 🚀 SECURITY BUTTON: REPLACED WITH ASYNC API CALL (including 2FA) ----------
+        saveSecurityBtn.addEventListener('click', async () => {
+            // 1️⃣ Get userId from hidden field (simulates login system)
+            const userId = userIdInput ? userIdInput.value.trim() : null;
+            if (!userId) {
+                showToast("❌ User session expired. Please login again.", true);
+                return;
+            }
+            
+            // 2️⃣ Capture password fields
+            const currPwd = currentPassword.value;
+            const newPwd = newPassword.value;
+            const confirmPwd = confirmPassword.value;
+            
+            // 3️⃣ Validate password change request if any password field is filled
+            let isPasswordUpdateRequested = false;
+            if (newPwd || confirmPwd || currPwd) {
+                isPasswordUpdateRequested = true;
+                // validation rules
+                if (!currPwd) {
+                    showToast("❌ Current password is required to update password", true);
+                    return;
+                }
+                if (newPwd !== confirmPwd) {
+                    showToast("❌ New passwords do not match", true);
+                    return;
+                }
+                if (newPwd.length < 6) {
+                    showToast("❌ Password must be at least 6 characters", true);
+                    return;
+                }
+                if (newPwd === currPwd) {
+                    showToast("⚠️ New password must be different from current password", true);
+                    return;
+                }
+            }
+            
+            // 4️⃣ Prepare data object for API (exactly as per requirement)
+            const data = {
+                userId: userId,
+                currentPassword: currPwd,
+                newPassword: newPwd,
+                confirmPassword: confirmPwd
+            };
+            
+            // 5️⃣ Only call change-password API if user actually wants to change password
+            let passwordUpdateSuccess = false;
+            if (isPasswordUpdateRequested) {
+                try {
+                    // Simulate real fetch to backend endpoint (replace with actual URL if needed)
+                    const res = await fetch('/api/users/change-password', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await res.json();
+                    
+                    if (result.success) {
+                        passwordUpdateSuccess = true;
+                        showToast("🔒 Password updated successfully");
+                        // Clear password fields for security
+                        currentPassword.value = '';
+                        newPassword.value = '';
+                        confirmPassword.value = '';
+                        // Update the info card with today's date
+                        const infoCardP = document.querySelector('#panel-security .info-card p');
+                        if (infoCardP) {
+                            const todayStr = new Date().toLocaleDateString('en-IN');
+                            infoCardP.innerHTML = `Last password change: Today (${todayStr}) | Strong password applied.`;
+                        }
+                    } else {
+                        showToast(result.message || "Password change failed", true);
+                        return; // stop further execution (2FA won't be saved if password fails)
+                    }
+                } catch (error) {
+                    console.error("API error:", error);
+                    showToast("❌ Server error. Could not update password.", true);
+                    return;
+                }
+            }
+            
+            // 6️⃣ Save 2FA state to localStorage (persist toggle)
+            saveTwoFactorState();
+            
+            // 7️⃣ Final feedback: if password was not updated, still show 2FA saved message
+            if (!isPasswordUpdateRequested) {
+                showToast(`🔐 Security settings saved • 2FA ${twoFactorEnabled ? 'ON' : 'OFF'}`, false);
+            } else if (passwordUpdateSuccess) {
+                showToast(`✅ Password changed & 2FA ${twoFactorEnabled ? 'enabled' : 'disabled'}`, false);
+            }
+        });
+        
+        // Load all saved data on init
+        loadGeneralSettings();
+        loadTwoFactorState();
+        
+        // ---------- Sidebar Navigation (mobile & active state) ----------
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                const text = this.innerText.trim();
+                if (text !== 'Settings') {
+                    showToast(`📁 ${text} section — demo navigation`, false);
+                } else {
+                    showToast(`⚙️ Settings — General & Security`, false);
+                }
+                // Close sidebar on mobile after click
+                if (window.innerWidth <= 900) {
+                    document.getElementById('sidebar').classList.remove('open');
+                    document.getElementById('sidebarOverlay').classList.remove('active');
+                }
+            });
+        });
+        
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+        }
+        
+        // Ensure active settings tab highlight remains consistent
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 900) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        });
+        
+        // (Optional) small console note for developer
+        console.log("✅ Security button replaced with async fetch API call. userId taken from hidden field (simulated login). 2FA state preserved.");
+    })();
+</script>
+</body>
+</html>
