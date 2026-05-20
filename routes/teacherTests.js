@@ -14,7 +14,7 @@ router.post("/api/create-test", ensureTeacher, async (req, res) => {
 
 req.body.questions = questions.map(q => ({
   text: q.text || "",
-  type: q.type || "mcq",
+  type: q.type || "MCQ",
   difficulty: q.difficulty || "easy",
   points: q.points || 1,
   options: (q.options || []).map(opt => ({
@@ -23,10 +23,12 @@ req.body.questions = questions.map(q => ({
   }))
 }));
 
-    const test = new TeacherTest({
-      ...req.body,
-      teacher: req.user._id
-    });
+   const test = new TeacherTest({
+  ...req.body,
+
+  createdBy: req.user._id,
+  creatorModel: "Teacher"
+});
 
     await test.save();
 
@@ -42,7 +44,7 @@ req.body.questions = questions.map(q => ({
 router.get("/api/my-tests", ensureTeacher, async (req, res) => {
     try {
         const tests = await TeacherTest.find({
-            teacher: req.user._id   // ✅ filter by teacher
+            createdBy: req.user._id  // ✅ filter by teacher
         }).sort({ createdAt: -1 });
 
         res.json(tests);
@@ -59,7 +61,7 @@ router.get("/view/:id", ensureTeacher, async (req, res) => {
 
         const test = await TeacherTest.findOne({
             _id: testId,
-            teacher: req.user._id   // ✅ security filter
+            createdBy: req.user._id   // ✅ security filter
         });
 
         if (!test) {
@@ -112,7 +114,7 @@ router.delete("/delete/:id", ensureTeacher, async (req, res) => {
 
         await TeacherTest.findOneAndDelete({
             _id: testId,
-            teacher: req.user._id   // ✅ only own test
+           createdBy: req.user._id    // ✅ only own test
         });
 
         res.json({ success: true });
@@ -132,7 +134,7 @@ router.put("/update/:id", ensureTeacher, async (req, res) => {
         if (updateData.questions) {
             updateData.questions = updateData.questions.map(q => ({
                 text: q.text || "",
-                type: q.type || "mcq",
+                type: q.type || "MCQ",
                 difficulty: q.difficulty || "easy",
                 points: q.points || 1,
                 options: (q.options || []).map(opt => ({
@@ -143,7 +145,7 @@ router.put("/update/:id", ensureTeacher, async (req, res) => {
         }
 
         await TeacherTest.findOneAndUpdate(
-            { _id: testId, teacher: req.user._id },
+            { _id: testId, createdBy: req.user._id },
             { $set: updateData },   // ✅ FIX
             { new: true }
         );
@@ -175,7 +177,7 @@ router.get("/api/:id", ensureTeacher, async (req, res) => {
     try {
         const test = await TeacherTest.findOne({
             _id: req.params.id,
-            teacher: req.user._id   // ✅ filter
+            createdBy: req.user._id  // ✅ filter
         });
 
         res.json(test);

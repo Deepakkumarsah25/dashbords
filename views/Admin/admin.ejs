@@ -103,9 +103,9 @@
                 <span>Dashboard</span>
             </button>
             <button onclick="showTestRequests()">
-    <i class="fas fa-envelope"></i>
-    <span>Test Requests</span>
-</button>
+                <i class="fas fa-envelope"></i>
+                <span>Test Requests</span>
+            </button>
             <button onclick="showAnalytics()">
                 <i class="fas fa-chart-line"></i>
                 <span>Analytics</span>
@@ -482,31 +482,31 @@
 
         async function showTestRequests() {
 
-  // dashboard hide
-  document.getElementById('dashboardContent').style.display = 'none';
+            // dashboard hide
+            document.getElementById('dashboardContent').style.display = 'none';
 
-  // loading UI
-  document.getElementById('dynamicContent').innerHTML = `
+            // loading UI
+            document.getElementById('dynamicContent').innerHTML = `
     <h2>Loading Requests...</h2>
   `;
 
-  // fetch data
-  const res = await fetch("/admin/test-requests-data");
-  const requests = await res.json();
+            // fetch data
+            const res = await fetch("/admin/test-requests-data");
+            const requests = await res.json();
 
-  // अगर empty है
-  if (requests.length === 0) {
-    document.getElementById('dynamicContent').innerHTML = `
+            // अगर empty है
+            if (requests.length === 0) {
+                document.getElementById('dynamicContent').innerHTML = `
       <h2>No Pending Requests</h2>
     `;
-    return;
-  }
+                return;
+            }
 
-  // render HTML
-  let html = `<h2>Pending Requests</h2>`;
+            // render HTML
+            let html = `<h2>Pending Requests</h2>`;
 
-  requests.forEach(r => {
-  html += `
+            requests.forEach(r => {
+                html += `
     <div style="border:1px solid black; padding:10px; margin:10px;">
       
       <h3>${r.teacherId?.name}</h3>
@@ -526,33 +526,33 @@ Format: Question | Option1 | Option2 | Option3 | Option4 | CorrectOptionNumber
 
       </div>
     `;
-  });
+            });
 
-  document.getElementById('dynamicContent').innerHTML = html;
-}
+            document.getElementById('dynamicContent').innerHTML = html;
+        }
 
-async function approveRequest(id) {
+        async function approveRequest(id) {
 
-  const questions = document.getElementById("q_" + id).value;
+            const questions = document.getElementById("q_" + id).value;
 
-  if (!questions) {
-    alert("Enter questions first!");
-    return;
-  }
+            if (!questions) {
+                alert("Enter questions first!");
+                return;
+            }
 
-  await fetch("/admin/approve-request", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ id, questions })
-  });
+            await fetch("/admin/approve-request", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ id, questions })
+            });
 
-  alert("Approved & Test Created!");
+            alert("Approved & Test Created!");
 
-  // reload list
-  showTestRequests();
-}
+            // reload list
+            showTestRequests();
+        }
         // Preloader
         window.addEventListener('load', function () {
             setTimeout(() => {
@@ -1570,11 +1570,11 @@ async function approveRequest(id) {
         }
 
         // Main Page Website Section
- function showindexpages() {
-    state.currentView = 'mainPage';
-    document.getElementById('dashboardContent').style.display = 'none';
+        function showindexpages() {
+            state.currentView = 'mainPage';
+            document.getElementById('dashboardContent').style.display = 'none';
 
-    const content = `
+            const content = `
     <div class="slide-up">
         <h2 style="margin-bottom:20px;">
             <i class="fas fa-globe"></i> Main Website Control
@@ -1607,15 +1607,15 @@ async function approveRequest(id) {
     </div>
     `;
 
-    document.getElementById('dynamicContent').innerHTML = content;
-}
+            document.getElementById('dynamicContent').innerHTML = content;
+        }
 
-//Admin Records Section
-function showAllOverRecords() {
-    state.currentView = 'records';
-    document.getElementById('dashboardContent').style.display = 'none';
+        //Admin Records Section
+        function showAllOverRecords() {
+            state.currentView = 'records';
+            document.getElementById('dashboardContent').style.display = 'none';
 
-    const content = `
+            const content = `
     <div class="slide-up">
         <h2 style="margin-bottom:20px;">
             <i class="fas fa-database"></i> Admin Records
@@ -1648,81 +1648,181 @@ function showAllOverRecords() {
     </div>
     `;
 
-    document.getElementById('dynamicContent').innerHTML = content;
-}
-async function showAllTeacher() {
-  document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('dynamicContent').innerHTML = content;
+        }
+       
+        async function showAllTeacher() {
 
-  const res = await fetch("/admin/teachers");
-  const teachers = await res.json();
+    try {
 
-  const content = `
-    <div class="data-table-container">
-      
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3>All Teachers</h3>
+        document.getElementById('dashboardContent').style.display = 'none';
 
-        <!-- 🔍 SEARCH BAR -->
-        <input type="text" id="teacherSearch"
-          placeholder="Search by name or email..."
-          style="padding:8px 12px; border:1px solid #ccc; border-radius:5px; width:250px;">
-      </div>
+        document.getElementById("dynamicContent").innerHTML = `
+            <div style="padding:30px; text-align:center;">
+                <h2>Loading Teachers...</h2>
+            </div>
+        `;
 
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Created</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+        // ✅ FIXED URL
+        const res = await fetch("/admin/teachers");
 
-        <tbody id="teacherTableBody">
-          ${teachers.map(t => `
-            <tr>
-              <td>${t.name || "N/A"}</td>
-              <td>${t.email || "N/A"}</td>
-              <td>${new Date(t.createdAt).toLocaleDateString()}</td>
+        if (!res.ok) {
+            throw new Error("Failed to fetch teachers");
+        }
 
-              <td>
-                <button onclick="openTeacherTests('${t._id}')"
-                  style="padding:6px 12px; background:#0a66c2; color:white; border:none; border-radius:5px;">
-                  Select
-                </button>
-              </td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    </div>
-  `;
+        const teachers = await res.json();
 
-  document.getElementById("dynamicContent").innerHTML = content;
+        console.log("Teachers Data:", teachers);
 
-  // 🔥 SEARCH LOGIC
-  const searchInput = document.getElementById("teacherSearch");
+        if (!teachers || teachers.length === 0) {
 
-  searchInput.addEventListener("keyup", function () {
-    const value = this.value.toLowerCase();
+            document.getElementById("dynamicContent").innerHTML = `
+                <div class="data-table-container">
+                    <h2>No Teachers / Users Found</h2>
+                </div>
+            `;
 
-    const rows = document.querySelectorAll("#teacherTableBody tr");
+            return;
+        }
 
-    rows.forEach(row => {
-      const name = row.children[0].innerText.toLowerCase();
-      const email = row.children[1].innerText.toLowerCase();
+        const content = `
+            <div class="data-table-container">
 
-      if (name.includes(value) || email.includes(value)) {
-        row.style.display = "";
-      } else {
-        row.style.display = "none";
-      }
-    });
-  });
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:15px;
+                    flex-wrap:wrap;
+                    gap:10px;
+                ">
+
+                    <h3>All Teachers & Users</h3>
+
+                    <input
+                        type="text"
+                        id="teacherSearch"
+                        placeholder="Search by name or email..."
+                        style="
+                            padding:10px 14px;
+                            border:1px solid #ccc;
+                            border-radius:6px;
+                            width:260px;
+                        "
+                    >
+                </div>
+
+                <div style="overflow-x:auto;">
+
+                    <table class="data-table" style="width:100%;">
+
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Created</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="teacherTableBody">
+
+                            ${teachers.map(t => `
+
+                                <tr>
+
+                                    <td>${t.name || "N/A"}</td>
+
+                                    <td>${t.email || "N/A"}</td>
+
+                                    <td>${t.role || "User"}</td>
+
+                                    <td>
+                                        ${
+                                            t.createdAt
+                                            ? new Date(t.createdAt).toLocaleDateString()
+                                            : "N/A"
+                                        }
+                                    </td>
+
+                                    <td>
+
+                                        <button
+                                            onclick="openTeacherTests('${t._id}')"
+                                            style="
+                                                padding:7px 14px;
+                                                background:#0a66c2;
+                                                color:white;
+                                                border:none;
+                                                border-radius:5px;
+                                                cursor:pointer;
+                                            "
+                                        >
+                                            Select
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+                            `).join("")}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+        `;
+
+        document.getElementById("dynamicContent").innerHTML = content;
+
+        const searchInput = document.getElementById("teacherSearch");
+
+        searchInput.addEventListener("keyup", function () {
+
+            const value = this.value.toLowerCase();
+
+            const rows = document.querySelectorAll("#teacherTableBody tr");
+
+            rows.forEach(row => {
+
+                const name = row.children[0].innerText.toLowerCase();
+
+                const email = row.children[1].innerText.toLowerCase();
+
+                if (
+                    name.includes(value) ||
+                    email.includes(value)
+                ) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+
+            });
+
+        });
+
+    } catch (error) {
+
+        console.log("Show Teacher Error:", error);
+
+        document.getElementById("dynamicContent").innerHTML = `
+            <div style="padding:30px; text-align:center; color:red;">
+                <h2>Error Loading Teachers</h2>
+                <p>${error.message}</p>
+            </div>
+        `;
+
+    }
+
 }
 
 function openTeacherTests(id) {
-  window.location.href = "/admin/teacher-tests-page/" + id;
+    window.location.href = "/admin/teacher-tests-page/" + id;
 }
     </script>
 </body>

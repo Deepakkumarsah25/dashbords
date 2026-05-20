@@ -748,38 +748,38 @@ function setupEventListeners() {
 
     // Test Services details buttons (event delegation)
     document.addEventListener('click', function (e) {
-       if (e.target.classList.contains('delete-test-icon')) {
-    const testId = e.target.dataset.id;
+        if (e.target.classList.contains('delete-test-icon')) {
+            const testId = e.target.dataset.id;
 
-    if (!confirm("Delete this test?")) return;
+            if (!confirm("Delete this test?")) return;
 
-    fetch(`/teacher-tests/delete/${testId}`, {
-        method: "DELETE"
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
+            fetch(`/teacher-tests/delete/${testId}`, {
+                method: "DELETE"
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
 
-            // 🔥 FULL RELOAD (BEST)
-            loadTestsFromDB();
+                        // 🔥 FULL RELOAD (BEST)
+                        loadTestsFromDB();
 
-            showNotification("Test deleted", "success");
+                        showNotification("Test deleted", "success");
+                    }
+                });
         }
-    });
-}
-       const editBtn = e.target.closest('.edit-btn');
+        const editBtn = e.target.closest('.edit-btn');
 
-if (editBtn) {
-    const testId = editBtn.dataset.id;
+        if (editBtn) {
+            const testId = editBtn.dataset.id;
 
-    console.log("Edit Clicked:", testId);
+            console.log("Edit Clicked:", testId);
 
-    fetch(`/teacher-tests/api/${testId}`)
-        .then(res => res.json())
-        .then(test => {
-            openTestForEdit(test);
-        });
-}
+            fetch(`/teacher-tests/api/${testId}`)
+                .then(res => res.json())
+                .then(test => {
+                    openTestForEdit(test);
+                });
+        }
 
         if (e.target.classList.contains('details-btn') || e.target.closest('.details-btn')) {
             if (!state.paymentCompleted) {
@@ -841,7 +841,68 @@ if (editBtn) {
 
     // Question Management
     addQuestionBtn.addEventListener('click', addQuestion);
-    saveQuestionsBtn.addEventListener('click', saveQuestions);
+    // ✅ Desktop click
+// Desktop
+function handleSaveAll(e) {
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (saveQuestionsBtn.dataset.loading === "true") return;
+
+    saveQuestionsBtn.dataset.loading = "true";
+
+    saveQuestionsBtn.disabled = true;
+
+    // SAVE QUESTIONS
+    saveQuestions();
+
+    // ✅ FORCE CLOSE MODAL
+    const modal = document.getElementById('createTestModal');
+
+    modal.style.display = "none";
+    modal.classList.remove("show");
+
+    document.body.style.overflow = "auto";
+
+    // ✅ BACK TO FIRST PAGE
+    hideAllSections();
+
+    createTestSection.classList.remove("hidden");
+
+    state.currentSection = 'create-test-section';
+
+    // ✅ SCROLL TOP
+    window.scrollTo(0, 0);
+
+    // ENABLE AGAIN
+    setTimeout(() => {
+
+        saveQuestionsBtn.disabled = false;
+
+        delete saveQuestionsBtn.dataset.loading;
+
+    }, 1000);
+}
+
+// EVENTS
+saveQuestionsBtn.onclick = handleSaveAll;
+
+saveQuestionsBtn.addEventListener("touchend", function (e) {
+
+    e.preventDefault();
+
+    handleSaveAll(e);
+
+}, { passive: false });
+
+// ✅ IMPORTANT
+saveQuestionsBtn.addEventListener("click", handleSaveAll);
+
+saveQuestionsBtn.addEventListener("touchend", handleSaveAll, {
+    passive: false
+});
+
     addOptionBtn.addEventListener('click', addOption);
     questionTypeElement.addEventListener('change', handleQuestionTypeChange);
 
@@ -1163,7 +1224,7 @@ async function handleAddStudent() {
     const url = isEditing ? `/teacher/update-student/${isEditing}` : '/teacher/add-student';
     const method = isEditing ? 'PUT' : 'POST';
 
-    
+
 
     try {
         const response = await fetch(url, {
@@ -1630,9 +1691,9 @@ function removeOption(button) {
         alert('At least 2 options are required for MCQ questions.');
     }
 }
-
 // Add question
 function addQuestion() {
+
     const questionText = questionTextElement.value.trim();
     const questionType = questionTypeElement.value;
     const points = parseInt(questionPointsElement.value);
@@ -1643,6 +1704,13 @@ function addQuestion() {
         return;
     }
 
+    // 🔥 MongoDB type fix
+    let mongoType = "MCQ";
+
+    if (questionType === "true-false") {
+        mongoType = "TF";
+    }
+
     // 🔴 IMPORTANT: keep same ID while editing
     let questionId = state.editingQuestionId
         ? state.editingQuestionId
@@ -1651,16 +1719,19 @@ function addQuestion() {
     let question = {
         id: questionId,
         text: questionText,
-        type: questionType,
+        type: mongoType,
         points,
         difficulty
     };
 
     // ===== MCQ =====
     if (questionType === 'multiple-choice') {
+
         const options = [];
         const optionInputs = optionsList.querySelectorAll('input[type="text"]');
-        const correctOption = document.querySelector('input[name="correctOption"]:checked');
+
+        const correctOption =
+            document.querySelector('input[name="correctOption"]:checked');
 
         if (!correctOption) {
             alert('Please select the correct answer.');
@@ -1668,12 +1739,15 @@ function addQuestion() {
         }
 
         optionInputs.forEach((input, index) => {
+
             if (input.value.trim()) {
+
                 options.push({
                     id: index,
                     text: input.value.trim(),
                     isCorrect: index === parseInt(correctOption.value)
                 });
+
             }
         });
 
@@ -1688,21 +1762,34 @@ function addQuestion() {
 
     // ===== TRUE/FALSE =====
     else if (questionType === 'true-false') {
-        const correctOption = document.querySelector('input[name="correctOption"]:checked');
+
+        const correctOption =
+            document.querySelector('input[name="correctOption"]:checked');
+
         if (!correctOption) {
             alert('Select True or False.');
             return;
         }
 
         question.correctAnswer = correctOption.value === 'true';
+
         question.options = [
-            { id: 0, text: 'True', isCorrect: correctOption.value === 'true' },
-            { id: 1, text: 'False', isCorrect: correctOption.value === 'false' }
+            {
+                id: 0,
+                text: 'True',
+                isCorrect: correctOption.value === 'true'
+            },
+            {
+                id: 1,
+                text: 'False',
+                isCorrect: correctOption.value === 'false'
+            }
         ];
     }
 
     // ===== UPDATE or ADD =====
     if (state.editingQuestionId) {
+
         const index = state.currentTestQuestions.findIndex(
             q => String(q.id) === String(state.editingQuestionId)
         );
@@ -1710,16 +1797,21 @@ function addQuestion() {
         if (index !== -1) {
             state.currentTestQuestions[index] = question;
         }
+
         showNotification('Question updated successfully!', 'success');
+
     } else {
+
         state.currentTestQuestions.push(question);
+
         showNotification('Question added successfully!', 'success');
     }
 
-
     // RESET
     state.editingQuestionId = null;
-    addQuestionBtn.innerHTML = '<i class="fas fa-plus"></i> Add Question';
+
+    addQuestionBtn.innerHTML =
+        '<i class="fas fa-plus"></i> Add Question';
 
     renderQuestionList();
     updateQuestionPreview();
@@ -1727,10 +1819,9 @@ function addQuestion() {
     questionTextElement.value = '';
     questionPointsElement.value = '1';
     questionTypeElement.value = 'multiple-choice';
+
     handleQuestionTypeChange();
 }
-
-
 
 // Render question list
 function renderQuestionList() {
@@ -1882,57 +1973,131 @@ function updateQuestionPreview() {
 
 // Save questions
 function saveQuestions() {
+
     if (state.currentTestQuestions.length === 0) {
         alert('Please add at least one question before saving.');
         return;
     }
 
-    // Save questions to localStorage
-    localStorage.setItem('currentTestQuestions', JSON.stringify(state.currentTestQuestions));
+    // save
+    localStorage.setItem(
+        'currentTestQuestions',
+        JSON.stringify(state.currentTestQuestions)
+    );
 
-    closeModal('createTestModal');
-    showNotification(`Saved ${state.currentTestQuestions.length} questions successfully!`, 'success');
+    // update preview
+    updateQuestionPreview();
+
+    // close modal directly
+    const modal = document.getElementById('createTestModal');
+
+    if (modal) {
+        modal.style.display = 'none';
+    }
+
+    // mobile repaint fix
+    document.body.style.overflow = 'hidden';
+
+    setTimeout(() => {
+        document.body.style.overflow = 'auto';
+    }, 50);
+
+    showNotification(
+        `Saved ${state.currentTestQuestions.length} questions successfully!`,
+        'success'
+    );
 }
-
 // Create a new test
 async function createTest(e) {
+
     e.preventDefault();
 
-    const data = {
-        name: document.getElementById("test-name").value,
-        subject: document.getElementById("test-subject").value,
-        duration: document.getElementById("test-duration").value,
-        description: document.getElementById("test-description").value,
-        questions: state.currentTestQuestions
-    };
+    try {
 
-    let url = "/teacher-tests/create";
-    let method = "POST";
+        const data = {
+            name: document.getElementById("test-name").value.trim(),
+            subject: document.getElementById("test-subject").value.trim(),
+            duration: Number(document.getElementById("test-duration").value),
+            description: document.getElementById("test-description").value.trim(),
+            questions: state.currentTestQuestions
+        };
 
-    // 🔥 EDIT MODE
-    if (state.editingTestId) {
-        url = `/teacher-tests/update/${state.editingTestId}`;
-        method = "PUT";
-    }
+        // ✅ Validation
+        if (!data.name || !data.subject) {
+            alert("Please enter test name and subject.");
+            return;
+        }
 
-    const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
+        if (data.questions.length === 0) {
+            alert("Please add at least one question.");
+            return;
+        }
 
-    const result = await res.json();
+        // ✅ Route
+        let url = "/teacher-tests/api/create-test";
+        let method = "POST";
 
-    if (result.success) {
-        alert(state.editingTestId ? "Test Updated!" : "Test Created!");
+        // ✅ Edit Mode
+        if (state.editingTestId) {
+            url = `/teacher-tests/update/${state.editingTestId}`;
+            method = "PUT";
+        }
 
-        state.editingTestId = null; // reset
+        // ✅ API Call
+        const res = await fetch(url, {
+            method,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        console.log("Server Response:", result);
+
+        // ❌ Failed
+        if (!result.success) {
+            alert(result.error || "Failed to save test.");
+            return;
+        }
+
+        // ✅ Success
+        alert(
+            state.editingTestId
+                ? "Test Updated Successfully!"
+                : "Test Created Successfully!"
+        );
+
+        // ✅ Reset
+        state.editingTestId = null;
 
         resetTestForm();
-        await loadTestsFromDB();
+
+        state.currentTestQuestions = [];
+
+        // reload
+        try {
+            await loadTestsFromDB();
+        } catch (e) {
+            console.log("load ignored");
+        }
+
+        // ✅ DIRECT CLICK TEST CATEGORY
+        const testCategoryBtn =
+            document.getElementById("nav-test-services");
+
+        if (testCategoryBtn) {
+            testCategoryBtn.click();
+        }
+
+    } catch (err) {
+
+        console.error("CREATE TEST ERROR:", err);
+
+        alert("Server error while creating test.");
     }
 }
-
 
 // Create test card from form data
 function createTestCardFromForm() {
@@ -2037,18 +2202,36 @@ function updateCourseCount() {
 
 // Reset the test form
 function resetTestForm() {
+
     if (!state.paymentCompleted) {
-        alert('Please complete payment first to use this feature.');
         return;
     }
 
     testForm.reset();
-    document.getElementById('test-duration').value = 60;
-    document.getElementById('test-difficulty').value = 'Intermediate';
 
-    // Reset questions
+    // duration reset
+    const durationInput =
+        document.getElementById('test-duration');
+
+    if (durationInput) {
+        durationInput.value = 60;
+    }
+
+    // difficulty reset safely
+    const difficultyInput =
+        document.getElementById('test-difficulty');
+
+    if (difficultyInput) {
+        difficultyInput.value = 'Intermediate';
+    }
+
+    // reset questions
     state.currentTestQuestions = [];
-    
+
+    // reset preview
+    renderQuestionList();
+
+    updateQuestionPreview();
 }
 
 // Update dashboard
@@ -2388,7 +2571,7 @@ function closeRequestModal() {
 }
 
 // outside click close
-window.addEventListener("click", function(e) {
+window.addEventListener("click", function (e) {
     const modal = document.getElementById("requestModal");
     if (e.target === modal) {
         modal.style.display = "none";
@@ -2779,19 +2962,19 @@ function openAnalytics(testId) {
 // Update progress bars for dashboard stats
 function updateProgress(type, current, max) {
     const percentage = Math.min((current / max) * 100, 100);
-    
+
     const progressElement = document.getElementById(`${type}-progress`);
     const progressValueElement = document.getElementById(`${type}-progress-value`);
     const progressTextElement = document.getElementById(`${type}-progress-text`);
-    
+
     if (progressElement) {
         progressElement.style.width = percentage + '%';
     }
-    
+
     if (progressValueElement) {
         progressValueElement.textContent = Math.round(percentage) + '%';
     }
-    
+
     if (progressTextElement) {
         progressTextElement.textContent = Math.round(percentage) + '%';
     }
@@ -2947,8 +3130,8 @@ async function research() {
         alert("Server error");
     }
 }
-function previous(){
-    window.location.href="/previous-year-paper";
+function previous() {
+    window.location.href = "/previous-year-paper";
 }
 
 const generateLinkBtn = document.getElementById('generate-link-btn');
@@ -3002,12 +3185,12 @@ function downloadQR() {
     link.href = canvas.toDataURL();
     link.click();
 }
-window.addEventListener("click", function(e) {
-  const modal = document.getElementById("inviteModal");
-  if (e.target === modal) {
-    modal.style.display = "none";
-  }
-}); 
+window.addEventListener("click", function (e) {
+    const modal = document.getElementById("inviteModal");
+    if (e.target === modal) {
+        modal.style.display = "none";
+    }
+});
 
 
 function viewStudent(studentId) {

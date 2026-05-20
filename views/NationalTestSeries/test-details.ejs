@@ -450,19 +450,33 @@
 
                 <!-- Thumbnail mockup (same as second code but styled with first ui) -->
                 <div class="thumbnail-section">
+
                     <div class="thumb-preview">
-                        <div class="thumb-icon">🎯</div>
+
+                        <div class="thumb-icon">
+                            🎯
+                        </div>
+
                         <div class="thumb-text">
                             Set a thumbnail that stands out
-                            <small>1920x1080 recommended · catches attention</small>
+                            <small>
+                                1920x1080 recommended · catches attention
+                            </small>
                         </div>
+
                     </div>
-                    <button class="btn-outline-sm" id="mockThumbBtn">📸 Upload thumbnail</button>
+
+                    <input type="file" id="thumbnailInput" accept="image/*" hidden>
+
+                    <button type="button" class="btn-outline-sm" id="uploadThumbBtn">
+                        📸 Upload thumbnail
+                    </button>
+
                 </div>
 
                 <!-- Two action buttons (Save Private / Publish Public) -->
                 <div class="action-buttons">
-                    <button class="btn btn-secondary" id="savePrivateBtn">
+                    <button class="btn btn-secondary" type="button" id="savePrivateBtn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
@@ -471,7 +485,7 @@
                         </svg>
                         Save Private (Draft)
                     </button>
-                    <button class="btn btn-primary rocket" id="publishBtn">
+                    <button type="button" class="btn btn-primary rocket" id="publishBtn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7" />
@@ -491,203 +505,597 @@
     </div>
 
     <div id="toastMsg" class="toast"></div>
+<script>
 
-    <script>
-        // ---------- DOM elements ----------
-        const testNameField = document.getElementById('testName');
-        const testDescField = document.getElementById('testDesc');
-        const durationField = document.getElementById('durationMinutes');
-        const wordSpan = document.getElementById('wordCountDisplay');
-        const savePrivateBtn = document.getElementById('savePrivateBtn');
-        const publishBtn = document.getElementById('publishBtn');
+    // ---------- DOM elements ----------
+    const testNameField =
+        document.getElementById('testName');
 
-        // Helper: toast (exactly as first design)
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toastMsg');
-            toast.textContent = message;
-            toast.style.background = isError ? '#2d1a1a' : '#1e2a3a';
-            toast.style.borderColor = isError ? '#ef4444' : '#4d9eff';
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2600);
+    const testDescField =
+        document.getElementById('testDesc');
+
+    const durationField =
+        document.getElementById('durationMinutes');
+
+    const wordSpan =
+        document.getElementById('wordCountDisplay');
+
+    const savePrivateBtn =
+        document.getElementById('savePrivateBtn');
+
+    const publishBtn =
+        document.getElementById('publishBtn');
+
+    // ---------- TOAST ----------
+    function showToast(
+        message,
+        isError = false
+    ) {
+
+        const toast =
+            document.getElementById(
+                'toastMsg'
+            );
+
+        toast.textContent =
+            message;
+
+        toast.style.background =
+            isError
+                ? '#2d1a1a'
+                : '#1e2a3a';
+
+        toast.style.borderColor =
+            isError
+                ? '#ef4444'
+                : '#4d9eff';
+
+        toast.classList.add(
+            'show'
+        );
+
+        setTimeout(() => {
+
+            toast.classList.remove(
+                'show'
+            );
+
+        }, 2600);
+
+    }
+
+    // ---------- WORD COUNT ----------
+    function countWords(str) {
+
+        if (!str.trim())
+            return 0;
+
+        return str
+            .trim()
+            .split(/\s+/)
+            .filter(w => w.length > 0)
+            .length;
+
+    }
+
+    // ---------- UPDATE WORD COUNT ----------
+    function updateWordCount() {
+
+        const rawText =
+            testDescField.value;
+
+        const wordCount =
+            countWords(rawText);
+
+        wordSpan.innerText =
+            wordCount;
+
+        if (wordCount > 50) {
+
+            wordSpan.classList.add(
+                'error'
+            );
+
+            wordSpan.style.color =
+                "#ffa69e";
+
         }
 
-        // Word count validator: max 50 words
-        function countWords(str) {
-            if (!str.trim()) return 0;
-            return str.trim().split(/\s+/).filter(w => w.length > 0).length;
+        else {
+
+            wordSpan.classList.remove(
+                'error'
+            );
+
+            wordSpan.style.color =
+                "";
+
         }
 
-        function updateWordCount() {
-            const rawText = testDescField.value;
-            const wordCount = countWords(rawText);
-            wordSpan.innerText = wordCount;
-            if (wordCount > 50) {
-                wordSpan.classList.add('error');
-                wordSpan.style.color = "#ffa69e";
-            } else {
-                wordSpan.classList.remove('error');
-                wordSpan.style.color = "";
-            }
-            return wordCount;
+        return wordCount;
+
+    }
+
+    // ---------- VALIDATION ----------
+    function validateForm(
+        visibility
+    ) {
+
+        const name =
+            testNameField.value.trim();
+
+        const description =
+            testDescField.value.trim();
+
+        let duration =
+            parseInt(
+                durationField.value
+            );
+
+        // ✅ NAME REQUIRED
+        if (!name) {
+
+            showToast(
+                "❌ Test name is required",
+                true
+            );
+
+            testNameField.focus();
+
+            return null;
+
         }
 
-        // realtime word limit feedback + visual block (but submission will block)
-        testDescField.addEventListener('input', () => {
+        // ✅ DESCRIPTION LIMIT
+        const words =
+            countWords(description);
+
+        if (words > 50) {
+
+            showToast(
+                `❌ Description exceeds 50 words (${words})`,
+                true
+            );
+
+            testDescField.focus();
+
+            return null;
+
+        }
+
+        // ✅ DURATION FIX
+        if (
+            isNaN(duration) ||
+            duration < 1
+        ) {
+
+            duration = 60;
+
+        }
+
+        if (duration > 300) {
+
+            duration = 300;
+
+        }
+
+        // ✅ RETURN CLEAN DATA
+        return {
+
+            name,
+
+            description,
+
+            duration
+
+        };
+
+    }
+
+    // ---------- REALTIME DESCRIPTION ----------
+    testDescField.addEventListener(
+        'input',
+        () => {
+
             updateWordCount();
-            // Optionally prevent extra words but not cut, just show warning.
-            const words = countWords(testDescField.value);
+
+            const words =
+                countWords(
+                    testDescField.value
+                );
+
             if (words > 50) {
-                // gentle highlight but allow user to delete words
-                testDescField.style.borderColor = "#ef4444";
-            } else {
-                testDescField.style.borderColor = "var(--border2)";
-            }
-        });
 
-        testDescField.addEventListener('blur', () => {
-            const words = countWords(testDescField.value);
+                testDescField.style.borderColor =
+                    "#ef4444";
+
+            }
+
+            else {
+
+                testDescField.style.borderColor =
+                    "var(--border2)";
+
+            }
+
+        }
+    );
+
+    // ---------- DESCRIPTION BLUR ----------
+    testDescField.addEventListener(
+        'blur',
+        () => {
+
+            const words =
+                countWords(
+                    testDescField.value
+                );
+
             if (words > 50) {
-                showToast(`❌ Description cannot exceed 50 words! Current: ${words} words.`, true);
+
+                showToast(
+
+                    `❌ Description cannot exceed 50 words! Current: ${words} words.`,
+
+                    true
+
+                );
+
                 testDescField.focus();
-            } else {
-                testDescField.style.borderColor = "var(--border2)";
-            }
-        });
 
-        // --- main validation before save/publish ---
-        function validateForm(visibilityType) {
-            // 1. Test Name required
-            const nameVal = testNameField.value.trim();
-            if (!nameVal) {
-                showToast("❌ Test Name is required. Please enter a title.", true);
-                testNameField.focus();
-                return false;
             }
 
-            // 2. Description max 50 words validation (strict)
-            const descRaw = testDescField.value;
-            const wordCount = countWords(descRaw);
-            if (wordCount > 50) {
-                showToast(`⚠️ Description has ${wordCount} words. Maximum allowed is 50 words. Please shorten it.`, true);
-                testDescField.focus();
-                return false;
+            else {
+
+                testDescField.style.borderColor =
+                    "var(--border2)";
+
             }
 
-            // 3. Duration: positive integer
-            let duration = parseInt(durationField.value, 10);
-            if (isNaN(duration) || duration <= 0) {
-                duration = 60;
-                durationField.value = 60;
-                showToast(`⏱️ Duration set to default 60 minutes.`, false);
-            } else if (duration > 300) {
-                showToast(`⚠️ Max duration 300 minutes, lowering to 300`, false);
-                duration = 300;
-                durationField.value = 300;
-            }
+        }
+    );
 
-            return { name: nameVal, description: descRaw || "No description provided", duration };
+   // ---------- SUBMIT TEST ----------
+// ---------- SUBMIT TEST ----------
+async function submitTest(
+    visibility
+) {
+
+    // ✅ PREVENT DOUBLE CLICK
+    event?.preventDefault();
+
+    // ✅ VALIDATE
+    const validation =
+        validateForm(
+            visibility
+        );
+
+    if (!validation)
+        return;
+
+    const {
+
+        name,
+
+        description,
+
+        duration
+
+    } = validation;
+
+    // ✅ ACTIVE BUTTON
+    const activeButton =
+
+        visibility === "public"
+
+            ? publishBtn
+
+            : savePrivateBtn;
+
+    const originalText =
+        activeButton.innerHTML;
+
+    // ✅ LOADING
+    activeButton.disabled =
+        true;
+
+    activeButton.innerHTML =
+
+        visibility === "public"
+
+            ? "⏳ Publishing..."
+
+            : "⏳ Saving Draft...";
+
+    try {
+
+        // ✅ FORMDATA
+        const formData =
+            new FormData();
+
+        formData.append(
+            "name",
+            name
+        );
+
+        formData.append(
+            "description",
+            description
+        );
+
+        formData.append(
+            "subject",
+            "General"
+        );
+
+        formData.append(
+            "duration",
+            duration
+        );
+
+        formData.append(
+            "visibility",
+            visibility
+        );
+
+        // ✅ THUMBNAIL
+        if (
+
+            selectedThumbnail &&
+
+            selectedThumbnail instanceof File
+
+        ) {
+
+            formData.append(
+
+                "thumbnail",
+
+                selectedThumbnail
+
+            );
+
         }
 
-        // API / fetch call preserving original endpoint + demo fallback (same as original behavior)
-        async function submitTest(visibility) {
-            const validation = validateForm(visibility);
-            if (validation === false) return;
+        // ✅ DEBUG
+        console.log(
+            "🚀 SENDING TEST..."
+        );
 
-            const { name, description, duration } = validation;
-            const activeButton = visibility === 'public' ? publishBtn : savePrivateBtn;
-            const originalText = activeButton.innerHTML;
-            activeButton.innerHTML = visibility === 'public' ? '⏳ Publishing...' : '⏳ Saving draft...';
-            activeButton.disabled = true;
+        for (
+            let pair of
+            formData.entries()
+        ) {
 
-            const payload = {
-                name: name,
-                description: description,
-                subject: "General",
-                duration: duration,
-                visibility: visibility   // 'public' or 'private'
-            };
+            console.log(
+                pair[0],
+                pair[1]
+            );
 
-            try {
-                // exact fetch as original second code specification (National-Test-Series create-test endpoint)
-                const response = await fetch("/National-Test-Series/create-test", {
+        }
+
+        // ✅ FETCH
+        const response =
+            await fetch(
+
+                "/National-Test-Series/create-test",
+
+                {
+
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
 
-                let data;
-                let successFlag = false;
+                    body: formData,
 
-                if (!response.ok) {
-                    // Demo simulation when backend not reachable (exactly like original code fallback)
-                    console.warn("Backend not reachable → demo mode. Test created (preview)");
-                    successFlag = true;
-                    data = { success: true, message: "Test created (simulated preview)" };
-                } else {
-                    data = await response.json();
-                    successFlag = data.success === true;
+                    credentials:
+                        "same-origin"
+
                 }
 
-                if (successFlag) {
-                    const successMsg = visibility === 'public'
-                        ? `✨ Test "${name}" published successfully! Redirecting to channel...`
-                        : `💾 Test "${name}" saved as private draft. Redirecting...`;
-                    showToast(successMsg, false);
-                    setTimeout(() => {
-                        window.location.href = "/National-Test-Series/teacher/channel";
-                    }, 900);
-                } else {
-                    const errMsg = data?.message || "Failed to save test. Please try again.";
-                    showToast(`⚠️ ${errMsg}`, true);
-                    activeButton.innerHTML = originalText;
-                    activeButton.disabled = false;
-                }
-            } catch (err) {
-                console.error("fetch error:", err);
-                // demo mode fallback: ensures that interface never breaks + redirect simulation
-                const useDemoMode = true;
-                if (useDemoMode) {
-                    showToast(`📡 Demo mode: Test "${name}" (${visibility}) created successfully. Redirect simulation.`, false);
-                    setTimeout(() => {
-                        window.location.href = "/National-Test-Series/teacher/channel";
-                    }, 900);
-                } else {
-                    showToast(`Network error: ${err.message}. Check connection.`, true);
-                    activeButton.innerHTML = originalText;
-                    activeButton.disabled = false;
-                }
-            } finally {
-                // avoid double disabling if redirect doesn't happen fast
-                setTimeout(() => {
-                    if (activeButton && activeButton.disabled === true && !window.location.pathname.includes("/teacher/channel")) {
-                        activeButton.innerHTML = originalText;
-                        activeButton.disabled = false;
-                    }
-                }, 2000);
-            }
+            );
+
+        // ✅ CHECK RESPONSE
+        if (!response.ok) {
+
+            throw new Error(
+
+                "Server response failed"
+
+            );
+
         }
 
-        // Event listeners
-        savePrivateBtn.onclick = () => submitTest('private');
-        publishBtn.onclick = () => submitTest('public');
+        // ✅ JSON
+        const data =
+            await response.json();
 
-        // Thumbnail mock action: shows demo info (not required to implement actual upload)
-        document.getElementById('mockThumbBtn').addEventListener('click', () => {
-            showToast("🖼️ Thumbnail uploader demo | full feature ready for image integration.", false);
-        });
+        console.log(
+            "SERVER RESPONSE:",
+            data
+        );
 
-        // Additional polishing: realtime initial word count
-        updateWordCount();
+        // ✅ SUCCESS
+        if (data.success) {
 
-        // Duration blur validation (same style)
-        durationField.addEventListener('blur', () => {
-            let val = parseInt(durationField.value, 10);
-            if (isNaN(val) || val < 1) durationField.value = '';
-            else if (val > 300) durationField.value = 300;
-        });
+            showToast(
 
-        console.log("🔥 National Test Series UI — design identical to RIDTECH style, description word limit (max 50 words), all validations implemented.");
-    </script>
+                visibility === "public"
+
+                    ? "🚀 Test Published Successfully"
+
+                    : "💾 Draft Saved Successfully"
+
+            );
+
+            // ✅ RESET THUMBNAIL
+            selectedThumbnail =
+                null;
+
+            thumbnailInput.value =
+                "";
+
+            uploadThumbBtn.innerHTML =
+
+                "📸 Upload thumbnail";
+
+            // ✅ REDIRECT
+            setTimeout(() => {
+
+                window.location.href =
+
+                    "/National-Test-Series/teacher/channel";
+
+            }, 1000);
+
+        }
+
+        // ❌ FAILED
+        else {
+
+            showToast(
+
+                data.msg ||
+
+                "Failed to create test",
+
+                true
+
+            );
+
+        }
+
+    }
+
+    // ❌ ERROR
+    catch (err) {
+
+        console.log(
+            "SUBMIT ERROR:",
+            err
+        );
+
+        showToast(
+
+            err.message ||
+
+            "Server Error",
+
+            true
+
+        );
+
+    }
+
+    // ✅ RESET BUTTON
+    finally {
+
+        activeButton.disabled =
+            false;
+
+        activeButton.innerHTML =
+            originalText;
+
+    }
+
+}
+
+    // ---------- EVENTS ----------
+    savePrivateBtn.onclick =
+        () => submitTest(
+            'private'
+        );
+
+    publishBtn.onclick =
+        () => submitTest(
+            'public'
+        );
+
+    updateWordCount();
+
+    // ---------- THUMBNAIL ----------
+    const thumbnailInput =
+        document.getElementById(
+            "thumbnailInput"
+        );
+
+    const uploadThumbBtn =
+        document.getElementById(
+            "uploadThumbBtn"
+        );
+
+    let selectedThumbnail =
+        null;
+
+    uploadThumbBtn.addEventListener(
+        "click",
+        () => {
+
+            thumbnailInput.click();
+
+        }
+    );
+
+    thumbnailInput.addEventListener(
+        "change",
+        (e) => {
+
+            const file =
+                e.target.files[0];
+
+            if (!file)
+                return;
+
+            selectedThumbnail =
+                file;
+
+            uploadThumbBtn.innerHTML =
+
+                `✅ ${file.name}`;
+
+            showToast(
+                "Thumbnail selected successfully"
+            );
+
+        }
+    );
+
+    // ---------- DURATION VALIDATION ----------
+    durationField.addEventListener(
+        'blur',
+        () => {
+
+            let val =
+                parseInt(
+                    durationField.value,
+                    10
+                );
+
+            if (
+                isNaN(val) ||
+                val < 1
+            ) {
+
+                durationField.value =
+                    '';
+
+            }
+
+            else if (
+                val > 300
+            ) {
+
+                durationField.value =
+                    300;
+
+            }
+
+        }
+    );
+
+    console.log(
+        "✅ National Test Series Loaded Successfully"
+    );
+
+</script>
 </body>
 
 </html>

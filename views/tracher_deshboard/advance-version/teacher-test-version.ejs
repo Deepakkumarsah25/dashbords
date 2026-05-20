@@ -640,6 +640,31 @@ canvas {
         opacity: 1;
     }
 }
+/* SAVE BUTTON MOBILE FIX */
+#saveQuestionsBtn {
+    position: relative !important;
+    z-index: 999999 !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 52px;
+}
+
+/* floating bot/chat fix */
+iframe,
+.chatbot,
+.chat-widget,
+.bot-icon,
+.floating-chat {
+    z-index: 1 !important;
+}
+
+.panel-buttons {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    z-index: 9999;
+    padding: 10px;
+}
 </style>
 
 </head>
@@ -2108,7 +2133,7 @@ canvas {
                     <button class="btn-cancel-desktop" onclick="closeModal('createTestModal')">
                         <i class="fas fa-times"></i> Cancel
                     </button>
-                    <button class="btn-save-desktop" id="saveQuestionsBtn">
+                    <button type="button" class="btn-save-desktop" id="saveQuestionsBtn">
                         <i class="fas fa-save"></i> Save All
                     </button>
                 </div>
@@ -2199,8 +2224,8 @@ canvas {
             <button class="mobile-cancel" onclick="closeModal('createTestModal')">
                 <i class="fas fa-times"></i> Cancel
             </button>
-            <button class="mobile-save" id="saveQuestionsBtnMobile">
-                <i class="fas fa-save"></i> Save All (<span id="saveCountMobile">0</span>)
+            <button type="button" class="mobile-save" id="saveQuestionsBtn">
+                <i class="fas fa-save"></i> Save All 
             </button>
         </div>
     </div>

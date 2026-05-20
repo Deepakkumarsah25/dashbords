@@ -19,7 +19,9 @@
     <div class="main-container">
         <div class="quiz-container">
             <div class="question-header">
-                <h2><%= testTitle %></h2>
+                <h2>
+                    <%= testTitle %>
+                </h2>
                 <div class="timer"><span id="timer"></span></div>
             </div>
 
@@ -48,7 +50,7 @@
                 <button class="btn btn-next" onclick="nextQuestion()">Next</button>
             </div>
 
-           <button class="btn submit-btn" onclick="submitQuiz()">Submit Test</button>
+            <button class="btn submit-btn" onclick="submitQuiz()">Submit Test</button>
         </div>
 
         <div class="sidebar">
@@ -69,17 +71,32 @@
 
     <!-- ✅ Inject questions + duration -->
     <script>
-    window.questions = <%- JSON.stringify(questions || []) %>;
-    window.testDuration = <%= duration %>;
+        window.questions = <%- JSON.stringify(questions || []) %>;
 
-    console.log("Injected TestId:", document.getElementById("testId").value);
-    console.log("Injected StudentId:", document.getElementById("studentId").value);
-    console.log("Questions:", window.questions);
-</script>
+if (!window.questions.length) {
+
+    window.questions = JSON.parse(
+        localStorage.getItem("questions") || "[]"
+    );
+
+}
+        window.testDuration = <%= duration %>;
+
+        console.log("Injected TestId:", document.getElementById("testId").value);
+        console.log("Injected StudentId:", document.getElementById("studentId").value);
+        console.log("Questions:", window.questions);
+
+
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark-mode");
+        }
+
+    </script>
 
 
     <!-- ✅ External JS -->
     <script src="/js/NationalTestPagecard/AllindiaTestPagecard.js"></script>
 
 </body>
+
 </html>

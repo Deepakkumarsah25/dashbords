@@ -125,17 +125,42 @@ router.get("/leads", async (req, res) => {
 
 router.get("/teachers", async (req, res) => {
   try {
-    let teachers = await Teacher.find();
 
-    if (!teachers.length) {
-      teachers = await User.find({ role: "teacher" });
-    }
+    // ✅ all teachers
+    const teachers = await Teacher.find().lean();
 
-    res.json(teachers);
+    // ✅ users who created tests
+    const creatorUserIds = await TeacherTest.find({
+      creatorModel: "User"
+    }).distinct("createdBy");
+
+    // ✅ only test creator users
+    const users = await User.find({
+      _id: { $in: creatorUserIds }
+    }).lean();
+
+    // ✅ combine both
+    const allCreators = [
+      ...teachers,
+      ...users
+    ];
+
+    // ✅ remove duplicate ids
+    const uniqueCreators = allCreators.filter(
+      (item, index, self) =>
+        index === self.findIndex(
+          t => t._id.toString() === item._id.toString()
+        )
+    );
+
+    res.json(uniqueCreators);
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+
+    console.log("TEACHER ROUTE ERROR:", error);
+
+    res.status(500).json([]);
+
   }
 });
 
@@ -145,10 +170,31 @@ const TeacherTest = require("../models/teacherTestModel");
 // ✅ PAGE OPEN KARNE KE LIYE
 router.get("/teacher-tests-page/:teacherId", async (req, res) => {
   try {
+
     const { teacherId } = req.params;
 
-    const teacher = await Teacher.findById(teacherId);
-    const tests = await TeacherTest.find({ teacher: teacherId });
+    // ✅ first Teacher check
+    let teacher = await Teacher.findById(teacherId);
+
+    let creatorModel = "Teacher";
+
+    // ✅ if not teacher then user
+    if (!teacher) {
+      teacher = await User.findById(teacherId);
+      creatorModel = "User";
+    }
+
+    if (!teacher) {
+      return res.status(404).send("User not found");
+    }
+
+    // ✅ CORRECT QUERY
+    const tests = await TeacherTest.find({
+      createdBy: teacher._id,
+      creatorModel: creatorModel
+    });
+
+    console.log("FOUND TESTS:", tests);
 
     res.render("Admin/teachertestcards/testcards", {
       teacher,
@@ -156,8 +202,11 @@ router.get("/teacher-tests-page/:teacherId", async (req, res) => {
     });
 
   } catch (err) {
-    console.log(err);
-    res.send("Error loading page");
+
+    console.log("TEST PAGE ERROR:", err);
+
+    res.status(500).send("Error loading tests");
+
   }
 });
 

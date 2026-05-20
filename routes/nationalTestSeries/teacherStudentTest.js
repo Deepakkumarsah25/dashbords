@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const TeacherTest = require("../../models/teacherTestModel");
-
+const upload =require("../../middlewares/upload");
 // 🔥 TEMP STORE (user wise questions)
 let tempQuestionsStore = {};
+
 
 
 // ================= SAVE TEMP QUESTIONS =================
@@ -26,89 +27,269 @@ router.post("/save-temp-questions", (req, res) => {
 
 
 // ================= CREATE TEST =================
-router.post("/create-test", async (req, res) => {
-  try {
-    const token = req.cookies.token;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+// ================= CREATE TEST =================
+router.post(
 
-    const creatorModel = decoded.role === "teacher" ? "Teacher" : "User";
+  "/create-test",
 
-    // 🔥 TEMP QUESTIONS
-    const rawQuestions = tempQuestionsStore[decoded.userId] || [];
+  (req, res, next) => {
 
-    console.log("RAW QUESTIONS:", rawQuestions);
+    upload.single("thumbnail")(
 
-    if (!rawQuestions.length) {
-      return res.json({ success: false, msg: "No questions found" });
-    }
+      req,
 
-    // 🔥 FINAL FORMAT FIX
-    const formattedQuestions = rawQuestions.map(q => {
+      res,
 
-      const questionText = q.text || q.q || "No Question";
-      const type = q.type || "MCQ";
-      const points = q.points || q.marks || 1;
+      function (err) {
 
-      let options = [];
+        if (err) {
 
-      // ✅ TRUE / FALSE FIX
-      if (type === "TF" || type === "True/False") {
-        options = [
-          { text: "True", isCorrect: q.correctAnswer === "True" },
-          { text: "False", isCorrect: q.correctAnswer === "False" }
-        ];
-      } 
-      // ✅ MCQ FIX
-      else {
-        options = (q.options || []).map(opt => {
-          const text = typeof opt === "string" ? opt : opt.text;
+          console.log(
+            "MULTER ERROR:",
+            err
+          );
 
-          return {
-            text,
-            isCorrect: text === q.correctAnswer || opt.isCorrect === true
-          };
-        });
+          return res.json({
+
+            success: false,
+
+            msg: "Thumbnail upload failed"
+
+          });
+
+        }
+
+        next();
+
       }
 
-      return {
-        text: questionText,
-        type: type,
-        points: points,
-        options: options
-      };
-    });
+    );
 
-    console.log("FORMATTED QUESTIONS:", formattedQuestions);
+  },
 
-    // 🔥 SAVE TEST
-    const newTest = new TeacherTest({
-      createdBy: decoded.userId,
-      creatorModel,
+  async (req, res) => {
 
-      name: req.body.name,
-      subject: req.body.subject || "General",
-      description: req.body.description,
-      duration: req.body.duration || 60,
+    try {
 
-      questions: formattedQuestions,
+      // ✅ TOKEN
+      const token =
+        req.cookies.token;
 
-      visibility: req.body.visibility || "private",
-      status: req.body.visibility === "public" ? "published" : "pending"
-    });
+      if (!token) {
 
-    await newTest.save();
+        return res.json({
 
-    // 🔥 CLEAN TEMP DATA
-    delete tempQuestionsStore[decoded.userId];
+          success: false,
 
-    res.json({ success: true });
+          msg: "Login required"
 
-  } catch (err) {
-    console.log("❌ Create Test Error:", err);
-    res.json({ success: false, msg: "Server error" });
+        });
+
+      }
+
+      // ✅ VERIFY
+      const decoded =
+        jwt.verify(
+          token,
+          process.env.JWT_SECRET
+        );
+
+      // ✅ QUESTIONS
+      const rawQuestions =
+        tempQuestionsStore[
+        decoded.userId
+        ] || [];
+
+      if (!rawQuestions.length) {
+
+        return res.json({
+
+          success: false,
+
+          msg: "No questions found"
+
+        });
+
+      }
+
+      // ✅ FORMAT QUESTIONS
+      const formattedQuestions =
+        rawQuestions.map((q) => {
+
+          let options = [];
+
+          if (
+            q.type === "TF" ||
+            q.type === "True/False"
+          ) {
+
+            options = [
+
+              {
+
+                text: "True",
+
+                isCorrect:
+                  q.correctAnswer ===
+                  "True"
+
+              },
+
+              {
+
+                text: "False",
+
+                isCorrect:
+                  q.correctAnswer ===
+                  "False"
+
+              }
+
+            ];
+
+          }
+
+          else {
+
+            options =
+              (q.options || []).map(
+                (opt) => ({
+
+                  text:
+                    typeof opt ===
+                      "string"
+                      ? opt
+                      : opt.text,
+
+                  isCorrect:
+                    opt.isCorrect ||
+                    false
+
+                })
+              );
+
+          }
+
+          return {
+
+            text:
+              q.q ||
+              q.text,
+
+            type:
+              q.type || "MCQ",
+
+            points:
+              q.marks || 1,
+
+            options
+
+          };
+
+        });
+
+      // ✅ THUMBNAIL
+     let thumbnailPath = "";
+
+console.log(req.file);
+
+if (req.file) {
+
+    thumbnailPath =
+    req.file.path;
+
+}
+
+      // ✅ CREATE TEST
+      const newTest =
+        new TeacherTest({
+
+          createdBy:
+            decoded.userId,
+
+          creatorModel:
+            decoded.role ===
+              "teacher"
+              ? "Teacher"
+              : "User",
+
+          name:
+            req.body.name,
+
+          description:
+            req.body.description,
+
+          subject:
+            req.body.subject ||
+            "General",
+
+          duration:
+            req.body.duration ||
+            60,
+
+          thumbnail:
+            thumbnailPath,
+
+          visibility:
+            req.body.visibility ||
+            "private",
+
+          questions:
+            formattedQuestions,
+
+          status:
+            req.body.visibility ===
+              "public"
+              ? "published"
+              : "pending"
+
+        });
+
+      // ✅ SAVE
+      await newTest.save();
+
+      // ✅ CLEAR TEMP
+      delete tempQuestionsStore[
+        decoded.userId
+      ];
+
+      console.log(
+        "✅ TEST CREATED"
+      );
+
+      res.json({
+
+        success: true,
+
+        msg:
+          "Test created successfully",
+
+        test: newTest
+
+      });
+
+    }
+
+    catch (err) {
+
+      console.log(
+        "❌ CREATE TEST ERROR:",
+        err
+      );
+
+      res.json({
+
+        success: false,
+
+        msg: "Server error"
+
+      });
+
+    }
+
   }
-});
 
+);
 // ================= MY CHANNEL =================
 router.get("/teacher/channel", async (req, res) => {
   try {
@@ -140,11 +321,11 @@ router.get("/all-tests", async (req, res) => {
     const tests = await TeacherTest.find({
       visibility: "public"
     })
-    .populate({
-      path: "createdBy",
-      select: "name"
-    })
-    .sort({ createdAt: -1 });
+      .populate({
+        path: "createdBy",
+        select: "name"
+      })
+      .sort({ createdAt: -1 });
 
     res.render("NationalTestSeries/NationalTest", { tests });
 
@@ -161,9 +342,9 @@ router.delete("/delete/:id", async (req, res) => {
     // ❌ NO TOKEN → NOT LOGGED IN
     const token = req.cookies.token;
     if (!token) {
-      return res.status(401).json({ 
-        success: false, 
-        msg: "Login required" 
+      return res.status(401).json({
+        success: false,
+        msg: "Login required"
       });
     }
 
@@ -172,9 +353,9 @@ router.delete("/delete/:id", async (req, res) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
-      return res.status(401).json({ 
-        success: false, 
-        msg: "Invalid token" 
+      return res.status(401).json({
+        success: false,
+        msg: "Invalid token"
       });
     }
 
@@ -182,17 +363,17 @@ router.delete("/delete/:id", async (req, res) => {
     const test = await TeacherTest.findById(req.params.id);
 
     if (!test) {
-      return res.status(404).json({ 
-        success: false, 
-        msg: "Test not found" 
+      return res.status(404).json({
+        success: false,
+        msg: "Test not found"
       });
     }
 
     // 🔥 OWNER CHECK (IMPORTANT)
     if (test.createdBy.toString() !== decoded.userId) {
-      return res.status(403).json({ 
-        success: false, 
-        msg: "You can delete only your own test" 
+      return res.status(403).json({
+        success: false,
+        msg: "You can delete only your own test"
       });
     }
 

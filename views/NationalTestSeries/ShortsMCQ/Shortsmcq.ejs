@@ -8,612 +8,93 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/Allindiatestserice/testserice.css">
-    
-    <!-- YOUR ORIGINAL CSS (UNCHANGED) -->
-    <style>
-        /* ----- RESET & GLOBAL ----- */
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --header-h: 64px;
-        }
-
-        body {
-            background: #f5f7fb;
-            color: #1e293b;
-            font-family: 'Roboto', system-ui, sans-serif;
-            overflow: hidden; /* body scroll band, container scroll karega */
-        }
-
-        /* scrollbar */
-        .short-container::-webkit-scrollbar { width: 5px; }
-        .short-container::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
-        .short-container::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
-
-        /* ══ HEADER — aapka wala, untouched ══ */
-        .header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-        }
-
-        /* ══ SCROLL CONTAINER — Instagram style ══ */
-        .short-container {
-            position: fixed;
-            top: var(--header-h);
-            left: 0; right: 0; bottom: 0;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            margin-left: 300px;
-        }
-
-        /* ══ EACH SLIDE = 100% of container ══ */
-        .short {
-            height: 100%;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            padding: 16px 16px 28px;
-            position: relative;
-            background: #ffffff;
-            border-bottom: 1px solid #eef2f6;
-        }
-
-        /* ══ CARD ══ */
-        .creative-card {
-            width: 100%;
-            max-width: 620px;
-            background: #ffffff;
-            border-radius: 2rem;
-            padding: 1.8rem 1.8rem 2rem;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.02);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 1px solid #eef2ff;
-            position: relative;
-            overflow: hidden;
-            animation: fadeSlideUp 0.4s cubic-bezier(0.2,0.9,0.4,1.1);
-        }
-        .creative-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 5px;
-            background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
-        }
-        .creative-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 25px 40px -14px rgba(0,0,0,0.15);
-        }
-
-        /* ══ TEACHER HEADER ══ */
-        .teacher-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 1.2rem;
-        }
-        .teacher-avatar {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            width: 48px; height: 48px; min-width: 48px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.6rem;
-            box-shadow: 0 4px 10px rgba(99,102,241,0.2);
-            color: white;
-        }
-        .teacher-info { flex: 1; min-width: 0; }
-        .teacher-name {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #0f172a;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .teacher-badge {
-            font-size: 0.7rem;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 2px;
-            flex-wrap: wrap;
-        }
-
-        /* ══ QUESTION TEXT ══ */
-        .question-text {
-            font-size: clamp(1.05rem, 3.2vw, 1.65rem);
-            font-weight: 700;
-            line-height: 1.35;
-            margin: 1rem 0 1.6rem;
-            color: #0f172a;
-            letter-spacing: -0.3px;
-        }
-
-        /* ══ OPTIONS ══ */
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 1.5rem 0 1.2rem;
-        }
-        .options button {
-            width: 100%;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 60px;
-            padding: 14px 20px;
-            font-size: clamp(0.82rem, 2.4vw, 1rem);
-            font-weight: 500;
-            color: #1e293b;
-            text-align: left;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-            -webkit-tap-highlight-color: transparent;
-        }
-        .options button:hover {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-            transform: scale(1.01);
-        }
-        .options button:active { transform: scale(0.99); }
-
-        .opt-prefix {
-            background: #eef2ff;
-            width: 34px; height: 34px; min-width: 34px;
-            display: inline-flex; align-items: center; justify-content: center;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: #4f46e5;
-            transition: 0.1s;
-        }
-
-        /* feedback — original check() logic compatible */
-        .options button[style*="background: green"] {
-            background: #dcfce7 !important;
-            border-color: #22c55e !important;
-            color: #166534 !important;
-        }
-        .options button[style*="background: green"] .opt-prefix {
-            background: #22c55e !important;
-            color: white !important;
-        }
-        .options button[style*="background: red"] {
-            background: #fee2e2 !important;
-            border-color: #ef4444 !important;
-            color: #991b1b !important;
-        }
-        .options button[style*="background: red"] .opt-prefix {
-            background: #ef4444 !important;
-            color: white !important;
-        }
-
-        /* ══ PROFILE LINK ══ */
-        .profile-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 1rem;
-            background: #f1f5f9;
-            padding: 8px 18px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #4f46e5;
-            transition: 0.2s;
-            border: 1px solid #e2e8f0;
-        }
-        .profile-link:hover {
-            background: #eef2ff;
-            color: #6366f1;
-            border-color: #c7d2fe;
-        }
-
-        /* ══ PROGRESS BAR ══ */
-        .story-progress {
-            position: absolute;
-            top: 10px;
-            left: 14px; right: 14px;
-            display: flex;
-            gap: 5px;
-            z-index: 10;
-        }
-        .progress-segment {
-            flex: 1;
-            height: 3px;
-            background: #e2e8f0;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        .progress-segment.active  { background: #4f46e5; }
-        .progress-segment.visited { background: #a5b4fc; }
-
-        /* ══ QUESTION COUNTER ══ */
-        .question-counter {
-            position: absolute;
-            bottom: 16px; right: 16px;
-            background: rgba(255,255,255,0.9);
-            backdrop-filter: blur(4px);
-            padding: 5px 14px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #334155;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #eef2f6;
-        }
-
-        /* ══ ANIMATION ══ */
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ══════════════════════════════════
-           RESPONSIVE (original untouched)
-        ══════════════════════════════════ */
-
-        /* Small phones (≤380px) */
-        @media (max-width: 380px) {
-            :root { --header-h: 56px; }
-            .creative-card { padding: 14px 12px 16px; border-radius: 16px; }
-            .teacher-avatar { width: 36px; height: 36px; min-width: 36px; font-size: 1.1rem; }
-            .teacher-name { font-size: 0.88rem; }
-            .options { gap: 8px; margin: 0.8rem 0; }
-            .options button { padding: 10px 12px; gap: 9px; }
-            .opt-prefix { width: 28px; height: 28px; min-width: 28px; font-size: 0.72rem; }
-            .profile-link { font-size: 0.76rem; padding: 6px 13px; }
-        }
-
-        /* Normal phones (381–550px) */
-        @media (min-width: 381px) and (max-width: 550px) {
-            :root { --header-h: 60px; }
-            .creative-card { padding: 16px 14px 18px; border-radius: 18px; }
-            .teacher-avatar { width: 42px; height: 42px; min-width: 42px; font-size: 1.3rem; }
-            .options button { padding: 12px 14px; gap: 10px; }
-            .opt-prefix { width: 30px; height: 30px; min-width: 30px; }
-        }
-
-        /* Tablet (551–900px) */
-        @media (min-width: 551px) and (max-width: 900px) {
-            .short { padding: 20px 24px 32px; }
-            .creative-card { padding: 22px 22px 24px; }
-        }
-
-        /* Desktop (901px+) */
-        @media (min-width: 901px) {
-            .short { padding: 24px 40px 40px; }
-        }
-
-        /* Notch / home-bar safe area */
-        @supports (padding: max(0px)) {
-            .short {
-                padding-bottom: max(28px, env(safe-area-inset-bottom));
-            }
-        }
-    </style>
-
-    <!-- ============================================= -->
-    <!-- ONLY RESPONSIVE FIXES – YOUR ORIGINAL CSS IS 100% INTACT -->
-    <!-- यहाँ सिर्फ responsiveness के लिए extra styles हैं, original CSS में कोई बदलाव नहीं -->
-    <!-- ============================================= -->
-    <style>
-        /* 
-          ⚡ FULL DEVICE RESPONSIVENESS - बिना original CSS को छुए ⚡
-          Fixes: margin-left issue, ultra-small devices, landscape mode, extra large screens
-        */
-
-        /* 1️⃣ Fix main container margin-left for ALL screen sizes (sidebar adapts gracefully) */
-        @media (max-width: 1100px) {
-            .short-container {
-                margin-left: 0 !important;
-                width: 100% !important;
-                left: 0 !important;
-                right: 0 !important;
-            }
-        }
-
-        /* For extra large screens (above 1400px) maintain original margin-left but ensure content is balanced */
-        @media (min-width: 1400px) {
-            .short-container {
-                margin-left: 300px;
-            }
-            .short {
-                padding: 28px 48px 48px;
-            }
-            .creative-card {
-                max-width: 720px;
-            }
-        }
-
-        /* 2️⃣ Prevent any horizontal overflow on all devices */
-        body {
-            overflow-x: hidden;
-        }
-        .short-container {
-            overflow-x: hidden;
-        }
-
-        /* 3️⃣ Make sure each slide uses full viewport height on all devices, especially mobile */
-        .short {
-            min-height: 100%;
-            height: auto;
-        }
-        /* For older devices + landscape orientation */
-        @media (max-height: 600px) and (orientation: landscape) {
-            .short {
-                padding: 12px 20px;
-                justify-content: flex-start;
-            }
-            .creative-card {
-                margin: 12px 0;
-                padding: 1rem 1.2rem;
-            }
-            .question-text {
-                margin: 0.5rem 0 0.8rem;
-            }
-            .options {
-                gap: 8px;
-                margin: 0.6rem 0;
-            }
-            .options button {
-                padding: 8px 14px;
-            }
-            .teacher-header {
-                margin-bottom: 0.6rem;
-            }
-        }
-
-        /* 4️⃣ Extra small devices (≤320px) extreme fine-tuning */
-        @media (max-width: 320px) {
-            :root {
-                --header-h: 52px;
-            }
-            .creative-card {
-                padding: 12px 10px 14px;
-                border-radius: 1.2rem;
-            }
-            .teacher-avatar {
-                width: 32px;
-                height: 32px;
-                min-width: 32px;
-                font-size: 1rem;
-            }
-            .teacher-name {
-                font-size: 0.8rem;
-                white-space: normal;
-                word-break: break-word;
-            }
-            .teacher-badge {
-                font-size: 0.6rem;
-                gap: 4px;
-            }
-            .question-text {
-                font-size: 1rem;
-                margin: 0.5rem 0 0.8rem;
-            }
-            .options button {
-                padding: 8px 10px;
-                gap: 8px;
-                font-size: 0.75rem;
-            }
-            .opt-prefix {
-                width: 26px;
-                height: 26px;
-                min-width: 26px;
-                font-size: 0.7rem;
-            }
-            .profile-link {
-                font-size: 0.7rem;
-                padding: 5px 12px;
-            }
-            .question-counter {
-                bottom: 8px;
-                right: 8px;
-                font-size: 0.6rem;
-                padding: 3px 10px;
-            }
-            .story-progress {
-                top: 6px;
-                left: 8px;
-                right: 8px;
-                gap: 3px;
-            }
-        }
-
-        /* 5️⃣ Tablets and medium devices – better spacing & full-width card comfort */
-        @media (min-width: 768px) and (max-width: 1100px) {
-            .short {
-                padding: 24px 32px;
-            }
-            .creative-card {
-                max-width: 85%;
-                border-radius: 1.8rem;
-            }
-        }
-
-        /* 6️⃣ Very small phones in landscape or narrow screens: progress bar & counter adjusted */
-        @media (max-width: 480px) and (orientation: portrait) {
-            .story-progress {
-                top: 6px;
-                left: 12px;
-                right: 12px;
-            }
-            .question-counter {
-                bottom: 12px;
-                right: 12px;
-            }
-            .creative-card {
-                padding: 1.2rem 1rem 1.5rem;
-            }
-        }
-
-        /* 7️⃣ Ensure the header height dynamically adapts on devices (any fixed header issues) */
-        @media (max-width: 600px) {
-            :root {
-                --header-h: 58px;
-            }
-        }
-        @media (max-width: 400px) {
-            :root {
-                --header-h: 54px;
-            }
-        }
-
-        /* 8️⃣ Perfect snap and scroll behavior on all touch devices */
-        .short-container {
-            scroll-snap-type: y mandatory;
-            scroll-padding-top: 0;
-        }
-
-        /* 9️⃣ Improve click/tap targets on mobile for better usability */
-        @media (pointer: coarse) {
-            .options button {
-                padding: 14px 18px;
-            }
-            .profile-link {
-                padding: 10px 20px;
-            }
-        }
-
-        /* 🔟 Edge case: when sidebar/header include has any margin conflict, reset for container */
-        .short-container {
-            transition: margin-left 0.2s ease;
-        }
-
-        /* For devices with foldable screens or dual displays (viewport handling) */
-        @media (max-width: 840px) and (min-width: 540px) {
-            .creative-card {
-                max-width: 90%;
-            }
-        }
-
-        /* Ensures card stays centered even if margin-left changes */
-        .short {
-            width: 100%;
-        }
-        .creative-card {
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* improve readability and spacing on foldables / large phones */
-        @media (min-width: 500px) and (max-width: 768px) {
-            .question-text {
-                font-size: 1.25rem;
-            }
-            .options button {
-                font-size: 0.95rem;
-            }
-        }
-
-        /* prevent any accidental overflow from long words */
-        .question-text, .options button span, .teacher-name {
-            word-break: break-word;
-            overflow-wrap: break-word;
-        }
-    </style>
+<link rel="stylesheet" href="/css/Allindiatestserice/shortmcq/shortmcqtest.css">
 </head>
 
 <body>
 
-<%- include("../common/allindiatestheader.ejs") %>
+    <%- include("../common/allindiatestheader.ejs") %>
 
-<div class="short-container">
-    <%
-        let totalQuestions = questions.length;
-    %>
+        <div class="short-container">
+            <% let totalQuestions=questions.length; %>
 
-    <% questions.forEach((q, idx) => { %>
-    <div class="short">
+                <% questions.forEach((q, idx)=> { %>
+                    <div class="short">
 
-        <!-- Progress Bar -->
-        <div class="story-progress">
-            <% for(let i = 0; i < totalQuestions; i++) { %>
-                <div class="progress-segment <%= i <= idx ? 'visited' : '' %> <%= i === idx ? 'active' : '' %>"></div>
-            <% } %>
-        </div>
+                        <!-- Progress Bar -->
+                        <div class="story-progress">
+                            <% for(let i=0; i < totalQuestions; i++) { %>
+                                <div
+                                    class="progress-segment <%= i <= idx ? 'visited' : '' %> <%= i === idx ? 'active' : '' %>">
+                                </div>
+                                <% } %>
+                        </div>
 
-        <!-- Card -->
-        <div class="creative-card">
+                        <!-- Card -->
+                        <div class="creative-card">
 
-            <!-- Teacher Info -->
-            <div class="teacher-header">
-                <div class="teacher-avatar">👨‍🏫</div>
-                <div class="teacher-info">
-                    <div class="teacher-name">
-                        <%= q.teacher?.name || "Unknown Teacher" %>
+                            <!-- Teacher Info -->
+                            <div class="teacher-header">
+                                <div class="teacher-avatar">👨‍🏫</div>
+                                <div class="teacher-info">
+                                    <div class="teacher-name">
+                                        <%= q.teacher?.name || "Unknown Teacher" %>
+                                    </div>
+                                    <div class="teacher-badge">
+                                        <span>🎓 Educator</span> • <span>⚡ MCQ</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Question -->
+                            <div class="question-text">
+                                <%= q.text %>
+                            </div>
+
+                            <!-- Options (FIXED 🔥) -->
+                            <div class="options">
+                                <% if(q.options && q.options.length> 0){ %>
+                                    <% q.options.forEach((opt, i)=> { %>
+                                        <button onclick="check(this, <%= opt.isCorrect %>)">
+                                            <span class="opt-prefix">
+                                                <%= String.fromCharCode(65+i) %>
+                                            </span>
+                                            <span>
+                                                <%= opt.text %>
+                                            </span>
+                                        </button>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <p style="color:red;">No options found</p>
+                                                <% } %>
+                            </div>
+
+                            <!-- Teacher Profile -->
+                            <a href="/teacher/<%= q.teacher?._id %>" class="profile-link">
+                                👤 View Teacher Profile →
+                            </a>
+
+                        </div>
+
+                        <!-- Counter -->
+                        <div class="question-counter">
+                            <%= idx+1 %> / <%= totalQuestions %>
+                        </div>
+
                     </div>
-                    <div class="teacher-badge">
-                        <span>🎓 Educator</span> • <span>⚡ MCQ</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Question -->
-            <div class="question-text">
-                <%= q.text %>
-            </div>
-
-            <!-- Options (FIXED 🔥) -->
-            <div class="options">
-                <% if(q.options && q.options.length > 0){ %>
-                    <% q.options.forEach((opt, i) => { %>
-                        <button onclick="check(this, <%= opt.isCorrect %>)">
-                            <span class="opt-prefix">
-                                <%= String.fromCharCode(65+i) %>
-                            </span>
-                            <span>
-                                <%= opt.text %>
-                            </span>
-                        </button>
-                    <% }) %>
-                <% } else { %>
-                    <p style="color:red;">No options found</p>
-                <% } %>
-            </div>
-
-            <!-- Teacher Profile -->
-            <a href="/teacher/<%= q.teacher?._id %>" class="profile-link">
-                👤 View Teacher Profile →
-            </a>
-
+                    <% }); %>
         </div>
 
-        <!-- Counter -->
-        <div class="question-counter">
-            <%= idx+1 %> / <%= totalQuestions %>
-        </div>
-
-    </div>
-    <% }); %>
-</div>
-
-<script>
-function check(btn, isCorrect){
-    if(isCorrect){
-        btn.style.background = "green";
-    } else {
-        btn.style.background = "red";
-    }
-}
-</script>
+        <script>
+            function check(btn, isCorrect) {
+                if (isCorrect) {
+                    btn.style.background = "green";
+                } else {
+                    btn.style.background = "red";
+                }
+            }
+        </script>
 
 </body>
+
 </html>

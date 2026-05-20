@@ -53,17 +53,34 @@ const userSchema = new mongoose.Schema(
       }
     ],
 // 🔥 FOLLOWING (user kis teacher ko follow kar raha hai)
+
+// 🔥 FOLLOWING
 following: [
   {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      refPath: "following.model"
+    },
+
+    model: {
+      type: String,
+      enum: ["User", "Teacher"]
+    }
   }
 ],
 
+// 🔥 FOLLOWERS
 followers: [
   {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      refPath: "followers.model"
+    },
+
+    model: {
+      type: String,
+      enum: ["User", "Teacher"]
+    }
   }
 ],
     totalTestsAttempted: {

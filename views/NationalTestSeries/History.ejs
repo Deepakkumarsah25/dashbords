@@ -7,163 +7,7 @@
     <title>History - RIDTECH</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/css/Allindiatestserice/History.css">
-    <style>
-            /* Additional styles only for history page */
-        .history-container {
-            padding: 20px 24px 40px 24px;
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .history-header h2 {
-            font-size: 24px;
-            font-weight: 500;
-            margin: 0;
-        }
-
-        .history-header button {
-            border: none;
-            background: #e3f2fd;
-            padding: 8px 16px;
-            border-radius: 24px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-
-        .history-header button:hover {
-            background: #d0e3f5;
-        }
-
-        .history-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 16px 0;
-            border-bottom: 1px solid #e5e5e5;
-            cursor: pointer;
-            transition: background 0.1s;
-        }
-
-        .history-item:hover {
-            background-color: #f2f2f2;
-        }
-
-        .history-left {
-            display: flex;
-            gap: 16px;
-            flex: 1;
-        }
-
-        .history-thumb img {
-            width: 160px;
-            height: 90px;
-            object-fit: cover;
-            border-radius: 12px;
-        }
-
-        .history-info {
-            flex: 1;
-        }
-
-        .history-title {
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .history-meta {
-            font-size: 13px;
-            color: #606060;
-        }
-
-        .history-actions {
-            position: relative;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background 0.2s;
-        }
-
-        .history-actions:hover {
-            background: #e5e5e5;
-        }
-
-        .three-dots {
-            font-size: 20px;
-            font-weight: bold;
-            color: #606060;
-            letter-spacing: 2px;
-        }
-
-        /* Simple dropdown menu for delete */
-        .action-menu {
-            position: absolute;
-            right: 0;
-            top: 30px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            z-index: 100;
-            display: none;
-            min-width: 120px;
-        }
-
-        .action-menu.show {
-            display: block;
-        }
-
-        .action-menu div {
-            padding: 10px 16px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.1s;
-        }
-
-        .action-menu div:hover {
-            background: #f2f2f2;
-        }
-
-        .action-menu .delete-item {
-            color: #d32f2f;
-        }
-
-        /* Mobile adjustments */
-        @media (max-width: 768px) {
-            .history-container {
-                padding: 12px 12px 20px 12px;
-            }
-
-            .history-thumb img {
-                width: 120px;
-                height: 68px;
-            }
-
-            .history-header h2 {
-                font-size: 20px;
-            }
-
-            .history-header button {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-        }
-
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .history-container {
-                padding: 20px 24px 40px 24px;
-            }
-        }
-    </style>
+   
 </head>
 
 <body>
@@ -225,8 +69,12 @@
                                         <div class="history-left"
                                             onclick="window.location.href='/National-Test-Series/test/<%= item.test._id %>'">
 
+
                                             <div class="history-thumb">
-                                                <img src="https://picsum.photos/300/200">
+
+                                                <img src="<%= item.test.thumbnail && item.test.thumbnail !== '' ? item.test.thumbnail : 'https://picsum.photos/300/200' %>"
+                                                    alt="thumbnail" onerror="this.src='https://picsum.photos/300/200'">
+
                                             </div>
 
                                             <div class="history-info">
@@ -267,159 +115,159 @@
         </div>
 
         <script>
-           document.addEventListener("DOMContentLoaded", function () {
+            document.addEventListener("DOMContentLoaded", function () {
 
-    const dynamicContent = document.getElementById("dynamicContent");
-    const tempContent = document.getElementById("historyPageContent");
+                const dynamicContent = document.getElementById("dynamicContent");
+                const tempContent = document.getElementById("historyPageContent");
 
-    if (dynamicContent && tempContent) {
-        const container = tempContent.querySelector(".history-container");
-        if (container) {
-            dynamicContent.innerHTML = "";
-            dynamicContent.appendChild(container);
-        }
-        tempContent.remove();
-    }
-
-    // ================= CLEAR ALL HISTORY =================
-    const clearBtn = document.getElementById("clearAllHistoryBtn");
-
-    if (clearBtn) {
-        clearBtn.addEventListener("click", async () => {
-
-            if (!confirm("Delete all history?")) return;
-
-            try {
-                const res = await fetch("/National-Test-Series/history/clear", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    }
-})
-                const data = await res.json();
-
-                if (res.status === 401) {
-                    alert("Please login first 🔐");
-                    window.location.href = "/login";
-                    return;
+                if (dynamicContent && tempContent) {
+                    const container = tempContent.querySelector(".history-container");
+                    if (container) {
+                        dynamicContent.innerHTML = "";
+                        dynamicContent.appendChild(container);
+                    }
+                    tempContent.remove();
                 }
 
-                if (!res.ok || !data.success) {
-                    alert(data.msg || "Failed to clear history ❌");
-                    return;
+                // ================= CLEAR ALL HISTORY =================
+                const clearBtn = document.getElementById("clearAllHistoryBtn");
+
+                if (clearBtn) {
+                    clearBtn.addEventListener("click", async () => {
+
+                        if (!confirm("Delete all history?")) return;
+
+                        try {
+                            const res = await fetch("/National-Test-Series/history/clear", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                }
+                            })
+                            const data = await res.json();
+
+                            if (res.status === 401) {
+                                alert("Please login first 🔐");
+                                window.location.href = "/login";
+                                return;
+                            }
+
+                            if (!res.ok || !data.success) {
+                                alert(data.msg || "Failed to clear history ❌");
+                                return;
+                            }
+
+                            location.reload();
+
+                        } catch (err) {
+                            console.error(err);
+                            alert("Server error ❌");
+                        }
+                    });
                 }
 
-                location.reload();
+                // ================= PAUSE BUTTON =================
+                const pauseBtn = document.getElementById("pauseHistoryBtn");
 
-            } catch (err) {
-                console.error(err);
-                alert("Server error ❌");
-            }
-        });
-    }
-
-    // ================= PAUSE BUTTON =================
-    const pauseBtn = document.getElementById("pauseHistoryBtn");
-
-    if (pauseBtn) {
-        pauseBtn.addEventListener("click", () => {
-            alert("History pause coming soon");
-        });
-    }
-
-    // ================= MENU HANDLING =================
-    function closeAllMenus() {
-        document.querySelectorAll('.action-menu').forEach(menu => {
-            menu.classList.remove('show');
-        });
-    }
-
-    // ================= PER ITEM DELETE =================
-    document.querySelectorAll('.history-actions').forEach(actionsDiv => {
-
-        const dots = actionsDiv.querySelector('.three-dots');
-        const menu = actionsDiv.querySelector('.action-menu');
-
-        // 🔥 OPEN MENU
-        dots.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeAllMenus();
-            menu.classList.toggle('show');
-        });
-
-        const deleteOption = menu.querySelector('.delete-item');
-
-        if (deleteOption) {
-            deleteOption.addEventListener('click', async (e) => {
-
-                e.stopPropagation();
-
-                const historyId = deleteOption.getAttribute('data-id');
-
-                if (!historyId) {
-                    alert("Invalid history ID ❌");
-                    return;
+                if (pauseBtn) {
+                    pauseBtn.addEventListener("click", () => {
+                        alert("History pause coming soon");
+                    });
                 }
 
-                if (!confirm("Delete this history entry?")) return;
+                // ================= MENU HANDLING =================
+                function closeAllMenus() {
+                    document.querySelectorAll('.action-menu').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                }
 
-                try {
-                    const res = await fetch(`/National-Test-Series/history/delete/${historyId}`, {
-    method: "DELETE",
-    headers: {
-        "Content-Type": "application/json"
-    }
-})
+                // ================= PER ITEM DELETE =================
+                document.querySelectorAll('.history-actions').forEach(actionsDiv => {
 
-                    const data = await res.json(); // 🔥 IMPORTANT
+                    const dots = actionsDiv.querySelector('.three-dots');
+                    const menu = actionsDiv.querySelector('.action-menu');
 
-                    // 🔐 LOGIN REQUIRED
-                    if (res.status === 401) {
-                        alert("Please login first 🔐");
-                        window.location.href = "/login";
-                        return;
+                    // 🔥 OPEN MENU
+                    dots.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        closeAllMenus();
+                        menu.classList.toggle('show');
+                    });
+
+                    const deleteOption = menu.querySelector('.delete-item');
+
+                    if (deleteOption) {
+                        deleteOption.addEventListener('click', async (e) => {
+
+                            e.stopPropagation();
+
+                            const historyId = deleteOption.getAttribute('data-id');
+
+                            if (!historyId) {
+                                alert("Invalid history ID ❌");
+                                return;
+                            }
+
+                            if (!confirm("Delete this history entry?")) return;
+
+                            try {
+                                const res = await fetch(`/National-Test-Series/history/delete/${historyId}`, {
+                                    method: "DELETE",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    }
+                                })
+
+                                const data = await res.json(); // 🔥 IMPORTANT
+
+                                // 🔐 LOGIN REQUIRED
+                                if (res.status === 401) {
+                                    alert("Please login first 🔐");
+                                    window.location.href = "/login";
+                                    return;
+                                }
+
+                                // ❌ ERROR
+                                if (!res.ok || !data.success) {
+                                    alert(data.msg || "Delete failed ❌");
+                                    return;
+                                }
+
+                                // ✅ SUCCESS → REMOVE UI
+                                const historyItem = actionsDiv.closest('.history-item');
+                                if (historyItem) historyItem.remove();
+
+                                // ✅ EMPTY STATE
+                                if (document.querySelectorAll('.history-item').length === 0) {
+                                    const container = document.querySelector('.history-container');
+                                    const noHistoryMsg = document.createElement('p');
+                                    noHistoryMsg.style.padding = "40px 0";
+                                    noHistoryMsg.style.textAlign = "center";
+                                    noHistoryMsg.style.color = "#606060";
+                                    noHistoryMsg.innerHTML = '<i class="fas fa-folder-open"></i> No history found';
+                                    container.appendChild(noHistoryMsg);
+                                }
+
+                            } catch (err) {
+                                console.error("DELETE ERROR:", err);
+                                alert("Server error ❌");
+                            }
+
+                            closeAllMenus();
+                        });
                     }
 
-                    // ❌ ERROR
-                    if (!res.ok || !data.success) {
-                        alert(data.msg || "Delete failed ❌");
-                        return;
+                });
+
+                // ================= CLICK OUTSIDE =================
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.history-actions')) {
+                        closeAllMenus();
                     }
+                });
 
-                    // ✅ SUCCESS → REMOVE UI
-                    const historyItem = actionsDiv.closest('.history-item');
-                    if (historyItem) historyItem.remove();
-
-                    // ✅ EMPTY STATE
-                    if (document.querySelectorAll('.history-item').length === 0) {
-                        const container = document.querySelector('.history-container');
-                        const noHistoryMsg = document.createElement('p');
-                        noHistoryMsg.style.padding = "40px 0";
-                        noHistoryMsg.style.textAlign = "center";
-                        noHistoryMsg.style.color = "#606060";
-                        noHistoryMsg.innerHTML = '<i class="fas fa-folder-open"></i> No history found';
-                        container.appendChild(noHistoryMsg);
-                    }
-
-                } catch (err) {
-                    console.error("DELETE ERROR:", err);
-                    alert("Server error ❌");
-                }
-
-                closeAllMenus();
             });
-        }
-
-    });
-
-    // ================= CLICK OUTSIDE =================
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.history-actions')) {
-            closeAllMenus();
-        }
-    });
-
-});
             function filterVideos() {
                 const cards = Array.from(document.querySelectorAll(".history-item"));
 

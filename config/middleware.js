@@ -1,30 +1,86 @@
 const express = require("express");
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
-const helmet = require("helmet");
-const fileUpload = require("express-fileupload");
-const passport = require("passport");
+
+const cookieParser =
+    require("cookie-parser");
+
+const cors =
+    require("cors");
+
+const helmet =
+    require("helmet");
+
+const passport =
+    require("passport");
 
 module.exports = function (app) {
 
-    app.use(helmet({
-        contentSecurityPolicy: false
-    }));
+    // ✅ SECURITY
+    app.use(
 
+        helmet({
+
+            contentSecurityPolicy:
+                false
+
+        })
+
+    );
+
+    // ✅ CORS
     app.use(cors());
 
-    app.use(express.json({ limit: "50mb" }));
-    app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+    // ✅ JSON
+    app.use(
 
-    app.use(cookieParser());
+        express.json({
 
-    app.use(fileUpload({
-        useTempFiles: false,
-        limits: { fileSize: 50 * 1024 * 1024 }
-    }));
+            limit: "50mb"
 
-    app.use(passport.initialize());
-    app.use(passport.session());
+        })
 
+    );
+
+    // ✅ FORM URL ENCODED
+    app.use(
+
+        express.urlencoded({
+
+            extended: true,
+
+            limit: "50mb"
+
+        })
+
+    );
+
+    // ✅ COOKIE
+    app.use(
+
+        cookieParser()
+
+    );
+
+    // ✅ STATIC FOLDER
+    app.use(
+
+        express.static("public")
+
+    );
+
+    // ✅ PASSPORT
+    app.use(
+
+        passport.initialize()
+
+    );
+
+    app.use(
+
+        passport.session()
+
+    );
+
+    // ✅ PASSPORT CONFIG
     require("../config/passport")(passport);
+
 };

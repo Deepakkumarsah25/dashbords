@@ -63,9 +63,11 @@
                 text-align: center;
                 gap: 16px;
             }
+
             .profile-info h1 {
                 justify-content: center;
             }
+
             .profile-bio {
                 justify-content: center;
             }
@@ -82,7 +84,7 @@
             font-size: 44px;
             font-weight: 600;
             color: white;
-            box-shadow: 0 8px 18px rgba(59,130,246,0.25);
+            box-shadow: 0 8px 18px rgba(59, 130, 246, 0.25);
             flex-shrink: 0;
             text-transform: uppercase;
         }
@@ -195,6 +197,7 @@
             .stat-number {
                 font-size: 20px;
             }
+
             .stat-label {
                 font-size: 12px;
             }
@@ -242,7 +245,8 @@
         .tests-grid {
             display: grid;
             gap: 20px;
-            grid-template-columns: 1fr; /* 1 column on phones */
+            grid-template-columns: 1fr;
+            /* 1 column on phones */
         }
 
         @media (min-width: 640px) {
@@ -318,7 +322,8 @@
 
         .video-info {
             flex: 1;
-            min-width: 0; /* prevents overflow */
+            min-width: 0;
+            /* prevents overflow */
         }
 
         .video-title {
@@ -396,6 +401,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -470,15 +476,19 @@
             .ig-profile-card {
                 padding: 16px;
             }
+
             .video-title {
                 font-size: 14px;
             }
+
             .channel-name {
                 font-size: 12px;
             }
+
             .video-stats {
                 font-size: 11px;
             }
+
             .channel-avatar {
                 width: 36px;
                 height: 36px;
@@ -487,63 +497,119 @@
         }
 
         /* follow mw */
- .profile-top-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px;
+        .profile-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .name-section {
+            flex: 1;
+        }
+
+        /* Follow button right side */
+        /* ================= PROFILE TOP ROW ================= */
+
+.profile-name-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    width:100%;
 }
 
-.name-section {
-    flex: 1;
+/* ================= FOLLOW BUTTON ================= */
+
+.follow-btn{
+    background:#2563eb;
+    color:#fff;
+    border:none;
+
+    padding:7px 18px;
+    font-size:13px;
+    font-weight:600;
+
+    border-radius:999px;
+    cursor:pointer;
+
+    min-width:95px;
+    height:38px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    white-space:nowrap;
+
+    box-shadow:0 3px 10px rgba(37,99,235,0.25);
+    transition:all .2s ease;
 }
 
-/* Follow button right side */
-.follow-btn {
-    background: #2563eb;
-    color: white;
-    border: none;
-    
-    /* 🔥 SIZE बढ़ाया */
-    padding: 12px 28px;   /* पहले 8px 20px था */
-    font-size: 16px;      /* पहले छोटा था */
-    font-weight: 700;
-
-    border-radius: 25px;
-    cursor: pointer;
-
-    height: fit-content;
-    margin-top: 5px;
-
-    /* 🔥 extra look */
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    transition: all 0.2s ease;
+.follow-btn:hover{
+    background:#1d4ed8;
+    transform:translateY(-1px);
 }
 
-.follow-btn:hover {
-    background: #1d4ed8;
-    transform: scale(1.05);
-}
-@media (max-width: 550px) {
-    .profile-top-row {
-        flex-direction: column;
-        align-items: center;
+/* mobile */
+
+@media(max-width:550px){
+
+    .profile-name-row{
+        flex-direction:column;
+        align-items:center;
     }
 
-    .follow-btn {
-        width: 100%;
-        max-width: 200px;
-        margin-top: 10px;
+    .follow-btn{
+        margin-top:8px;
     }
+
 }
-@media (max-width: 550px) {
-    .follow-btn {
-        width: 100%;
-        max-width: 240px;
-        padding: 10px 20px;
-        font-size: 15px;
-    }
-}
+
+        @media (max-width: 550px) {
+            .follow-btn {
+                width: 100%;
+                max-width: 240px;
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+        }
+
+        /*==================================== dark mode tragal buttom code ==============================*/
+        /* body bg code */
+        body.dark-mode .ig-profile-card {
+            background-color: #202020;
+        }
+
+        /* name color */
+        body.dark-mode .profile-info h1 {
+            color: #ffffff;
+        }
+
+        body.dark-mode .teacher-handle {
+            background-color: #f1f5f9c7;
+        }
+
+        body.dark-mode .profile-bio i {
+            color: #ffffff;
+        }
+
+        body.dark-mode .profile-bio {
+            color: #ffffff;
+        }
+
+        body.dark-mode .stat-label {
+            color: #ffffff;
+        }
+
+        body.dark-mode .test-card {
+            background: #181818;
+        }
+
+
+        body.dark-mode .channel-avatar {
+            background: #beadad;
+        }
     </style>
 </head>
 
@@ -552,210 +618,463 @@
     <!-- Your existing sidebar + navbar -->
     <%- include("../common/allindiatestheader.ejs") %>
 
-    <!-- Hidden profile content -->
-    <div id="profilePageContent" style="display: none;">
-        <div class="profile-main-wrapper" id="profileMainWrapper">
-            <div class="ig-profile-card">
-                <!-- Header -->
-                <div class="profile-header-row">
-                    <div class="avatar-circle">
-                        <%= teacher.name?.charAt(0).toUpperCase() || "T" %>
-                    </div>
-                    <div class="profile-info">
-                        <h1>
-                            👨‍🏫 <%= teacher.name %>
-                            <span class="teacher-handle">
-                                @<%= (teacher.username || teacher.name?.toLowerCase().replace(/\s/g, '') || 'educator').replace(/[^a-z0-9._]/g, '') %>
-                            </span>
-                        </h1>
-                        
-                        <div class="profile-bio">
-                            <span><i class="fas fa-envelope"></i> <%= teacher.email || 'teacher@ridtech.edu' %></span>
-                            <span><i class="fas fa-chalkboard-user"></i> Educator · knowledge creator</span>
-                        </div>
-                        
-                    </div>
-                    <button class="follow-btn">Follow</button>
-                </div>
+        <!-- Hidden profile content -->
+        <div id="profilePageContent" style="display: none;">
+            <div class="profile-main-wrapper" id="profileMainWrapper">
+                <div class="ig-profile-card">
+                    <!-- Header -->
+                    <div class="profile-header-row">
 
-                <!-- Stats -->
-                <div class="stats-row">
-                    <div class="stat-item" id="statTests">
-                        <div class="stat-number"><%= tests?.length || 0 %></div>
-                        <div class="stat-label">posts</div>
-                    </div>
-                    <div class="stat-item" id="followersTrigger">
-                        <div class="stat-number"><%= followers?.length || 0 %></div>
-                        <div class="stat-label">followers</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">0</div>
-                        <div class="stat-label">following</div>
-                    </div>
-                </div>
+    <div class="avatar-circle">
+        <%= teacher.name?.charAt(0).toUpperCase() || "T" %>
+    </div>
 
-                <hr class="profile-divider">
+    <div class="profile-info">
 
-                <!-- Tests section -->
-                <div class="tests-header">
-                    <span><i class="fas fa-pen-fancy"></i> 📝 TEACHER'S TESTS</span>
-                </div>
+        <!-- top row -->
+        <div class="profile-name-row">
 
-                <div class="tests-grid">
-                    <% if (tests && tests.length > 0) { %>
-                        <% tests.forEach(t => { %>
-                            <div class="test-card" onclick="window.location.href='/National-Test-Series/test/<%= t._id %>'">
-                                <div class="thumbnail">
-                                    <img src="https://picsum.photos/300/200?random=<%= t._id %>" alt="test thumbnail">
-                                </div>
-                                <div class="video-details">
-                                    <div class="channel-avatar">
-                                        <%= teacher.name?.charAt(0).toUpperCase() || "T" %>
-                                    </div>
-                                    <div class="video-info">
-                                        <div class="video-title"><%= t.name %></div>
-                                        <div class="channel-name">
-                                            👨‍🏫 <%= teacher.name %>
-                                        </div>
-                                        <div class="video-stats">
-                                            📅 <%= new Date(t.createdAt).toLocaleDateString() %>
-                                        </div>
-                                    </div>
-                                </div>
+            <h1>
+                👨‍🏫 <%= teacher.name %>
+
+                <span class="teacher-handle">
+                    @<%= (teacher.username || teacher.name?.toLowerCase().replace(/\s/g, '' )
+                        || 'educator' ).replace(/[^a-z0-9._]/g, '' ) %>
+                </span>
+            </h1>
+
+            <button class="follow-btn" id="followBtn" data-id="<%= teacher._id %>">
+                <%= isFollowing ? "Following" : "Follow" %>
+            </button>
+
+        </div>
+
+        <div class="profile-bio">
+            <span>
+                <i class="fas fa-envelope"></i>
+                <%= teacher.email || 'teacher@ridtech.edu' %>
+            </span>
+
+            <span>
+                <i class="fas fa-chalkboard-user"></i>
+                Educator · knowledge creator
+            </span>
+        </div>
+
+    </div>
+
+</div>
+                    <!-- Stats -->
+                    <div class="stats-row">
+                        <div class="stat-item" id="statTests">
+                            <div class="stat-number">
+                                <%= tests?.length || 0 %>
                             </div>
-                        <% }) %>
-                    <% } else { %>
-                        <div class="empty-tests">
-                            <i class="fas fa-flask" style="font-size: 36px; opacity: 0.5;"></i>
-                            <p style="margin-top: 12px;">📭 No tests created yet. Stay tuned!</p>
+                            <div class="stat-label">posts</div>
                         </div>
-                    <% } %>
+                        <div class="stat-item" id="followersTrigger">
+                            <div class="stat-number">
+                                <%= followers?.length || 0 %>
+                            </div>
+                            <div class="stat-label">followers</div>
+                        </div>
+                        <div class="stat-item" id="followingTrigger">
+                            <div class="stat-number">
+                                <%= following?.length || 0 %>
+                            </div>
+                            <div class="stat-label">following</div>
+                        </div>
+                    </div>
+
+                    <hr class="profile-divider">
+
+                    <!-- Tests section -->
+                    <div class="tests-header">
+                        <span><i class="fas fa-pen-fancy"></i> 📝 TEACHER'S TESTS</span>
+                    </div>
+
+                    <div class="tests-grid">
+                        <% if (tests && tests.length> 0) { %>
+                            <% tests.forEach(t=> { %>
+                                <div class="test-card"
+                                    onclick="window.location.href='/National-Test-Series/test/<%= t._id %>'">
+                                    <div class="thumbnail">
+
+                                        <img src="<%= t.thumbnail && t.thumbnail !== '' ? t.thumbnail : 'https://picsum.photos/300/200?random=' + t._id %>"
+                                            alt="test thumbnail"
+                                            onerror="this.src='https://picsum.photos/300/200?random=<%= t._id %>'">
+
+                                    </div>
+                                    <div class="video-details">
+                                        <div class="channel-avatar">
+                                            <%= teacher.name?.charAt(0).toUpperCase() || "T" %>
+                                        </div>
+                                        <div class="video-info">
+                                            <div class="video-title">
+                                                <%= t.name %>
+                                            </div>
+                                            <div class="channel-name">
+                                                👨‍🏫 <%= teacher.name %>
+                                            </div>
+                                            <div class="video-stats">
+                                                📅 <%= new Date(t.createdAt).toLocaleDateString() %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                                    <% } else { %>
+                                        <div class="empty-tests">
+                                            <i class="fas fa-flask" style="font-size: 36px; opacity: 0.5;"></i>
+                                            <p style="margin-top: 12px;">📭 No tests created yet. Stay tuned!</p>
+                                        </div>
+                                        <% } %>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Followers Modal -->
-    <div id="followersModal" class="followers-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span>👥 Followers (<%= followers?.length || 0 %>)</span>
-                <button id="closeModalBtn">&times;</button>
-            </div>
-            <div class="followers-list">
-                <% if (followers && followers.length > 0) { %>
-                    <% followers.forEach(f => { %>
-                        <div class="follower-entry">
-                            <div class="follower-avatar-small">
-                                <%= f.name?.charAt(0).toUpperCase() || '?' %>
+        <!-- ================= FOLLOWERS MODAL ================= -->
+
+        <div id="followersModal" class="followers-modal">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <span>
+                        👥 Followers (<%= followers?.length || 0 %>)
+                    </span>
+
+                    <button id="closeModalBtn">
+                        &times;
+                    </button>
+
+                </div>
+
+                <div class="followers-list">
+
+                    <% if (followers && followers.length> 0) { %>
+
+                        <% followers.forEach(f=> { %>
+
+                            <div class="follower-entry">
+
+                                <div class="follower-avatar-small">
+
+                                    <%= f.name?.charAt(0).toUpperCase() || '?' %>
+
+                                </div>
+
+                                <div>
+
+                                    <div class="follower-name">
+                                        <%= f.user?.name %>
+                                    </div>
+
+                                    <div class="follower-email">
+                                        <%= f.user?.email %>
+                                    </div>
+
+                                </div>
+
                             </div>
-                            <div>
-                                <div class="follower-name"><%= f.name %></div>
-                                <div class="follower-email"><%= f.email %></div>
-                            </div>
-                        </div>
-                    <% }) %>
-                <% } else { %>
-                    <div class="no-followers">
-                        <i class="far fa-frown" style="font-size: 28px;"></i>
-                        <p style="margin-top: 10px;">No followers yet 😢</p>
-                    </div>
-                <% } %>
+
+                            <% }) %>
+
+                                <% } else { %>
+
+                                    <div class="no-followers">
+
+                                        <i class="far fa-frown" style="font-size:28px;">
+                                        </i>
+
+                                        <p style="margin-top:10px;">
+                                            No followers yet 😢
+                                        </p>
+
+                                    </div>
+
+                                    <% } %>
+
+                </div>
+
             </div>
+
         </div>
-    </div>
 
-    <script>
-        (function() {
-            // Move profile content into #dynamicContent
-            const dynamicContent = document.getElementById("dynamicContent");
-            const tempContent = document.getElementById("profilePageContent");
-            if (dynamicContent && tempContent) {
-                const wrapper = tempContent.querySelector(".profile-main-wrapper");
-                if (wrapper) {
-                    dynamicContent.innerHTML = "";
-                    dynamicContent.appendChild(wrapper);
-                }
-                tempContent.remove();
-            }
 
-            // Reposition profile – but reset margins on mobile if sidebar is hidden
-            function repositionProfile() {
-                const profileDiv = document.querySelector(".profile-main-wrapper");
-                if (!profileDiv) return;
+        <!-- ================= FOLLOWING MODAL ================= -->
 
-                let sidebar = document.querySelector('aside, .sidebar, [class*="sidebar"], [class*="side-bar"], .left-menu, .vertical-nav, #sidebar, .main-sidebar');
-                let navbar = document.querySelector('header, nav, .navbar, [class*="navbar"], [class*="header"], .top-bar, .main-header, .app-header');
+        <div id="followingModal" class="followers-modal">
 
-                let sidebarWidth = 0;
-                let navbarHeight = 0;
+            <div class="modal-content">
 
-                // On mobile (<768px), often sidebar is hidden or overlay – set margin to 0
-                const isMobile = window.innerWidth < 768;
-                if (isMobile) {
-                    profileDiv.style.marginLeft = '0px';
-                    profileDiv.style.marginTop = (navbar ? navbar.getBoundingClientRect().height : 60) + 'px';
-                    profileDiv.style.width = '100%';
-                    return;
-                }
+                <div class="modal-header">
 
-                // Desktop: detect actual widths
-                if (sidebar) {
-                    sidebarWidth = sidebar.getBoundingClientRect().width;
-                } else {
-                    const leftFixed = Array.from(document.querySelectorAll('div, aside')).find(el => {
-                        const style = getComputedStyle(el);
-                        return (style.position === 'fixed' || style.position === 'sticky') && 
-                               parseInt(style.left) === 0 && 
-                               el.offsetWidth > 150;
-                    });
-                    sidebarWidth = leftFixed ? leftFixed.offsetWidth : 260;
-                }
+                    <span>
+                        👥 Following (<%= following?.length || 0 %>)
+                    </span>
 
-                if (navbar) {
-                    navbarHeight = navbar.getBoundingClientRect().height;
-                } else {
-                    const topFixed = Array.from(document.querySelectorAll('header, nav, div')).find(el => {
-                        const style = getComputedStyle(el);
-                        return (style.position === 'fixed' || style.position === 'sticky') && 
-                               parseInt(style.top) === 0;
-                    });
-                    navbarHeight = topFixed ? topFixed.offsetHeight : 70;
-                }
+                    <button id="closeFollowingBtn">
+                        &times;
+                    </button>
 
-                profileDiv.style.marginLeft = sidebarWidth + 'px';
-                profileDiv.style.marginTop = navbarHeight + 'px';
-                profileDiv.style.width = `calc(100% - ${sidebarWidth}px)`;
-            }
+                </div>
 
-            window.addEventListener('DOMContentLoaded', () => setTimeout(repositionProfile, 60));
-            window.addEventListener('resize', () => setTimeout(repositionProfile, 30));
-            window.addEventListener('load', repositionProfile);
+                <div class="followers-list">
 
-            // Followers modal logic
-            const modal = document.getElementById('followersModal');
-            const trigger = document.getElementById('followersTrigger');
-            const closeBtn = document.getElementById('closeModalBtn');
+                    <% if (following && following.length> 0) { %>
 
-            if (trigger && modal) {
-                trigger.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    modal.classList.add('active');
-                });
-                if (closeBtn) {
-                    closeBtn.addEventListener('click', () => modal.classList.remove('active'));
-                }
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) modal.classList.remove('active');
-                });
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && modal.classList.contains('active')) {
-                        modal.classList.remove('active');
+                        <% following.forEach(f=> { %>
+
+                            <div class="follower-entry">
+
+                                <div class="follower-avatar-small">
+
+                                    <%= f.user?.name?.charAt(0).toUpperCase() || '?' %>
+
+                                </div>
+
+                                <div>
+
+                                    <div class="follower-name">
+                                        <%= f.name %>
+                                    </div>
+
+                                    <div class="follower-email">
+                                        <%= f.email %>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <% }) %>
+
+                                <% } else { %>
+
+                                    <div class="no-followers">
+
+                                        <i class="far fa-frown" style="font-size:28px;">
+                                        </i>
+
+                                        <p style="margin-top:10px;">
+                                            No following yet 😢
+                                        </p>
+
+                                    </div>
+
+                                    <% } %>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <script>
+            // ================= FOLLOWING MODAL =================
+
+            const followingTrigger =
+                document.getElementById("followingTrigger");
+
+            const followingModal =
+                document.getElementById("followingModal");
+
+            const closeFollowingBtn =
+                document.getElementById("closeFollowingBtn");
+
+            if (followingTrigger && followingModal) {
+
+                followingTrigger.addEventListener(
+                    "click",
+                    () => {
+                        followingModal.classList.add("active");
                     }
-                });
+                );
+
+                closeFollowingBtn.addEventListener(
+                    "click",
+                    () => {
+                        followingModal.classList.remove("active");
+                    }
+                );
+
+                followingModal.addEventListener(
+                    "click",
+                    (e) => {
+
+                        if (e.target === followingModal) {
+                            followingModal.classList.remove("active");
+                        }
+
+                    }
+                );
+
             }
-        })();
-    </script>
+            (function () {
+                // Move profile content into #dynamicContent
+                const dynamicContent = document.getElementById("dynamicContent");
+                const tempContent = document.getElementById("profilePageContent");
+                if (dynamicContent && tempContent) {
+                    const wrapper = tempContent.querySelector(".profile-main-wrapper");
+                    if (wrapper) {
+                        dynamicContent.innerHTML = "";
+                        dynamicContent.appendChild(wrapper);
+                    }
+                    tempContent.remove();
+                }
+
+                // Reposition profile – but reset margins on mobile if sidebar is hidden
+                function repositionProfile() {
+                    const profileDiv = document.querySelector(".profile-main-wrapper");
+                    if (!profileDiv) return;
+
+                    let sidebar = document.querySelector('aside, .sidebar, [class*="sidebar"], [class*="side-bar"], .left-menu, .vertical-nav, #sidebar, .main-sidebar');
+                    let navbar = document.querySelector('header, nav, .navbar, [class*="navbar"], [class*="header"], .top-bar, .main-header, .app-header');
+
+                    let sidebarWidth = 0;
+                    let navbarHeight = 0;
+
+                    // On mobile (<768px), often sidebar is hidden or overlay – set margin to 0
+                    const isMobile = window.innerWidth < 768;
+                    if (isMobile) {
+                        profileDiv.style.marginLeft = '0px';
+                        profileDiv.style.marginTop = (navbar ? navbar.getBoundingClientRect().height : 60) + 'px';
+                        profileDiv.style.width = '100%';
+                        return;
+                    }
+
+                    // Desktop: detect actual widths
+                    if (sidebar) {
+                        sidebarWidth = sidebar.getBoundingClientRect().width;
+                    } else {
+                        const leftFixed = Array.from(document.querySelectorAll('div, aside')).find(el => {
+                            const style = getComputedStyle(el);
+                            return (style.position === 'fixed' || style.position === 'sticky') &&
+                                parseInt(style.left) === 0 &&
+                                el.offsetWidth > 150;
+                        });
+                        sidebarWidth = leftFixed ? leftFixed.offsetWidth : 260;
+                    }
+
+                    if (navbar) {
+                        navbarHeight = navbar.getBoundingClientRect().height;
+                    } else {
+                        const topFixed = Array.from(document.querySelectorAll('header, nav, div')).find(el => {
+                            const style = getComputedStyle(el);
+                            return (style.position === 'fixed' || style.position === 'sticky') &&
+                                parseInt(style.top) === 0;
+                        });
+                        navbarHeight = topFixed ? topFixed.offsetHeight : 70;
+                    }
+
+                    profileDiv.style.marginLeft = sidebarWidth + 'px';
+                    profileDiv.style.marginTop = navbarHeight + 'px';
+                    profileDiv.style.width = `calc(100% - ${sidebarWidth}px)`;
+                }
+
+                window.addEventListener('DOMContentLoaded', () => setTimeout(repositionProfile, 60));
+                window.addEventListener('resize', () => setTimeout(repositionProfile, 30));
+                window.addEventListener('load', repositionProfile);
+
+                // Followers modal logic
+                const modal = document.getElementById('followersModal');
+                const trigger = document.getElementById('followersTrigger');
+                const followingTrigger =
+                    document.getElementById("followingTrigger");
+
+                const followingModal =
+                    document.getElementById("followingModal");
+
+                const closeFollowingBtn =
+                    document.getElementById("closeFollowingBtn");
+                const closeBtn = document.getElementById('closeModalBtn');
+
+                if (trigger && modal) {
+                    trigger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        modal.classList.add('active');
+                    });
+                    if (closeBtn) {
+                        closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+                    }
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) modal.classList.remove('active');
+                    });
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape' && modal.classList.contains('active')) {
+                            modal.classList.remove('active');
+                        }
+                    });
+                }
+            })();
+
+            // ================= FOLLOW BUTTON =================
+
+            const followBtn =
+                document.getElementById("followBtn");
+
+            if (followBtn) {
+
+                followBtn.addEventListener(
+                    "click",
+                    async () => {
+
+                        const targetId =
+                            followBtn.dataset.id;
+
+                        try {
+
+                            const res = await fetch(
+                                `/follow/${targetId}`,
+                                {
+                                    method: "POST"
+                                }
+                            );
+
+                            const data = await res.json();
+
+                            if (data.success) {
+
+                                followBtn.innerText =
+                                    data.following
+                                        ? "Following"
+                                        : "Follow";
+
+                                // followers count realtime
+                                const followersCount =
+                                    document.querySelector(
+                                        "#followersTrigger .stat-number"
+                                    );
+
+                                if (followersCount) {
+
+                                    followersCount.innerText =
+                                        data.followersCount;
+
+                                }
+
+                                // 🔥 auto refresh following data
+                                location.reload();
+
+                            }
+
+                        }
+
+                        catch (err) {
+
+                            console.log(err);
+
+                        }
+
+                    }
+                );
+
+            }
+        </script>
 
 </body>
+
 </html>

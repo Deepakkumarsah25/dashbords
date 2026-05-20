@@ -87,7 +87,8 @@
         </div>
         <div class="profile-menu-item" id="yourDataBtn"><i class="fas fa-database"></i><span>Your data</span></div>
         <div class="profile-divider"></div>
-        <div class="profile-menu-item" id="settingsBtn"><i class="fas fa-cog"></i><span>Settings</span></div>
+        <div class="profile-menu-item" id="settingsBtn" onclick="setting()"><i
+                class="fas fa-cog"></i><span>Settings</span></div>
         <div class="profile-menu-item" id="helpBtn"><i class="fas fa-question-circle"></i><span>Help</span></div>
         <div class="profile-menu-item" id="feedbackBtn"><i class="fas fa-comment-dots"></i><span>Feedback</span></div>
     </div>
@@ -98,16 +99,24 @@
         <!-- LEFT SIDEBAR (DESKTOP) -->
         <div class="desktop-sidebar" id="desktopSidebar">
             <div class="sidebar-item" data-nav="home">
-                <i class="fas fa-home"></i><span>Home</span>
+                <i class="fas fa-home"></i>
+                <span>Home</span>
             </div>
+
+            <div class="sidebar-item" data-nav="shorts">
+                <i class="fas fa-fire"></i>
+                <span>Shorts MCQ</span>
+            </div>
+
             <div class="sidebar-item" onclick="
-                 <% if (user && user._id) { %>
-                 window.location.href='/api/profile/<%= user._id %>'
-                 <% } else { %>
-            window.location.href='/login'
-            <% } %>
+    <% if (user && user._id) { %>
+        window.location.href='/api/profile/<%= user._id %>'
+    <% } else { %>
+        window.location.href='/login'
+    <% } %>
 ">
-                <i class="fas fa-newspaper"></i><span>Follower</span>
+                <i class="fas fa-newspaper"></i>
+                <span>Follower</span>
             </div>
             <div class="sidebar-divider"></div>
             <div class="sidebar-item" data-nav="library">
@@ -122,13 +131,18 @@
             <div class="sidebar-divider"></div>
             <div class="sidebar-title">EXPLORE</div>
             <div class="sidebar-item" data-nav="music">
-                <i class="fas fa-music"></i><span>Music</span>
+                <i class="fas fa-laptop-code"></i>
+                <span>Tech Interview</span>
             </div>
+
             <div class="sidebar-item" data-nav="gaming">
-                <i class="fas fa-gamepad"></i><span>Gaming</span>
+                <i class="fas fa-birthday-cake"></i>
+                <span>Birthday Software</span>
             </div>
+
             <div class="sidebar-item" data-nav="movies">
-                <i class="fas fa-tv"></i><span>Movies</span>
+                <i class="fas fa-file-alt"></i>
+                <span>Test Series</span>
             </div>
         </div>
 
@@ -151,7 +165,7 @@
 ">
                 <i class="fas fa-newspaper"></i><span>Follower</span>
             </div>
-            
+
             <div class="sidebar-item" data-nav="library">
                 <i class="fas fa-bookmark"></i><span>Library</span>
             </div>
@@ -159,9 +173,9 @@
                 <i class="fas fa-history"></i><span>History</span>
             </div>
             <div class="sidebar-item logout-item" id="logoutBtn">
-    <i class="fas fa-sign-out-alt"></i>
-    <span>Sign out</span>
-</div>
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sign out</span>
+            </div>
         </div>
     </div>
 
@@ -196,11 +210,22 @@
             </div>
             <button class="voice-search-btn" id="overlayVoiceBtn"><i class="fas fa-microphone"></i></button>
         </div>
-        <div class="search-suggestions" id="searchSuggestions">
-            <div class="suggestion-item"><i class="fas fa-history"></i><span>SSC CGL 2025</span></div>
-            <div class="suggestion-item"><i class="fas fa-history"></i><span>Banking exam preparation</span></div>
-            <div class="suggestion-item"><i class="fas fa-history"></i><span>NEET previous year papers</span></div>
-        </div>
+        <div class="search-suggestions" id="searchSuggestions"></div>
+    </div>
+
+</div>
+<div id="historyPopup" class="history-popup">
+
+    <div class="popup-box">
+
+        <button id="removeHistoryBtn">
+            Remove from search history
+        </button>
+
+        <button onclick="closeHistoryPopup()">
+            Cancel
+        </button>
+
     </div>
 
 </div>
@@ -301,6 +326,9 @@
             }
             else if (nav === "subscriptions") {
                 window.location.href = "/subscriptions";
+            }
+            else if (nav === "shorts") {
+                window.location.href = "/shorts-mcq";
             }
             else {
                 console.log(nav + " clicked");
@@ -417,83 +445,301 @@
     });
 
 
-  // 🎤 VOICE SEARCH (FINAL FIX)
+    // 🎤 VOICE SEARCH (FINAL FIX)
 
-const micBtn = document.getElementById("desktopMicBtn");
-const searchInput = document.getElementById("desktopSearchInput");
+    const micBtn = document.getElementById("desktopMicBtn");
+    const searchInput = document.getElementById("desktopSearchInput");
 
-const overlayMic = document.getElementById("overlayVoiceBtn");
-const overlayInput = document.getElementById("overlaySearchInput");
+    const overlayMic = document.getElementById("overlayVoiceBtn");
+    const overlayInput = document.getElementById("overlaySearchInput");
 
-const voicePopup = document.getElementById("voicePopup");
+    const voicePopup = document.getElementById("voicePopup");
 
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
 
-    recognition.lang = "en-IN"; // "hi-IN" bhi use kar sakte ho
-    recognition.continuous = false;
-    recognition.interimResults = false;
+        recognition.lang = "en-IN"; // "hi-IN" bhi use kar sakte ho
+        recognition.continuous = false;
+        recognition.interimResults = false;
 
-    // 🎤 DESKTOP MIC CLICK
-    micBtn.addEventListener("click", () => {
-        recognition.start();
-        voicePopup.classList.add("active"); // popup show
-    });
+        // 🎤 DESKTOP MIC CLICK
+        micBtn.addEventListener("click", () => {
+            recognition.start();
+            voicePopup.classList.add("active"); // popup show
+        });
 
-    // 📱 OVERLAY MIC CLICK
-    overlayMic?.addEventListener("click", () => {
-        recognition.start();
-        voicePopup.classList.add("active");
-    });
+        // 📱 OVERLAY MIC CLICK
+        overlayMic?.addEventListener("click", () => {
+            recognition.start();
+            voicePopup.classList.add("active");
+        });
 
-    // 🎯 RESULT (SINGLE — duplicate hata diya)
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
+        // 🎯 RESULT (SINGLE — duplicate hata diya)
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
 
-        // check kaha type karna hai
-        if (document.activeElement === overlayInput) {
-            overlayInput.value = transcript;
-        } else {
-            searchInput.value = transcript;
-        }
-    };
+            // check kaha type karna hai
+            if (document.activeElement === overlayInput) {
+                overlayInput.value = transcript;
+            } else {
+                searchInput.value = transcript;
+            }
+        };
 
-    // ❌ ERROR
-    recognition.onerror = (event) => {
-        console.error("Voice error:", event.error);
-        voicePopup.classList.remove("active");
-    };
+        // ❌ ERROR
+        recognition.onerror = (event) => {
+            console.error("Voice error:", event.error);
+            voicePopup.classList.remove("active");
+        };
 
-    // ✅ END
-    recognition.onend = () => {
-        voicePopup.classList.remove("active");
-    };
+        // ✅ END
+        recognition.onend = () => {
+            voicePopup.classList.remove("active");
+        };
 
-} else {
-    alert("❌ Browser support nahi karta voice recognition");
-}
-
-// 📱 MOBILE SEARCH FIX
-
-const overlaySearchBtn = document.querySelector(".voice-search-btn"); // mic ke bagal wala button nahi chahiye
-const overlayInputField = document.getElementById("overlaySearchInput");
-
-// 🔍 ENTER PRESS
-overlayInputField.addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-        runMobileSearch();
+    } else {
+        alert("❌ Browser support nahi karta voice recognition");
     }
+
+    // 📱 MOBILE SEARCH FIX
+
+    const overlaySearchBtn = document.querySelector(".voice-search-btn"); // mic ke bagal wala button nahi chahiye
+    const overlayInputField = document.getElementById("overlaySearchInput");
+
+    // 🔍 ENTER PRESS
+    overlayInputField.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+            runMobileSearch();
+        }
+    });
+
+    // 🔍 SEARCH FUNCTION
+    function runMobileSearch() {
+        const query = overlayInputField.value.trim();
+
+        if (!query) return;
+
+        // redirect same as desktop
+        window.location.href = "/National-Test-Series?search=" + encodeURIComponent(query);
+    }
+
+
+    // setting parts code redirect to the  Rid-Bharat-main/views/NationalTestSeries/settings/setting.ejs
+    function setting() {
+        window.location.href = "/setting"
+    }
+
+
+    // ================= SEARCH HISTORY =================
+
+    const searchSuggestions = document.getElementById("searchSuggestions");
+
+
+    // history get
+    function getSearchHistory() {
+        return JSON.parse(localStorage.getItem("searchHistory")) || [];
+    }
+
+
+    // save history
+    function saveSearchHistory(query) {
+
+        let history = getSearchHistory();
+
+        // duplicate remove
+        history = history.filter(item => item !== query);
+
+        // new add top par
+        history.unshift(query);
+
+        // max 10 history
+        history = history.slice(0, 10);
+
+        localStorage.setItem("searchHistory", JSON.stringify(history));
+    }
+
+
+    // render history
+    function renderSearchHistory() {
+
+        const history = getSearchHistory();
+
+        searchSuggestions.innerHTML = "";
+
+        if (history.length === 0) {
+            searchSuggestions.innerHTML = `
+            <div class="suggestion-item">
+                <span>No Search History</span>
+            </div>
+        `;
+            return;
+        }
+
+        history.forEach((item, index) => {
+
+            searchSuggestions.innerHTML += `
+            <div class="suggestion-item history-item"
+                 onmousedown="startPress(${index})"
+                 onmouseup="cancelPress()"
+                 ontouchstart="startPress(${index})"
+                 ontouchend="cancelPress()">
+
+                <div class="suggestion-left"
+                     onclick="selectHistory('${item}')">
+
+                    <i class="fas fa-history"></i>
+                    <span>${item}</span>
+
+                </div>
+
+            </div>
+        `;
+        });
+    }
+
+    // select history
+    function selectHistory(query) {
+
+        overlayInputField.value = query;
+
+        window.location.href =
+            "/National-Test-Series?search=" + encodeURIComponent(query);
+    }
+
+
+    // delete history
+    function deleteHistory(index) {
+
+        let history = getSearchHistory();
+
+        history.splice(index, 1);
+
+        localStorage.setItem("searchHistory", JSON.stringify(history));
+
+        renderSearchHistory();
+    }
+
+
+    // search function
+    function runMobileSearch() {
+
+        const query = overlayInputField.value.trim();
+
+        if (!query) return;
+
+        // save history
+        saveSearchHistory(query);
+
+        window.location.href =
+            "/National-Test-Series?search=" + encodeURIComponent(query);
+    }
+
+
+    // overlay open hone par history show
+    searchIcon?.addEventListener("click", () => {
+
+        searchOverlay.classList.add("open");
+
+        renderSearchHistory();
+    });
+
+    let pressTimer;
+    let selectedHistoryIndex = null;
+
+    const historyPopup = document.getElementById("historyPopup");
+    const removeHistoryBtn = document.getElementById("removeHistoryBtn");
+
+
+    // long press start
+    function startPress(index) {
+
+        selectedHistoryIndex = index;
+
+        pressTimer = setTimeout(() => {
+
+            historyPopup.style.display = "flex";
+
+        }, 600);
+    }
+
+
+    // cancel press
+    function cancelPress() {
+        clearTimeout(pressTimer);
+    }
+
+
+    // close popup
+    function closeHistoryPopup() {
+        historyPopup.style.display = "none";
+    }
+
+
+    // remove history
+    removeHistoryBtn.addEventListener("click", () => {
+
+        let history = getSearchHistory();
+
+        history.splice(selectedHistoryIndex, 1);
+
+        localStorage.setItem(
+            "searchHistory",
+            JSON.stringify(history)
+        );
+
+        closeHistoryPopup();
+
+        renderSearchHistory();
+    });
+
+    // logout js code 
+
+    // ================= LOGOUT =================
+
+document.getElementById("signOutBtn")?.addEventListener("click", async () => {
+
+    try {
+
+        await fetch("/logout", {
+            method: "GET",
+            credentials: "same-origin"
+        });
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        window.location.replace("/login");
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
 });
 
-// 🔍 SEARCH FUNCTION
-function runMobileSearch() {
-    const query = overlayInputField.value.trim();
 
-    if (!query) return;
+document.getElementById("logoutBtn")?.addEventListener("click", async () => {
 
-    // redirect same as desktop
-    window.location.href = "/National-Test-Series?search=" + encodeURIComponent(query);
-}
+    try {
+
+        await fetch("/logout", {
+            method: "GET",
+            credentials: "same-origin"
+        });
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        window.location.replace("/login");
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+});
 </script>

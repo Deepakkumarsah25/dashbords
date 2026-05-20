@@ -278,22 +278,74 @@
         const correctIdx = parseInt(selectedRadio.value);
         if (correctIdx >= optionTexts.length || !optionTexts[correctIdx]) { showToast("⚠️ Correct option must have valid text"); return; }
         const correctAnswerText = optionTexts[correctIdx];
+        const options = [];
+
+        optionInputs.forEach((inp, index) => {
+          const val = inp.value.trim();
+
+          if (val !== "") {
+            options.push({
+              text: val,
+              isCorrect: index === correctIdx
+            });
+          }
+        });
+
         questions.push({
           q: qText,
-          type: 'TF',
-          typeLabel: 'True/False',
+          type: 'MCQ',
+          typeLabel: 'Multiple Choice',
           marks,
-          correctAnswer: correctValue,
-          options: ["True", "False"] // 🔥 FIX
+          correctAnswer: correctAnswerText,
+          options
         });
+
         showToast(`✅ MCQ added: "${qText.substring(0, 40)}..."`);
+
       } else {
+
         const tfTrueRadio = document.getElementById('tfTrue');
         const tfFalseRadio = document.getElementById('tfFalse');
-        if (!tfTrueRadio.checked && !tfFalseRadio.checked) { showToast("⚠️ Please select the correct answer: True or False"); return; }
-        const correctValue = tfTrueRadio.checked ? "True" : "False";
-        questions.push({ q: qText, type: 'TF', typeLabel: 'True/False', marks, correctAnswer: correctValue });
+
+        if (!tfTrueRadio.checked && !tfFalseRadio.checked) {
+
+          showToast("⚠️ Please select the correct answer: True or False");
+
+          return;
+
+        }
+
+        const correctValue = tfTrueRadio.checked
+          ? "True"
+          : "False";
+
+        questions.push({
+
+          q: qText,
+
+          type: 'TF',
+
+          typeLabel: 'True/False',
+
+          marks,
+
+          correctAnswer: correctValue,
+
+          options: [
+            {
+              text: "True",
+              isCorrect: correctValue === "True"
+            },
+            {
+              text: "False",
+              isCorrect: correctValue === "False"
+            }
+          ]
+
+        });
+
         showToast(`✅ True/False added: "${qText.substring(0, 40)}..."`);
+
       }
       renderQuestionList();
       resetFormFields();
@@ -354,6 +406,12 @@
         const data = await res.json();
 
         if (data.success) {
+
+          localStorage.setItem(
+            "questions",
+            JSON.stringify(questions)
+          );
+
           window.location.href = "/test-details";
         } else {
           alert("❌ Failed to save questions");

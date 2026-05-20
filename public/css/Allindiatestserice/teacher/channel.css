@@ -1,82 +1,81 @@
- /* Additional styles only for history page */
-        .history-container {
+ /* Your Tests specific styles */
+        .tests-container {
             padding: 20px 24px 40px 24px;
         }
 
-        .history-header {
+        .tests-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             flex-wrap: wrap;
             gap: 12px;
         }
 
-        .history-header h2 {
+        .tests-header h2 {
             font-size: 24px;
             font-weight: 500;
             margin: 0;
         }
 
-        .history-header button {
-            border: none;
-            background: #e3f2fd;
-            padding: 8px 16px;
-            border-radius: 24px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-
-        .history-header button:hover {
-            background: #d0e3f5;
-        }
-
-        .history-item {
+        .test-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
             padding: 16px 0;
             border-bottom: 1px solid #e5e5e5;
-            cursor: pointer;
             transition: background 0.1s;
         }
 
-        .history-item:hover {
-            background-color: #f2f2f2;
+        .test-item:hover {
+            background-color: #fafafa;
         }
 
-        .history-left {
+        .test-left {
             display: flex;
             gap: 16px;
             flex: 1;
+            cursor: pointer;
         }
 
-        .history-thumb img {
+        .test-thumb img {
             width: 160px;
             height: 90px;
             object-fit: cover;
             border-radius: 12px;
         }
 
-        .history-info {
+        .test-info {
             flex: 1;
         }
 
-        .history-title {
+        .test-title {
             font-weight: 600;
             font-size: 16px;
             margin-bottom: 4px;
         }
 
-        .history-meta {
+        .test-subject {
             font-size: 13px;
             color: #606060;
+            margin-bottom: 8px;
         }
 
-        .history-actions {
+        .test-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .test-stats span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .test-actions {
             position: relative;
             cursor: pointer;
             padding: 8px;
@@ -84,7 +83,7 @@
             transition: background 0.2s;
         }
 
-        .history-actions:hover {
+        .test-actions:hover {
             background: #e5e5e5;
         }
 
@@ -95,7 +94,6 @@
             letter-spacing: 2px;
         }
 
-        /* Simple dropdown menu for delete */
         .action-menu {
             position: absolute;
             right: 0;
@@ -123,33 +121,48 @@
             background: #f2f2f2;
         }
 
-        .action-menu .delete-item {
+        .action-menu .delete-test {
             color: #d32f2f;
         }
 
-        /* Mobile adjustments */
+        /* Mobile */
         @media (max-width: 768px) {
-            .history-container {
+            .tests-container {
                 padding: 12px 12px 20px 12px;
             }
 
-            .history-thumb img {
+            .test-thumb img {
                 width: 120px;
                 height: 68px;
             }
 
-            .history-header h2 {
+            .tests-header h2 {
                 font-size: 20px;
             }
 
-            .history-header button {
-                padding: 6px 12px;
-                font-size: 12px;
+            .test-stats {
+                gap: 12px;
+                font-size: 11px;
             }
         }
 
+        /* Tablet */
         @media (min-width: 769px) and (max-width: 1024px) {
-            .history-container {
+            .tests-container {
                 padding: 20px 24px 40px 24px;
             }
+        }
+
+
+        /* ===================================sub title text color ======================*/
+        body.dark-mode .test-subject {
+            color: #ffffff;
+        }
+
+        body.dark-mode .test-stats {
+            color: #f2f2f2;
+        }
+
+        body.dark-mode .three-dots {
+            color: #ffffff;
         }

@@ -347,6 +347,39 @@
       .action-pill { padding: 6px 18px; font-size: 0.8rem; }
       .teacher-header { padding: 1rem 1.2rem; }
     }
+
+    /* change public cards color */
+    /* 🔥 PUBLIC TEST CARD COLOR */
+.public-card {
+  background: linear-gradient(145deg, #dcfce7, #bbf7d0) !important;
+  border: 2px solid #22c55e !important;
+}
+
+/* 🔥 PUBLIC TITLE */
+.public-card .test-title span {
+  color: #166534 !important;
+  background: none !important;
+}
+
+/* 🔥 PUBLIC BADGE EFFECT */
+.public-card::before {
+  content: "PUBLIC";
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #22c55e;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* 🔥 IMPORTANT */
+.test-card {
+  position: relative;
+}
   </style>
 </head>
 <body>
@@ -389,7 +422,7 @@
         // ensure we have a unique identifier (fallback to index if id missing, but typical mongo _id or id)
         const testId = test.id || test._id || (Math.random() + Date.now()); 
       %>
-        <div class="test-card" data-test-id="<%= testId %>">
+        <div class="test-card <%= test.visibility === 'public' ? 'public-card' : '' %>" data-test-id="<%= testId %>">
           <div class="card-content">
             <div class="test-title">
               <span><i class="fas fa-clipboard-list"></i> <%= test.name %></span>

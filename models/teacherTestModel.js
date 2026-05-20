@@ -1,9 +1,21 @@
 const mongoose = require("mongoose");
 
 const questionSchema = new mongoose.Schema({
-  text: String,
-  type: String,
-  points: { type: Number, default: 1 },
+  text: {
+    type: String,
+    required: true
+  },
+
+  type: {
+    type: String,
+    enum: ["MCQ", "TF"],
+    required: true
+  },
+
+  points: {
+    type: Number,
+    default: 1
+  },
 
   options: [
     {
@@ -15,7 +27,7 @@ const questionSchema = new mongoose.Schema({
 
 const teacherTestSchema = new mongoose.Schema({
 
-  // 🔥 MAIN CHANGE
+  // CREATED BY
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
@@ -28,12 +40,34 @@ const teacherTestSchema = new mongoose.Schema({
     required: true
   },
 
-  name: String,
-  subject: String,
-  duration: Number,
-  description: String,
+  // TEST DETAILS
+  name: {
+    type: String,
+    required: true
+  },
 
-  // 🔥 PUBLIC / PRIVATE
+  subject: {
+    type: String,
+    required: true
+  },
+
+  duration: {
+    type: Number,
+    required: true
+  },
+
+  description: {
+    type: String,
+    default: ""
+  },
+
+  // THUMBNAIL
+  thumbnail: {
+    type: String,
+    default: ""
+  },
+
+  // PUBLIC / PRIVATE
   visibility: {
     type: String,
     enum: ["private", "public"],
@@ -46,8 +80,16 @@ const teacherTestSchema = new mongoose.Schema({
     default: "pending"
   },
 
-  views: { type: Number, default: 0 },
-  likes: { type: Number, default: 0 },
+  // STATS
+  views: {
+    type: Number,
+    default: 0
+  },
+
+  likes: {
+    type: Number,
+    default: 0
+  },
 
   likedBy: [
     {
@@ -56,6 +98,7 @@ const teacherTestSchema = new mongoose.Schema({
     }
   ],
 
+  // QUESTIONS
   questions: [questionSchema],
 
   createdAt: {

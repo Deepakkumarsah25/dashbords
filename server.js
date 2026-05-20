@@ -74,6 +74,23 @@ app.use(session({
         secure: process.env.NODE_ENV === 'production'
     }
 }));
+
+// ================= NO CACHE =================
+
+app.use((req, res, next) => {
+
+    res.set(
+        "Cache-Control",
+        "no-store, no-cache, must-revalidate, private"
+    );
+
+    res.set("Pragma", "no-cache");
+
+    res.set("Expires", "0");
+
+    next();
+
+});
 // ========== SECURITY MIDDLEWARE ==========
 
 app.use('/ebook/uploads', express.static(path.join(__dirname, 'public/uploads')));
@@ -103,12 +120,15 @@ const configureViews = () => {
   app.set("views", [
     path.join(__dirname, "views", "ebook"),
     path.join(__dirname, "views"),
-    path.join(__dirname, "code", "views")   // 🔥 ADD THIS
+    path.join(__dirname, "code", "views"),   // 🔥 ADD THIS
+    path.join(__dirname,"DCA","views")
+
   ]);
 
   // ✅ STATIC FILES (CSS, JS, images)
   app.use(express.static(path.join(__dirname, "public")));        // main public
   app.use(express.static(path.join(__dirname, "code", "public"))); // 🔥 code/public
+  app.use(express.static(path.join(__dirname,"DCA","public")))
 };
 //=========================RTS MIDDLEWIRE=====================
 const rtsApp = require("./RTS/rtsmiddlewire");
@@ -338,16 +358,33 @@ app.listen = function () {
     pdfStream.pipe(res);
   });
 // ========== LOGOUT ROUTE ==========
-  app.get("/logout", (req, res) => {
-    if (req.session) {
-      req.session.destroy((err) => {
-        if (err) return res.status(500).send("Could not log out.");
-        res.redirect("/login");
-      });
-    } else {
-      res.json({ message: "Logged out successfully" });
-    }
-  });
+ // ================= LOGOUT =================
+
+app.get("/logout", (req, res) => {
+
+    res.clearCookie("token");
+
+    req.session.destroy((err) => {
+
+        if (err) {
+
+            console.log(err);
+
+            return res.status(500).json({
+                success: false
+            });
+
+        }
+
+        res.clearCookie("connect.sid");
+
+        return res.json({
+            success: true
+        });
+
+    });
+
+});
 // ========== DURATION API ==========
   app.get("/api/duration", (req, res) => {
     const duration = process.env.DURATION;
@@ -439,6 +476,11 @@ app.get("/library-dashboard",(req,res)=>{
   res.render("organisation/library-dashboard.ejs")
 
 })
+
+//DCA Class Routes this parts 
+const computerClassRouters = require("./DCA/server.js");
+app.use("/computer", computerClassRouters);
+//============================================================
 app.get("/dca-dashboard",(req,res)=>{
   res.render("organisation/dca-dashboard.ejs")
   
@@ -558,7 +600,6 @@ app.use("/National-Test-Series", testRoutes);
 // all india test routes 
 const shortsRoutes = require("./routes/nationalTestSeries/shortroutes");
 app.use("/", shortsRoutes);
-
 const myteam=require("./routes/myteampages/myteam.js")
 app.use("/",myteam)
 // ===== TECH INTERVIEW SERVER CONNECT =====

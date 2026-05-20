@@ -29,17 +29,33 @@ const teacherSchema = new mongoose.Schema(
         }
       }
     ],// 🔥 FOLLOWERS (kaun kaun follow kar raha)
+// 🔥 FOLLOWERS
 followers: [
   {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      refPath: "followers.model"
+    },
+
+    model: {
+      type: String,
+      enum: ["User", "Teacher"]
+    }
   }
 ],
 
+// 🔥 FOLLOWING
 following: [
   {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      refPath: "following.model"
+    },
+
+    model: {
+      type: String,
+      enum: ["User", "Teacher"]
+    }
   }
 ],
   },

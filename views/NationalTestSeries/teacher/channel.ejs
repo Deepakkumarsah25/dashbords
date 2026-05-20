@@ -6,163 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Your Tests - RIDTECH</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        /* Your Tests specific styles */
-        .tests-container {
-            padding: 20px 24px 40px 24px;
-        }
-
-        .tests-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .tests-header h2 {
-            font-size: 24px;
-            font-weight: 500;
-            margin: 0;
-        }
-
-        .test-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 16px 0;
-            border-bottom: 1px solid #e5e5e5;
-            transition: background 0.1s;
-        }
-
-        .test-item:hover {
-            background-color: #fafafa;
-        }
-
-        .test-left {
-            display: flex;
-            gap: 16px;
-            flex: 1;
-            cursor: pointer;
-        }
-
-        .test-thumb img {
-            width: 160px;
-            height: 90px;
-            object-fit: cover;
-            border-radius: 12px;
-        }
-
-        .test-info {
-            flex: 1;
-        }
-
-        .test-title {
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .test-subject {
-            font-size: 13px;
-            color: #606060;
-            margin-bottom: 8px;
-        }
-
-        .test-stats {
-            display: flex;
-            gap: 16px;
-            font-size: 13px;
-            color: #555;
-        }
-
-        .test-stats span {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .test-actions {
-            position: relative;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background 0.2s;
-        }
-
-        .test-actions:hover {
-            background: #e5e5e5;
-        }
-
-        .three-dots {
-            font-size: 20px;
-            font-weight: bold;
-            color: #606060;
-            letter-spacing: 2px;
-        }
-
-        .action-menu {
-            position: absolute;
-            right: 0;
-            top: 30px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            z-index: 100;
-            display: none;
-            min-width: 120px;
-        }
-
-        .action-menu.show {
-            display: block;
-        }
-
-        .action-menu div {
-            padding: 10px 16px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.1s;
-        }
-
-        .action-menu div:hover {
-            background: #f2f2f2;
-        }
-
-        .action-menu .delete-test {
-            color: #d32f2f;
-        }
-
-        /* Mobile */
-        @media (max-width: 768px) {
-            .tests-container {
-                padding: 12px 12px 20px 12px;
-            }
-
-            .test-thumb img {
-                width: 120px;
-                height: 68px;
-            }
-
-            .tests-header h2 {
-                font-size: 20px;
-            }
-
-            .test-stats {
-                gap: 12px;
-                font-size: 11px;
-            }
-        }
-
-        /* Tablet */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .tests-container {
-                padding: 20px 24px 40px 24px;
-            }
-        }
-    </style>
-</head>
+   <link rel="stylesheet" href="/css/Allindiatestserice/teacher/channel.css">
 
 <body>
 
@@ -173,7 +17,7 @@
             <div class="tests-container">
                 <div class="tests-header">
                     <h2><i class="fas fa-video"></i> Your Tests</h2>
-                   
+
                 </div>
 
                 <% if(tests && tests.length> 0){ %>
@@ -182,7 +26,10 @@
                             <div class="test-left"
                                 onclick="window.location.href='/National-Test-Series/test/<%= test._id %>'">
                                 <div class="test-thumb">
-                                    <img src="https://picsum.photos/200/120" alt="thumbnail">
+
+                                    <img src="<%= test.thumbnail && test.thumbnail !== '' ? test.thumbnail : 'https://picsum.photos/200/120' %>"
+                                        alt="thumbnail" onerror="this.src='https://picsum.photos/200/120'">
+
                                 </div>
                                 <div class="test-info">
                                     <div class="test-title">
@@ -222,137 +69,137 @@
         </div>
 
         <script>
-           document.addEventListener("DOMContentLoaded", function () {
+            document.addEventListener("DOMContentLoaded", function () {
 
-    const dynamicContent = document.getElementById("dynamicContent");
-    const tempContent = document.getElementById("testsPageContent");
+                const dynamicContent = document.getElementById("dynamicContent");
+                const tempContent = document.getElementById("testsPageContent");
 
-    if (dynamicContent && tempContent) {
-        const container = tempContent.querySelector(".tests-container");
-        if (container) {
-            dynamicContent.innerHTML = "";
-            dynamicContent.appendChild(container);
-        }
-        tempContent.remove();
-    }
-
-    // ✅ Create new test button
-    const createBtn = document.getElementById("createNewTestBtn");
-    if (createBtn) {
-        createBtn.addEventListener("click", () => {
-            window.location.href = "/create-test";
-        });
-    }
-
-    // ================= MENU HANDLING =================
-    function closeAllMenus() {
-        document.querySelectorAll('.action-menu').forEach(menu => {
-            menu.classList.remove('show');
-        });
-    }
-
-    document.querySelectorAll('.test-actions').forEach(actionsDiv => {
-
-        const dots = actionsDiv.querySelector('.three-dots');
-        const menu = actionsDiv.querySelector('.action-menu');
-
-        // 🔥 OPEN MENU
-        dots.addEventListener('click', (e) => {
-            e.stopPropagation();
-            closeAllMenus();
-            menu.classList.toggle('show');
-        });
-
-        // ================= DELETE =================
-        const deleteOption = menu.querySelector('.delete-test');
-
-        if (deleteOption) {
-            deleteOption.addEventListener('click', async (e) => {
-                e.stopPropagation();
-
-                const testId = deleteOption.getAttribute('data-id');
-
-                if (!testId) {
-                    alert("Invalid test ID ❌");
-                    return;
+                if (dynamicContent && tempContent) {
+                    const container = tempContent.querySelector(".tests-container");
+                    if (container) {
+                        dynamicContent.innerHTML = "";
+                        dynamicContent.appendChild(container);
+                    }
+                    tempContent.remove();
                 }
 
-                if (!confirm("Delete this test permanently?")) return;
+                // ✅ Create new test button
+                const createBtn = document.getElementById("createNewTestBtn");
+                if (createBtn) {
+                    createBtn.addEventListener("click", () => {
+                        window.location.href = "/create-test";
+                    });
+                }
 
-                try {
-                    const res = await fetch(`/National-Test-Series/delete/${testId}`, {
-                        method: "DELETE",
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
+                // ================= MENU HANDLING =================
+                function closeAllMenus() {
+                    document.querySelectorAll('.action-menu').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                }
+
+                document.querySelectorAll('.test-actions').forEach(actionsDiv => {
+
+                    const dots = actionsDiv.querySelector('.three-dots');
+                    const menu = actionsDiv.querySelector('.action-menu');
+
+                    // 🔥 OPEN MENU
+                    dots.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        closeAllMenus();
+                        menu.classList.toggle('show');
                     });
 
-                    const data = await res.json(); // 🔥 IMPORTANT
+                    // ================= DELETE =================
+                    const deleteOption = menu.querySelector('.delete-test');
 
-                    // 🔐 NOT LOGGED IN
-                    if (res.status === 401) {
-                        alert("Please login first 🔐");
-                        window.location.href = "/login";
-                        return;
+                    if (deleteOption) {
+                        deleteOption.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+
+                            const testId = deleteOption.getAttribute('data-id');
+
+                            if (!testId) {
+                                alert("Invalid test ID ❌");
+                                return;
+                            }
+
+                            if (!confirm("Delete this test permanently?")) return;
+
+                            try {
+                                const res = await fetch(`/National-Test-Series/delete/${testId}`, {
+                                    method: "DELETE",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    }
+                                });
+
+                                const data = await res.json(); // 🔥 IMPORTANT
+
+                                // 🔐 NOT LOGGED IN
+                                if (res.status === 401) {
+                                    alert("Please login first 🔐");
+                                    window.location.href = "/login";
+                                    return;
+                                }
+
+                                // 🚫 NOT OWNER
+                                if (res.status === 403) {
+                                    alert("You can delete only your own test ❌");
+                                    return;
+                                }
+
+                                // ❌ OTHER ERROR
+                                if (!res.ok || !data.success) {
+                                    alert(data.msg || "Delete failed ❌");
+                                    return;
+                                }
+
+                                // ✅ SUCCESS → REMOVE UI
+                                const testItem = actionsDiv.closest('.test-item');
+                                if (testItem) testItem.remove();
+
+                                // ✅ EMPTY STATE
+                                if (document.querySelectorAll('.test-item').length === 0) {
+                                    const container = document.querySelector('.tests-container');
+                                    const noMsg = document.createElement('p');
+                                    noMsg.style.padding = "40px 0";
+                                    noMsg.style.textAlign = "center";
+                                    noMsg.style.color = "#606060";
+                                    noMsg.innerHTML = '<i class="fas fa-folder-open"></i> No tests created yet';
+                                    container.appendChild(noMsg);
+                                }
+
+                            } catch (err) {
+                                console.error("DELETE ERROR:", err);
+                                alert("Server error ❌");
+                            }
+
+                            closeAllMenus();
+                        });
                     }
 
-                    // 🚫 NOT OWNER
-                    if (res.status === 403) {
-                        alert("You can delete only your own test ❌");
-                        return;
+                    // ================= EDIT =================
+                    const editOption = menu.querySelector('.edit-test');
+
+                    if (editOption) {
+                        editOption.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const testId = editOption.getAttribute('data-id');
+                            window.location.href = `/National-Test-Series/edit/${testId}`;
+                        });
                     }
 
-                    // ❌ OTHER ERROR
-                    if (!res.ok || !data.success) {
-                        alert(data.msg || "Delete failed ❌");
-                        return;
+                });
+
+                // 🔥 CLICK OUTSIDE → CLOSE MENU
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.test-actions')) {
+                        closeAllMenus();
                     }
+                });
 
-                    // ✅ SUCCESS → REMOVE UI
-                    const testItem = actionsDiv.closest('.test-item');
-                    if (testItem) testItem.remove();
-
-                    // ✅ EMPTY STATE
-                    if (document.querySelectorAll('.test-item').length === 0) {
-                        const container = document.querySelector('.tests-container');
-                        const noMsg = document.createElement('p');
-                        noMsg.style.padding = "40px 0";
-                        noMsg.style.textAlign = "center";
-                        noMsg.style.color = "#606060";
-                        noMsg.innerHTML = '<i class="fas fa-folder-open"></i> No tests created yet';
-                        container.appendChild(noMsg);
-                    }
-
-                } catch (err) {
-                    console.error("DELETE ERROR:", err);
-                    alert("Server error ❌");
-                }
-
-                closeAllMenus();
             });
-        }
-
-        // ================= EDIT =================
-        const editOption = menu.querySelector('.edit-test');
-
-        if (editOption) {
-            editOption.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const testId = editOption.getAttribute('data-id');
-                window.location.href = `/National-Test-Series/edit/${testId}`;
-            });
-        }
-
-    });
-
-    // 🔥 CLICK OUTSIDE → CLOSE MENU
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.test-actions')) {
-            closeAllMenus();
-        }
-    });
-
-});
             function executeSearch(query) {
                 const cards = document.querySelectorAll(".test-item"); // 🔥 FIX
                 const q = query.toLowerCase().trim();

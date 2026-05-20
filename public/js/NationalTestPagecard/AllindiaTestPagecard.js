@@ -18,8 +18,7 @@ function loadQuestion(index) {
 
     // Question text
     document.getElementById("question").textContent =
-        `Q${index + 1}. ${q.text}`;
-
+    `Q${index + 1}. ${q.text || q.q || "Question Missing"}`;
     // Question counter
     document.getElementById("questionCounter").textContent =
         `Question ${index + 1} of ${questions.length}`;
@@ -49,7 +48,7 @@ function loadQuestion(index) {
         div.innerHTML = `
             <input type="radio" name="option" value="${i}"
             ${isSelected ? "checked" : ""} style="margin-right:8px;">
-            ${opt.text}
+            ${opt.text || opt}
         `;
 
         div.addEventListener("click", () => {
@@ -232,111 +231,111 @@ function startTimer() {
 }
 
 // ----------------- Camera & Movement Detection -----------------
-let videoStream;
-let movementCount = 0;
-function startCamera() {
-    const container = document.createElement("div");
-    container.id = "camera-container";
-    container.style = `
-        position:fixed;
-        top:20px;
-        left:20px;
-        width:140px;
-        height:140px;
-        border-radius:50%;
-        overflow:hidden;
-        border:3px solid red;
-        z-index:9999;
-        cursor:move;
-    `;
+// let videoStream;
+// let movementCount = 0;
+// function startCamera() {
+//     const container = document.createElement("div");
+//     container.id = "camera-container";
+//     container.style = `
+//         position:fixed;
+//         top:20px;
+//         left:20px;
+//         width:140px;
+//         height:140px;
+//         border-radius:50%;
+//         overflow:hidden;
+//         border:3px solid red;
+//         z-index:9999;
+//         cursor:move;
+//     `;
 
-    document.body.appendChild(container);
+//     document.body.appendChild(container);
 
-    // =============================
-    // 🔥 RESIZE (DOUBLE CLICK + MOBILE LONG PRESS)
-    // =============================
-    let isSmall = false;
+//     // =============================
+//     // 🔥 RESIZE (DOUBLE CLICK + MOBILE LONG PRESS)
+//     // =============================
+//     let isSmall = false;
 
-    // 👉 Desktop double click
-    container.addEventListener("dblclick", () => {
-        if (!isSmall) {
-            container.style.width = "70px";
-            container.style.height = "70px";
-            isSmall = true;
-        } else {
-            container.style.width = "140px";
-            container.style.height = "140px";
-            isSmall = false;
-        }
-    });
+//     // 👉 Desktop double click
+//     container.addEventListener("dblclick", () => {
+//         if (!isSmall) {
+//             container.style.width = "70px";
+//             container.style.height = "70px";
+//             isSmall = true;
+//         } else {
+//             container.style.width = "140px";
+//             container.style.height = "140px";
+//             isSmall = false;
+//         }
+//     });
 
-    // 👉 Mobile long press
-    let pressTimer;
+//     // 👉 Mobile long press
+//     let pressTimer;
 
-    container.addEventListener("touchstart", () => {
-        pressTimer = setTimeout(() => {
-            if (!isSmall) {
-                container.style.width = "70px";
-                container.style.height = "70px";
-                isSmall = true;
-            } else {
-                container.style.width = "140px";
-                container.style.height = "140px";
-                isSmall = false;
-            }
-        }, 500);
-    });
+//     container.addEventListener("touchstart", () => {
+//         pressTimer = setTimeout(() => {
+//             if (!isSmall) {
+//                 container.style.width = "70px";
+//                 container.style.height = "70px";
+//                 isSmall = true;
+//             } else {
+//                 container.style.width = "140px";
+//                 container.style.height = "140px";
+//                 isSmall = false;
+//             }
+//         }, 500);
+//     });
 
-    container.addEventListener("touchend", () => {
-        clearTimeout(pressTimer);
-    });
+//     container.addEventListener("touchend", () => {
+//         clearTimeout(pressTimer);
+//     });
 
-    const video = document.createElement("video");
-    video.autoplay = true;
-    video.playsinline = true;
-    video.style = "width:100%; height:100%; object-fit:cover;";
-    container.appendChild(video);
+//     const video = document.createElement("video");
+//     video.autoplay = true;
+//     video.playsinline = true;
+//     video.style = "width:100%; height:100%; object-fit:cover;";
+//     container.appendChild(video);
 
-    // 📸 Camera start
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-            video.srcObject = stream;
-            videoStream = stream;
-            detectMovement(video);
-        })
-        .catch(() => alert("Camera access denied!"));
+//     // 📸 Camera start
+//     navigator.mediaDevices.getUserMedia({ video: true })
+//         .then(stream => {
+//             video.srcObject = stream;
+//             videoStream = stream;
+//             detectMovement(video);
+//         })
+//         .catch(() => alert("Camera access denied!"));
 
-    // =============================
-    // 🔥 DRAG FUNCTIONALITY (DESKTOP)
-    // =============================
-    let isDragging = false;
-    let offsetX, offsetY;
+//     // =============================
+//     // 🔥 DRAG FUNCTIONALITY (DESKTOP)
+//     // =============================
+//     let isDragging = false;
+//     let offsetX, offsetY;
 
-    container.addEventListener("mousedown", (e) => {
-        isDragging = true;
-        offsetX = e.clientX - container.offsetLeft;
-        offsetY = e.clientY - container.offsetTop;
-    });
+//     container.addEventListener("mousedown", (e) => {
+//         isDragging = true;
+//         offsetX = e.clientX - container.offsetLeft;
+//         offsetY = e.clientY - container.offsetTop;
+//     });
 
-    document.addEventListener("mousemove", (e) => {
-        if (!isDragging) return;
-        container.style.left = (e.clientX - offsetX) + "px";
-        container.style.top = (e.clientY - offsetY) + "px";
-    });
+//     document.addEventListener("mousemove", (e) => {
+//         if (!isDragging) return;
+//         container.style.left = (e.clientX - offsetX) + "px";
+//         container.style.top = (e.clientY - offsetY) + "px";
+//     });
 
-    document.addEventListener("mouseup", () => {
-        isDragging = false;
-    });
+//     document.addEventListener("mouseup", () => {
+//         isDragging = false;
+//     });
 
-    // =============================
-    // 📱 MOBILE DRAG
-    // =============================
-    container.addEventListener("touchmove", (e) => {
-        const touch = e.touches[0];
-        container.style.left = (touch.clientX - offsetX) + "px";
-        container.style.top = (touch.clientY - offsetY) + "px";
-    });
-}
+//     // =============================
+//     // 📱 MOBILE DRAG
+//     // =============================
+//     container.addEventListener("touchmove", (e) => {
+//         const touch = e.touches[0];
+//         container.style.left = (touch.clientX - offsetX) + "px";
+//         container.style.top = (touch.clientY - offsetY) + "px";
+//     });
+// }
 
 function detectMovement(video) {
     const canvas = document.createElement("canvas");
@@ -399,11 +398,17 @@ function restartTest() {
 
 // ----------------- Page Load -----------------
 window.onload = function () {
-    if (questions.length === 0) {
-        alert("No Questions Loaded");
-        return;
-    }
+   if (questions.length === 0) {
 
+    console.log(
+        "Questions From LocalStorage:",
+        localStorage.getItem("questions")
+    );
+
+    alert("No Questions Loaded");
+
+    return;
+}
     // ✅ Save quiz start time
     quizStartTime = Date.now();
     localStorage.setItem("quizStartTime", quizStartTime);

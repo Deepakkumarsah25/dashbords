@@ -3,6 +3,14 @@ const router = express.Router();
 
 const TeacherTest = require("../../models/teacherTestModel");
 
+
+
+
+
+
+router.get("/setting",(req,res)=>{
+  res.render("NationalTestSeries/settings/setting.ejs")
+})
 // 🔥 Shorts MCQ Route
 router.get("/shorts-mcq", async (req, res) => {
   try {

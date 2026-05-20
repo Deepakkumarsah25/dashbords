@@ -89,7 +89,7 @@ if (user.role === "teacher") {
       }
 
       if (user.organisationType === "DCA") {
-        return res.redirect("/dca-dashboard");
+        return res.redirect("/computer");
       }
 
       if (user.organisationType === "Coaching Centre") {
@@ -113,14 +113,35 @@ if (user.role === "teacher") {
 
 
 exports.logout = (req, res) => {
-  res.clearCookie("token");
 
-  // 🔥 SESSION DESTROY KARO
-  req.session.destroy(() => {
-    console.log("Session destroyed");
-  });
+    res.clearCookie("token");
 
-  res.send({ message: "successfully signed out!" });
+    req.session.destroy((err) => {
+
+        if (err) {
+
+            console.log(err);
+
+            return res.status(500).json({
+                success: false
+            });
+
+        }
+
+        res.clearCookie("connect.sid");
+
+        res.set({
+            "Cache-Control": "no-store, no-cache, must-revalidate, private",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        });
+
+        return res.json({
+            success: true
+        });
+
+    });
+
 };
 exports.verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
