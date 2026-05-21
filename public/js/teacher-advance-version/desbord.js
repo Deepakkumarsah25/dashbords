@@ -1,13 +1,12 @@
-
 // State management
 const state = {
-    paymentCompleted: false,
+    paymentCompleted: true,
     tests: [],
     templates: [],
     questions: [],
     currentTestQuestions: [],
     students: [],
-    currentSection: 'payment-section',
+    currentSection: 'dashboard-section',
     selectedColor: "#e34f26",
     dashboardAnimationsPlayed: false,
     profilePhoto: null,
@@ -24,7 +23,6 @@ const coursesData = [
 const testServicesData = {
 };
 // DOM Elements
-const paymentSection = document.getElementById('payment-section');
 const dashboardSection = document.getElementById('dashboard-section');
 const createTestSection = document.getElementById('create-test-section');
 const testServicesSection = document.getElementById('test-services-section');
@@ -38,30 +36,22 @@ const previousSection = document.getElementById('previous-section');
 const syllabusSection = document.getElementById('syllabus-section');
 const navSyllabus = document.getElementById('nav-syllabus');
 const syllabusLock = document.getElementById('syllabus-lock');
-const gotoPaymentFromSyllabus = document.getElementById('goto-payment-from-syllabus');
 const calculatorSection = document.getElementById('calculator-section');
 const calendarSection = document.getElementById('calendar-section');
 const alertsSection = document.getElementById('alerts-section');
 const navAlerts = document.getElementById('nav-alerts');
 const alertsLock = document.getElementById('alerts-lock');
-const gotoPaymentFromAlerts = document.getElementById('goto-payment-from-alerts');
 const sendEmailBtn = document.getElementById('send-email-btn');
 const navCalendar = document.getElementById('nav-calendar');
 const calendarLock = document.getElementById('calendar-lock');
-const gotoPaymentFromCalendar = document.getElementById('goto-payment-from-calendar');
 const navCalculator = document.getElementById('nav-calculator');
 const calculatorLock = document.getElementById('calculator-lock');
-const gotoPaymentFromCalculator = document.getElementById('goto-payment-from-calculator');
 const navPrevious = document.getElementById('nav-previous');
 const previousLock = document.getElementById('previous-lock');
-const gotoPaymentFromPrevious = document.getElementById('goto-payment-from-previous');
 const navNotes = document.getElementById('nav-notes');
 const notesLock = document.getElementById('notes-lock');
-const gotoPaymentFromNotes = document.getElementById('goto-payment-from-notes');
 const navResearch = document.getElementById('nav-research');
 const researchLock = document.getElementById('research-lock');
-const gotoPaymentFromResearch = document.getElementById('goto-payment-from-research');
-const navPayment = document.getElementById('nav-payment');
 const navDashboard = document.getElementById('nav-dashboard');
 const navTests = document.getElementById('nav-tests-sidebar');
 const navTemplates = document.getElementById('nav-templates-sidebar');
@@ -72,7 +62,6 @@ const studentsSection = document.getElementById('students-section');
 const studentsLock = document.getElementById('students-lock');
 const navAnalytics = document.getElementById('nav-analytics');
 const navSettings = document.getElementById('nav-settings');
-const makePaymentBtn = document.getElementById('make-payment');
 const testForm = document.getElementById('test-creation-form');
 const accountStatus = document.getElementById('account-status');
 const currentStatus = document.getElementById('current-status');
@@ -97,15 +86,7 @@ const templatesLock = document.getElementById('templates-lock');
 const pythonServiceLock = document.getElementById('python-service-lock');
 const analyticsLock = document.getElementById('analytics-lock');
 const settingsLock = document.getElementById('settings-lock');
-// Go to payment buttons
-const gotoPaymentFromDashboard = document.getElementById('goto-payment-from-dashboard');
-const gotoPaymentFromTests = document.getElementById('goto-payment-from-tests');
-const gotoPaymentFromTestServices = document.getElementById('goto-payment-from-test-services');
-const gotoPaymentFromTemplates = document.getElementById('goto-payment-from-templates');
-const gotoPaymentFromPython = document.getElementById('goto-payment-from-python');
-const gotoPaymentFromAnalytics = document.getElementById('goto-payment-from-analytics');
-const gotoPaymentFromSettings = document.getElementById('goto-payment-from-settings');
-const gotoPaymentFromStudents = document.getElementById('goto-payment-from-students');
+// Navigation buttons
 // Statistics elements
 const totalTestsElement = document.getElementById('total-tests');
 const totalQuestionsElement = document.getElementById('total-questions');
@@ -158,6 +139,7 @@ const addOptionBtn = document.getElementById('addOptionBtn');
 const questionPointsElement = document.getElementById('questionPoints');
 const addQuestionBtn = document.getElementById('addQuestionBtn');
 const saveQuestionsBtn = document.getElementById('saveQuestionsBtn');
+const saveQuestionsBtnMobile = document.getElementById('saveQuestionsBtnMobile');
 const questionDifficultyElement = document.getElementById('questionDifficulty');
 // Dashboard Animation Elements
 const testsProgress = document.getElementById('tests-progress');
@@ -184,16 +166,11 @@ const sidebarOverlay = document.getElementById('sidebarOverlay');
 
 // Initialize the app
 function initApp() {
-    // Check if payment was previously completed
-    const savedPayment = localStorage.getItem('teacherPaymentCompleted');
-    if (savedPayment === 'true') {
-        state.paymentCompleted = true;
-        unlockAllFeatures();
-        showDashboard();
-    } else {
-        lockAllFeatures();
-        showPaymentSection();
-    }
+    // Force unlock everything and skip payment gating
+    state.paymentCompleted = true;
+    localStorage.setItem('teacherPaymentCompleted', 'true');
+    unlockAllFeatures();
+    showDashboard();
 
     // Load saved templates
     const savedTemplates = localStorage.getItem('teacherTemplates');
@@ -365,81 +342,28 @@ function renderActivityChart() {
 
 // Lock all features (payment not completed)
 function lockAllFeatures() {
-    // Update UI to show locked state
-    accountStatus.textContent = "Free Account";
-    currentStatus.textContent = "Free Account (Limited Features)";
-    settingsAccountType.textContent = "Free Account";
-    currentStatus.style.color = "#e74c3c";
-
-    // Show lock overlays
-    if (dashboardLock) dashboardLock.style.display = 'flex';
-    if (createTestLock) createTestLock.style.display = 'flex';
-    if (testServicesLock) testServicesLock.style.display = 'flex';
-    if (templatesLock) templatesLock.style.display = 'flex';
-    if (pythonServiceLock) pythonServiceLock.style.display = 'flex';
-    if (analyticsLock) analyticsLock.style.display = 'flex';
-    if (studentsLock) studentsLock.style.display = 'flex';
-    if (settingsLock) settingsLock.style.display = 'flex';
-    if (notesLock) notesLock.style.display = 'flex';
-    if (previousLock) previousLock.style.display = 'flex';
-    if (syllabusLock) syllabusLock.style.display = 'flex';
-    if (calculatorLock) calculatorLock.style.display = 'flex';
-    if (calendarLock) calendarLock.style.display = 'flex';
-    if (alertsLock) alertsLock.style.display = 'flex';
-
-    // Disable all form elements
-    disableFormElements();
-
-    // Update navigation items to show locked state
-    document.querySelectorAll('.nav-item:not(#nav-payment)').forEach(item => {
-        item.classList.add('locked');
-        const lockIcon = item.querySelector('.lock-icon');
-        if (lockIcon) lockIcon.style.display = 'block';
-    });
-
-    // Enable only payment navigation
-    navPayment.classList.remove('locked');
-    navPayment.classList.add('active');
+    unlockAllFeatures();
 }
 
-// Unlock all features (payment completed)
+// Unlock all features
 function unlockAllFeatures() {
-    // Update UI to show unlocked state
-    accountStatus.textContent = "Premium Account";
-    accountStatus.style.color = "#27ae60";
-    currentStatus.textContent = "Premium Account (All Features Unlocked)";
-    settingsAccountType.textContent = "Premium Account";
-    currentStatus.style.color = "#27ae60";
+    state.paymentCompleted = true;
+    localStorage.setItem('teacherPaymentCompleted', 'true');
 
-    // Hide lock overlays
-    if (dashboardLock) dashboardLock.style.display = 'none';
-    if (createTestLock) createTestLock.style.display = 'none';
-    if (testServicesLock) testServicesLock.style.display = 'none';
-    if (templatesLock) templatesLock.style.display = 'none';
-    if (pythonServiceLock) pythonServiceLock.style.display = 'none';
-    if (analyticsLock) analyticsLock.style.display = 'none';
-    if (studentsLock) studentsLock.style.display = 'none';
-    if (settingsLock) settingsLock.style.display = 'none';
-    if (researchLock) researchLock.style.display = 'none';
-    if (notesLock) notesLock.style.display = 'none';
-    if (previousLock) previousLock.style.display = 'none';
-    if (syllabusLock) syllabusLock.style.display = 'none';
-    if (calculatorLock) calculatorLock.style.display = 'none';
-    if (calendarLock) calendarLock.style.display = 'none';
-    if (alertsLock) alertsLock.style.display = 'none';
+    if (accountStatus) accountStatus.textContent = "Premium Account";
+    if (currentStatus) {
+        currentStatus.textContent = "Premium Account (All Features Unlocked)";
+        currentStatus.style.color = "#27ae60";
+    }
+    if (settingsAccountType) settingsAccountType.textContent = "Premium Account";
 
-    // Enable all form elements
     enableFormElements();
 
-    // Update navigation items to show unlocked state
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('locked');
         const lockIcon = item.querySelector('.lock-icon');
-        if (lockIcon) lockIcon.style.display = 'none';
+        if (lockIcon) lockIcon.remove();
     });
-
-    // Show success notification
-    // showNotification('All features unlocked successfully!', 'success');
 }
 
 // Disable all form elements
@@ -505,14 +429,13 @@ function enableFormElements() {
 // Set up all event listeners
 function setupEventListeners() {
     // Navigation - with payment check
-    navPayment.addEventListener('click', () => showPaymentSection());
 
     navDashboard.addEventListener('click', () => {
         if (state.paymentCompleted) {
             showDashboard();
         } else {
             alert('Please complete payment first to access the dashboard.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -521,7 +444,7 @@ function setupEventListeners() {
             showCreateTestSection();
         } else {
             alert('Please complete payment first to create tests.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -530,7 +453,7 @@ function setupEventListeners() {
             showTestServicesSection();
         } else {
             alert('Please complete payment first to access Test Services.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -539,7 +462,7 @@ function setupEventListeners() {
             showStudentsSection();
         } else {
             alert('Please complete payment first to access Students.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -548,7 +471,7 @@ function setupEventListeners() {
             showTemplatesSection();
         } else {
             alert('Please complete payment first to access templates.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -557,7 +480,7 @@ function setupEventListeners() {
             showPythonServiceSection();
         } else {
             alert('Please complete payment first to access Python Test Service.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -566,7 +489,7 @@ function setupEventListeners() {
             showAnalyticsSection();
         } else {
             alert('Please complete payment first to access Analytics.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -575,7 +498,7 @@ function setupEventListeners() {
             showSettingsSection();
         } else {
             alert('Please complete payment first to access Settings.');
-            showPaymentSection();
+            showDashboard();
         }
     });
     navResearch.addEventListener('click', () => {
@@ -583,7 +506,7 @@ function setupEventListeners() {
             showResearchSection();
         } else {
             alert('Please complete payment first to access Research Papers.');
-            showPaymentSection();
+            showDashboard();
         }
     });
     navNotes.addEventListener('click', () => {
@@ -591,7 +514,7 @@ function setupEventListeners() {
             showNotesSection();
         } else {
             alert('Please complete payment first to access Notes.');
-            showPaymentSection();
+            showDashboard();
         }
     });
     navPrevious.addEventListener('click', () => {
@@ -599,7 +522,7 @@ function setupEventListeners() {
             showPreviousSection();
         } else {
             alert('Please complete payment first to access Previous Papers.');
-            showPaymentSection();
+            showDashboard();
         }
     });
     navSyllabus.addEventListener('click', () => {
@@ -607,7 +530,7 @@ function setupEventListeners() {
             showSyllabusSection();
         } else {
             alert('Please complete payment first.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -616,7 +539,7 @@ function setupEventListeners() {
             showCalculatorSection();
         } else {
             alert('Please complete payment first.');
-            showPaymentSection();
+            showDashboard();
         }
     });
     navCalendar.addEventListener('click', () => {
@@ -624,7 +547,7 @@ function setupEventListeners() {
             showCalendarSection();
         } else {
             alert('Please complete payment first.');
-            showPaymentSection();
+            showDashboard();
         }
     });
     navAlerts.addEventListener('click', () => {
@@ -632,7 +555,7 @@ function setupEventListeners() {
             showAlertsSection();
         } else {
             alert('Please complete payment first.');
-            showPaymentSection();
+            showDashboard();
         }
     });
     const topNavAlerts = document.getElementById('top-nav-alerts');
@@ -645,31 +568,15 @@ function setupEventListeners() {
     }
 
 
-    gotoPaymentFromAlerts.addEventListener('click', showPaymentSection);
-    gotoPaymentFromCalendar.addEventListener('click', showPaymentSection);
-    gotoPaymentFromSyllabus.addEventListener('click', showPaymentSection);
-    gotoPaymentFromCalculator.addEventListener('click', showPaymentSection);
-    gotoPaymentFromPrevious.addEventListener('click', () => showPaymentSection());
-    gotoPaymentFromNotes.addEventListener('click', () => showPaymentSection());
-    gotoPaymentFromResearch.addEventListener('click', () => showPaymentSection());
     // Payment
-    makePaymentBtn.addEventListener('click', processPayment);
-    // Go to payment buttons
-    gotoPaymentFromDashboard.addEventListener('click', () => showPaymentSection());
-    gotoPaymentFromTests.addEventListener('click', () => showPaymentSection());
-    gotoPaymentFromTestServices.addEventListener('click', () => showPaymentSection());
-    gotoPaymentFromTemplates.addEventListener('click', () => showPaymentSection());
-    gotoPaymentFromPython.addEventListener('click', () => showPaymentSection());
-    gotoPaymentFromAnalytics.addEventListener('click', () => showPaymentSection());
-    gotoPaymentFromSettings.addEventListener('click', () => showPaymentSection());
-    gotoPaymentFromStudents.addEventListener('click', () => showPaymentSection());
+    // Navigation buttons
 
     addStudentBtn.addEventListener('click', () => {
         if (state.paymentCompleted) {
             addStudentModal.style.display = 'flex';
         } else {
             alert('Please complete payment first to add students.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -679,7 +586,7 @@ function setupEventListeners() {
             handleAddStudent();
         } else {
             alert('Please complete payment first to add students.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -692,7 +599,7 @@ function setupEventListeners() {
             createTest(e);
         } else {
             alert('Please complete payment first to create tests.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -710,7 +617,7 @@ function setupEventListeners() {
             createTestCardFromForm();
         } else {
             alert('Please complete payment first to create test cards.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -720,7 +627,7 @@ function setupEventListeners() {
             createQuickTestCard();
         } else {
             alert('Please complete payment first to create test cards.');
-            showPaymentSection();
+            showDashboard();
         }
     });
 
@@ -784,7 +691,7 @@ function setupEventListeners() {
         if (e.target.classList.contains('details-btn') || e.target.closest('.details-btn')) {
             if (!state.paymentCompleted) {
                 alert('Please complete payment first to access Test Services.');
-                showPaymentSection();
+                showDashboard();
                 return;
             }
 
@@ -842,66 +749,67 @@ function setupEventListeners() {
     // Question Management
     addQuestionBtn.addEventListener('click', addQuestion);
     // ✅ Desktop click
-// Desktop
-function handleSaveAll(e) {
+    // Desktop
+    function handleSaveAll(e) {
 
-    e.preventDefault();
-    e.stopPropagation();
+        e.preventDefault();
+        e.stopPropagation();
 
-    if (saveQuestionsBtn.dataset.loading === "true") return;
+        if (saveQuestionsBtn.dataset.loading === "true") return;
 
-    saveQuestionsBtn.dataset.loading = "true";
+        saveQuestionsBtn.dataset.loading = "true";
 
-    saveQuestionsBtn.disabled = true;
+        saveQuestionsBtn.disabled = true;
 
-    // SAVE QUESTIONS
-    saveQuestions();
+        // SAVE QUESTIONS
+        saveQuestions();
 
-    // ✅ FORCE CLOSE MODAL
-    const modal = document.getElementById('createTestModal');
+        // ✅ FORCE CLOSE MODAL
+        const modal = document.getElementById('createTestModal');
 
-    modal.style.display = "none";
-    modal.classList.remove("show");
+        modal.style.display = "none";
+        modal.classList.remove("show");
 
-    document.body.style.overflow = "auto";
+        document.body.style.overflow = "auto";
 
-    // ✅ BACK TO FIRST PAGE
-    hideAllSections();
+        // ✅ BACK TO FIRST PAGE
+        hideAllSections();
 
-    createTestSection.classList.remove("hidden");
+        createTestSection.classList.remove("hidden");
 
-    state.currentSection = 'create-test-section';
+        state.currentSection = 'create-test-section';
 
-    // ✅ SCROLL TOP
-    window.scrollTo(0, 0);
+        // ✅ SCROLL TOP
+        window.scrollTo(0, 0);
 
-    // ENABLE AGAIN
-    setTimeout(() => {
+        // ENABLE AGAIN
+        setTimeout(() => {
 
-        saveQuestionsBtn.disabled = false;
+            saveQuestionsBtn.disabled = false;
 
-        delete saveQuestionsBtn.dataset.loading;
+            delete saveQuestionsBtn.dataset.loading;
 
-    }, 1000);
-}
+        }, 1000);
+    }
 
-// EVENTS
-saveQuestionsBtn.onclick = handleSaveAll;
+    // EVENTS
+    if (saveQuestionsBtn) {
+        saveQuestionsBtn.onclick = handleSaveAll;
+        saveQuestionsBtn.addEventListener("click", handleSaveAll);
+        saveQuestionsBtn.addEventListener("touchend", function (e) {
+            e.preventDefault();
+            handleSaveAll(e);
+        }, { passive: false });
+    }
 
-saveQuestionsBtn.addEventListener("touchend", function (e) {
-
-    e.preventDefault();
-
-    handleSaveAll(e);
-
-}, { passive: false });
-
-// ✅ IMPORTANT
-saveQuestionsBtn.addEventListener("click", handleSaveAll);
-
-saveQuestionsBtn.addEventListener("touchend", handleSaveAll, {
-    passive: false
-});
+    if (saveQuestionsBtnMobile) {
+        saveQuestionsBtnMobile.onclick = handleSaveAll;
+        saveQuestionsBtnMobile.addEventListener("click", handleSaveAll);
+        saveQuestionsBtnMobile.addEventListener("touchend", function (e) {
+            e.preventDefault();
+            handleSaveAll(e);
+        }, { passive: false });
+    }
 
     addOptionBtn.addEventListener('click', addOption);
     questionTypeElement.addEventListener('change', handleQuestionTypeChange);
@@ -1077,10 +985,7 @@ function showNotification(message, type = 'info') {
 
 // Show payment section
 function showPaymentSection() {
-    hideAllSections();
-    paymentSection.classList.remove('hidden');
-    updateActiveNav('nav-payment');
-    state.currentSection = 'payment-section';
+    showDashboard();
 }
 
 // Show dashboard section with animations
@@ -1352,7 +1257,8 @@ function showSettingsSection() {
 
 // Hide all sections
 function hideAllSections() {
-    paymentSection.classList.add('hidden');
+    const paymentSection = document.getElementById('payment-section');
+    if (paymentSection) paymentSection.classList.add('hidden');
     dashboardSection.classList.add('hidden');
     createTestSection.classList.add('hidden');
     testServicesSection.classList.add('hidden');
@@ -1560,25 +1466,10 @@ function animateCounter(element, targetValue) {
 
 // Process payment
 function processPayment() {
-    // Simulate payment processing
-    makePaymentBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Payment...';
-    makePaymentBtn.disabled = true;
-
-    setTimeout(() => {
-        // Payment successful
-        state.paymentCompleted = true;
-        localStorage.setItem('teacherPaymentCompleted', 'true');
-
-        makePaymentBtn.innerHTML = '<i class="fas fa-check"></i> Payment Successful!';
-        makePaymentBtn.style.background = 'linear-gradient(90deg, #27ae60, #2ecc71)';
-
-        // Unlock all features
-        unlockAllFeatures();
-
-        // Directly show dashboard
-        showDashboard();
-
-    }, 1500);
+    state.paymentCompleted = true;
+    localStorage.setItem('teacherPaymentCompleted', 'true');
+    unlockAllFeatures();
+    showDashboard();
 }
 
 
@@ -2337,7 +2228,7 @@ function renderTestServices(courseName) {
         serviceCard.innerHTML = `
        <div class="test-service-header" style="background: linear-gradient(135deg, ${service.color}, #2980b9);">
            <i class="fas fa-trash delete-test-icon"
-           data-id="${service.id}"
+           data-id="${service._id || service.id}"
           style="position:absolute; top:10px; right:10px; cursor:pointer; background:rgba(0,0,0,0.3); padding:6px; border-radius:50%; color:white;">
           </i>
 
@@ -2379,22 +2270,48 @@ function renderTestServices(courseName) {
                 </button>
 
                 <button class="enroll-btn view-btn" 
-                        data-id="${service.id}"
-                        style="background: linear-gradient(90deg, #3498db, #2980b9);">
-                    <i class="fas fa-eye"></i> View
-                </button>
+        data-id="${service._id || service.id}"
+        style="background: linear-gradient(90deg, #3498db, #2980b9);">
+    <i class="fas fa-eye"></i> View
+</button>
 
                 <button class="enroll-btn edit-btn" 
-                        data-id="${service.id}"
-                        style="background: linear-gradient(90deg, #f39c12, #e67e22);">
-                    <i class="fas fa-edit"></i><span>Edit</span>
-                </button>
+        data-id="${service._id || service.id}"
+        style="background: linear-gradient(90deg, #f39c12, #e67e22);">
+    <i class="fas fa-edit"></i><span>Edit</span>
+</button>
 
                <button class="enroll-btn result-btn"
-        data-id="${service.id}"
-        style="background: linear-gradient(90deg, #9b59b6, #8e44ad);">
-    <i class="fas fa-chart-bar"></i> Result
+data-id="${service._id || service.id}"
+style="background: linear-gradient(90deg, #9b59b6, #8e44ad);">
+<i class="fas fa-chart-bar"></i> Result
 </button>
+${(service.status || "").toLowerCase() === "published"
+                ? `
+<button 
+    class="action-btn-modern publish-btn-modern"
+    style="
+        background: linear-gradient(135deg,#6c5ce7,#4834d4);
+        color:white;
+        cursor:default;
+    ">
+
+    <i class="fas fa-check-circle"></i>
+    <span>Published</span>
+
+</button>
+`
+                : `
+<button 
+    class="action-btn-modern publish-btn-modern"
+    onclick="makeTestLive('${service._id || service.id}')">
+
+    <i class="fas fa-paper-plane"></i>
+    <span>Publish</span>
+
+</button>
+`
+            }
  
             </div>
         `;
@@ -3217,4 +3134,114 @@ function viewStudent(studentId) {
 
 function closeViewStudent() {
     document.getElementById("viewStudentModal").style.display = "none";
+}
+
+
+
+//public test on all india test serice 
+async function publishTest(testId) {
+
+    try {
+
+        const res = await fetch(`/teacher-tests/publish/${testId}`, {
+            method: "PUT"
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+
+            alert("Test Public Successfully!");
+
+            loadTestsFromDB();
+
+        } else {
+
+            alert(data.error || "Publish failed");
+
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Server error");
+
+    }
+}
+async function makeTestLive(testId) {
+
+    try {
+
+        const res = await fetch(
+            `/National-Test-Series/live/${testId}`,
+            {
+                method: "POST"
+            }
+        );
+
+        const data = await res.json();
+
+        if (data.success) {
+
+            // ✅ LOCAL STATE UPDATE
+            const index = state.tests.findIndex(
+                t => (t._id || t.id) === testId
+            );
+
+            if (index !== -1) {
+
+                state.tests[index].status = "published";
+
+                state.tests[index].visibility = "public";
+
+            }
+
+            // ✅ UPDATE CARD DATA ALSO
+            Object.keys(testServicesData).forEach(course => {
+
+                testServicesData[course] =
+                    testServicesData[course].map(service => {
+
+                        if ((service._id || service.id) === testId) {
+
+                            return {
+                                ...service,
+                                status: "published",
+                                visibility: "public"
+                            };
+                        }
+
+                        return service;
+                    });
+            });
+
+            // ✅ RE-RENDER CURRENT PAGE
+            const currentCourse =
+                document.getElementById("service-title")?.textContent;
+
+            if (currentCourse) {
+
+                renderTestServices(currentCourse);
+
+            }
+
+            showNotification(
+                "Test Published Successfully",
+                "success"
+            );
+
+        } else {
+
+            alert(data.msg || "Publish failed");
+
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+        alert("Server error");
+
+    }
 }

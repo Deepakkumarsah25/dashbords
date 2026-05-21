@@ -5,7 +5,10 @@ const User = require("../../models/user"); // 🔥 ADD THIS
 const Teacher = require("../../models/Teacher"); // 🔥 ADD THIS
 router.get("/", async (req, res) => {
   try {
-    const tests = await Test.find({ status: "published" })
+    const tests = await Test.find({
+  status: "published",
+  visibility: "public"
+})
       .populate({
   path: "createdBy",
   select: "_id name followers"

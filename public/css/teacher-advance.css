@@ -1,4 +1,5 @@
-/* Reset and Base Styles */
+   
+      /* Reset and Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -3067,4 +3068,744 @@ textarea.custom-input {
 .questions-container::-webkit-scrollbar-thumb {
     background: #c1c1c1;
     border-radius: 10px;
+}
+   
+   
+   .invite-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.invite-box {
+  background: #fff;
+  padding: 25px;
+  width: 400px;
+  border-radius: 12px;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.invite-box h2 {
+  margin-bottom: 10px;
+}
+
+.invite-link-box {
+  display: flex;
+  margin: 15px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.invite-link-box input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+}
+
+.invite-link-box button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.invite-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.whatsapp-btn {
+  background: #25d366;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+}
+
+.qr-btn {
+  background: #9b59b6;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+}
+
+.close-btn {
+  margin-top: 15px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+}
+.invite-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.cancel-btn {
+  flex: 1;
+  background: #ecf0f1;
+  color: #333;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #dcdde1;
+}
+
+.close-btn {
+  flex: 1;
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background: #2980b9;
+}
+
+canvas {
+  margin-top: 15px;
+}
+/* ===== MODAL OVERLAY ===== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65); /* dark glass */
+    backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* ===== MODAL BOX ===== */
+.modal-box {
+    width: 420px;
+    max-width: 95%;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 25px 22px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    position: relative;
+    animation: modalPop 0.35s ease;
+}
+
+/* ===== TITLE ===== */
+.modal-box h3 {
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* ===== INPUTS ===== */
+.modal-box input,
+.modal-box textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    outline: none;
+    margin-top: 6px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+/* focus effect */
+.modal-box input:focus,
+.modal-box textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+/* textarea */
+.modal-box textarea {
+    resize: none;
+    height: 80px;
+}
+
+/* ===== LABEL ===== */
+.modal-box label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+}
+
+/* ===== BUTTON ===== */
+.modal-box button {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.modal-box button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(99,102,241,0.4);
+}
+
+/* ===== CLOSE BUTTON ===== */
+.close-btn {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #64748b;
+    transition: 0.2s;
+}
+
+.close-btn:hover {
+    color: #ef4444;
+}
+
+/* ===== FILE INPUT STYLE ===== */
+.modal-box input[type="file"] {
+    background: #f8fafc;
+    border: 1px dashed #cbd5f5;
+    padding: 8px;
+    cursor: pointer;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes modalPop {
+    from {
+        transform: translateY(40px) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* ===== SEND REQUEST BUTTON ===== */
+.send-request-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* hover */
+.send-request-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99,102,241,0.5);
+}
+
+/* click effect */
+.send-request-btn:active {
+    transform: scale(0.96);
+}
+
+/* icon style */
+.send-request-btn i {
+    font-size: 13px;
+}
+    
+/* ===== COMPACT MODAL - NO SCROLL ===== */
+.compact-modal {
+    max-width: 1100px !important;
+    width: 95% !important;
+    height: auto !important;
+    max-height: 90vh !important;
+}
+
+.compact-body {
+    padding: 20px !important;
+    overflow: visible !important;
+}
+
+.two-column-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Left Panel - Questions List */
+.questions-list-panel {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #e0e6ed;
+    max-height: 450px;
+    display: flex;
+    flex-direction: column;
+}
+
+.questions-list-panel h4 {
+    margin-bottom: 12px;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.question-list-compact {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 380px;
+    padding-right: 8px;
+}
+
+.question-list-compact::-webkit-scrollbar {
+    width: 5px;
+}
+
+.question-list-compact::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.empty-state-compact {
+    text-align: center;
+    padding: 30px 15px;
+    color: #7f8c8d;
+}
+
+.empty-state-compact i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: #bdc3c7;
+}
+
+/* Right Panel - Add Question Form */
+.add-question-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #e0e6ed;
+}
+
+.add-question-panel h4 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.compact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-row-2cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 8px 0;
+}
+
+.question-option-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8f9fa;
+    padding: 6px 8px;
+    border-radius: 8px;
+}
+
+.question-option-input input[type="radio"] {
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.question-option-input input[type="text"] {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.btn-sm {
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.btn-outline {
+    background: transparent;
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.btn-outline:hover {
+    background: #3498db;
+    color: white;
+}
+
+.add-question-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    font-size: 0.9rem;
+}
+
+/* Panel Buttons */
+.panel-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e6ed;
+    justify-content: flex-end;
+}
+
+.panel-buttons .btn-sm {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+}
+
+.panel-buttons .btn-secondary {
+    background: #95a5a6;
+    color: white;
+}
+
+.panel-buttons .btn-success {
+    background: linear-gradient(90deg, #2ecc71, #27ae60);
+    color: white;
+}
+
+.panel-buttons .btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+    .two-column-layout {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .questions-list-panel {
+        max-height: 250px;
+    }
+    
+    .question-list-compact {
+        max-height: 180px;
+    }
+    
+    .form-row-2cols {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Question Item Style */
+.question-item {
+    background: white;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border-left: 3px solid #3498db;
+    font-size: 0.85rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.question-text {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.question-meta {
+    font-size: 0.7rem;
+    color: #7f8c8d;
+    display: flex;
+    gap: 10px;
+}
+
+.delete-question {
+    float: right;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+/* highlight for Send Request */
+#nav-send-request a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+/* hover */
+#nav-send-request a:hover {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+}
+
+/* active */
+#nav-send-request.active a {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+}
+
+/* ===== MODAL BACKGROUND ===== */
+.student-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* ===== MODAL BOX ===== */
+.student-modal-box {
+    background: #ffffff;
+    width: 350px;
+    max-width: 90%;
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    animation: modalFade 0.3s ease;
+    overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+.modal-header {
+    background: linear-gradient(135deg, #3498db, #6c5ce7);
+    color: #fff;
+    padding: 15px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* CLOSE ICON */
+.close-icon {
+    font-size: 22px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.close-icon:hover {
+    transform: scale(1.2);
+}
+
+/* ===== BODY ===== */
+.modal-body {
+    padding: 18px;
+    font-size: 0.95rem;
+    color: #2c3e50;
+}
+
+.modal-body p {
+    margin: 10px 0;
+    padding: 8px 10px;
+    background: #f4f6f9;
+    border-radius: 8px;
+}
+
+/* ===== FOOTER ===== */
+.modal-footer {
+    padding: 15px;
+    text-align: right;
+}
+
+/* BUTTON */
+.close-btn {
+    background: linear-gradient(135deg, #e74c3c, #ff6b6b);
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.close-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+}
+
+/* ===== ANIMATION ===== */
+@keyframes modalFade {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+/* SAVE BUTTON MOBILE FIX */
+#saveQuestionsBtn {
+    position: relative !important;
+    z-index: 999999 !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 52px;
+}
+
+/* floating bot/chat fix */
+iframe,
+.chatbot,
+.chat-widget,
+.bot-icon,
+.floating-chat {
+    z-index: 1 !important;
+}
+
+.panel-buttons {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    z-index: 9999;
+    padding: 10px;
+}
+
+.publish-btn {
+    background: linear-gradient(90deg, #ff9800, #f57c00);
+    color: white;
+}
+
+.publish-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+}
+/* ===== MODERN FOOTER BUTTONS ===== */
+
+.modern-footer{
+    display:flex;
+    gap:12px;
+    padding:16px;
+    background:#f8fafc;
+    border-top:1px solid #e2e8f0;
+}
+
+/* Common Button */
+.action-btn-modern{
+    flex:1;
+    border:none;
+    border-radius:12px;
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-size:0.92rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .25s ease;
+    position:relative;
+    overflow:hidden;
+}
+
+/* View Button */
+.view-btn{
+    background:linear-gradient(135deg,#3498db,#2563eb);
+    color:#fff;
+    box-shadow:0 4px 12px rgba(37,99,235,.25);
+}
+
+.view-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(37,99,235,.35);
+}
+
+/* Publish Button */
+.publish-btn-modern{
+    background:linear-gradient(135deg,#10b981,#059669);
+    color:#fff;
+    box-shadow:0 4px 12px rgba(5,150,105,.25);
+}
+
+.publish-btn-modern:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(5,150,105,.35);
+}
+
+/* Click Animation */
+.action-btn-modern:active{
+    transform:scale(.97);
+}
+
+/* Icon */
+.action-btn-modern i{
+    font-size:15px;
+}
+
+/* Published State */
+.publish-btn-modern.published{
+    background:linear-gradient(135deg,#6366f1,#4f46e5);
+}
+
+/* Mobile */
+@media(max-width:480px){
+
+    .modern-footer{
+        flex-direction:column;
+    }
+
+    .action-btn-modern{
+        width:100%;
+    }
 }

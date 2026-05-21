@@ -681,4 +681,71 @@ router.get("/teacher/:id", async (req, res) => {
 
     res.render("teacherProfile", { questions });
 });
+
+// ✅ multer setup top-level pe rakho
+const storage = multer.diskStorage({
+  destination: "public/uploads/",
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
+});
+const upload = multer({ storage });
+
+// ✅ route ko router.get("/teacher/channel") ke bahar rakho
+router.post(
+  "/teacher/send-request",
+  upload.fields([
+    { name: "banner", maxCount: 1 },
+    { name: "notes", maxCount: 1 }
+  ]),
+  async (req, res) => {
+    try {
+      const token = req.cookies.token;
+      const decoded = require("jsonwebtoken").verify(token, process.env.JWT_SECRET);
+
+      const bannerFile = req.files?.banner?.[0];
+      const notesFile = req.files?.notes?.[0];
+
+      const newRequest = new TestRequest({
+        teacherId: decoded.userId,
+        banner: bannerFile ? "/uploads/" + bannerFile.filename : "",
+        notes: notesFile ? "/uploads/" + notesFile.filename : "",
+        description: req.body.description || ""
+      });
+
+      await newRequest.save();
+      res.json({ success: true });
+    } catch (err) {
+      console.log("Send Request Error:", err);
+      res.json({ success: false, error: err.message });
+    }
+  }
+);
+
+
+// public test on all india test 
+
+router.put("/teacher-tests/publish/:id", async (req, res) => {
+
+    try {
+
+        await Test.findByIdAndUpdate(req.params.id, {
+
+            visibility: "public",
+            status: "published"
+
+        });
+
+        res.json({
+            success: true
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.json({
+            success: false,
+            error: "Publish failed"
+        });
+    }
+});
 module.exports = router;
