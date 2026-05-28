@@ -325,42 +325,60 @@ router.post("/teacher/create-test", ensureTeacher, async (req, res) => {
 
 // ================= VIEW TEST (Teacher Preview) =================
 router.get("/teacher/view-test/:testId", ensureTeacher, async (req, res) => {
+
   try {
-    const test = await Test.findById(req.params.testId);
-    if (!test) return res.send("Test Not Found");
 
-    // Load questions from Question collection
-    const dbQuestions = await Question.find({ testId: test._id });
-    // console.log("Received Questions From DB:", dbQuestions.length);
+    // 🔥 USE TeacherTest MODEL
+    const test = await TeacherTest.findById(req.params.testId);
 
-    // Format questions for student test page
+    if (!test) {
+      return res.send("Test Not Found");
+    }
+
+    // 🔥 Questions direct test object me ho sakte hain
+    const dbQuestions = test.questions || [];
+
     const formattedQuestions = dbQuestions.map((q, index) => ({
-  num: index + 1,
-  question_en: q.text,
-  question_hi: q.text,
 
-  options_en: q.options.map(o => o.text),
-  options_hi: q.options.map(o => o.text),
+      num: index + 1,
 
-  answer_en: q.options.find(o => o.isCorrect)?.text || "",
-  answer_hi: q.options.find(o => o.isCorrect)?.text || "",
+      question_en: q.question || q.text || "",
+      question_hi: q.question || q.text || "",
 
-  points: q.points || 1,
-  attempted: false,
-  selected: ""
-}));
+      options_en:
+        (q.options || []).map(o => o.text || o),
 
-    // Render test page with formatted questions
-res.render("tracher_deshboard/viewtext", {
-  testTitle: test.title,
-  questions: formattedQuestions,
-  duration: test.duration,
-  testId: test._id,
-  sid: ""   // teacher preview → no student id
-});
+      options_hi:
+        (q.options || []).map(o => o.text || o),
+
+      answer_en:
+        (q.options || []).find(o => o.isCorrect)?.text || "",
+
+      answer_hi:
+        (q.options || []).find(o => o.isCorrect)?.text || "",
+
+      points: q.points || 1,
+
+      attempted: false,
+      selected: ""
+
+    }));
+
+    res.render(
+      "tracher_deshboard/advance-version/viewtest",
+      {
+        testTitle: test.title || test.testName,
+        questions: formattedQuestions,
+        duration: test.duration || 60,
+        testId: test._id,
+        sid: ""
+      }
+    );
 
   } catch (err) {
+
     console.log("View Test Error:", err);
+
     res.send("Error loading test");
   }
 });

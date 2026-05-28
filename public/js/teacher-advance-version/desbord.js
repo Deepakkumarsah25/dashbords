@@ -708,7 +708,7 @@ function setupEventListeners() {
                 : e.target.closest('.view-btn');
 
             const testId = button.getAttribute('data-id');
-            window.location.href = `/teacher/analytics/${testId}`;
+            window.location.href = `/teacher/view-test/${testId}`;;
         }
 
         // Enroll buttons
@@ -725,7 +725,7 @@ function setupEventListeners() {
                 : e.target.closest('.view-btn');
 
             const testId = button.getAttribute('data-id');
-            window.location.href = `/teacher/analytics/${testId}`;
+            window.location.href = `/teacher/view-test/${testId}`;;
         }
 
         // ✅ RESULT BUTTON (ADD THIS HERE)
@@ -3335,7 +3335,7 @@ async function loadAnalyticsCards() {
     font-size:13px;
   "
 >
-  View
+  Details
 </a>
 
                     </td>

@@ -525,87 +525,239 @@
 // ==============================
 // SAFE LOCAL STORAGE FETCH
 // ==============================
-const attempted = Number(localStorage.getItem("attempted")) || 0;
-const notAttempted = Number(localStorage.getItem("notAttempted")) || 0;
-const score = Number(localStorage.getItem("score")) || 0;
-const timeTaken = localStorage.getItem("timeTaken") || "0 sec";
+// ==============================
+// SAFE LOCAL STORAGE FETCH
+// ==============================
+const attempted =
+    Number(localStorage.getItem("attempted")) || 0;
 
-// load questions
+const notAttempted =
+    Number(localStorage.getItem("notAttempted")) || 0;
+
+const score =
+    Number(localStorage.getItem("score")) || 0;
+
+const timeTaken =
+    localStorage.getItem("timeTaken") || "0 sec";
+
+// ==============================
+// LOAD QUESTIONS
+// ==============================
 let questions = [];
+
 try {
-    questions = JSON.parse(localStorage.getItem("questions")) || [];
+
+    questions =
+        JSON.parse(localStorage.getItem("questions")) || [];
+
 } catch (e) {
+
     questions = [];
+
 }
 
 // ==============================
 // KPI CALCULATIONS
 // ==============================
-const totalQuestions = questions.length || (attempted + notAttempted);
-const accuracy = attempted > 0
-    ? Math.round((score / attempted) * 100)
-    : 0;
+const totalQuestions =
+    questions.length || (attempted + notAttempted);
+
+const accuracy =
+    attempted > 0
+        ? Math.round((score / attempted) * 100)
+        : 0;
 
 // ==============================
 // UPDATE KPI UI
 // ==============================
-document.getElementById("scoreKPI").innerText = score;
-document.getElementById("timeKPI").innerText = timeTaken;
-document.getElementById("totalQKPI").innerText = totalQuestions;
-document.getElementById("accuracyKPI").innerText = accuracy + "%";
+document.getElementById("scoreKPI").innerText =
+    score;
+
+document.getElementById("timeKPI").innerText =
+    timeTaken;
+
+document.getElementById("totalQKPI").innerText =
+    totalQuestions;
+
+document.getElementById("accuracyKPI").innerText =
+    accuracy + "%";
 
 // ==============================
 // TABLE FILL
 // ==============================
-const table = document.getElementById("resultsTable");
+// ==============================
+// TABLE FILL
+// ==============================
+const table =
+    document.getElementById("resultsTable");
+
 table.innerHTML = "";
 
 questions.forEach((q, i) => {
 
-    let selectedText = "<i>Not Attempted</i>";
+    // ==========================
+    // OPTIONS SUPPORT
+    // ==========================
+    const options =
+        q.options ||
+        q.options_en ||
+        q.options_hi ||
+        [];
+
+    // ==========================
+    // QUESTION TEXT
+    // ==========================
+    const questionText =
+        q.question_en ||
+        q.question_hi ||
+        q.text ||
+        "-";
+
+    // ==========================
+    // SELECTED ANSWER
+    // ==========================
+    let selectedText = "Not Attempted";
+
     let isCorrect = false;
 
-    if (q.selected !== undefined && q.selected !== null) {
-        selectedText = q.options[q.selected]?.text || "-";
-        isCorrect = q.options[q.selected]?.isCorrect || false;
+    if (
+        q.selected !== undefined &&
+        q.selected !== null
+    ) {
+
+        const selectedOption =
+            options[q.selected];
+
+        // STRING OPTION
+        if (typeof selectedOption === "string") {
+
+            selectedText = selectedOption;
+
+        }
+
+        // OBJECT OPTION
+        else if (selectedOption) {
+
+            selectedText =
+                selectedOption.text || "-";
+
+            isCorrect =
+                selectedOption.isCorrect || false;
+        }
     }
 
-    const correctOption = q.options.find(opt => opt.isCorrect);
-    const correctText = correctOption ? correctOption.text : "-";
+    // ==========================
+    // CORRECT ANSWER
+    // ==========================
+    let correctText = "-";
 
+    // OBJECT FORMAT
+    const correctOption =
+        options.find(opt =>
+            typeof opt === "object" &&
+            opt.isCorrect
+        );
+
+    if (correctOption) {
+
+        correctText =
+            correctOption.text || "-";
+    }
+
+    // STRING FORMAT SUPPORT
+    else if (q.correctAnswer) {
+
+        correctText =
+            q.correctAnswer;
+    }
+
+    // ==========================
+    // SCORE FIX
+    // ==========================
+    if (selectedText === correctText) {
+        isCorrect = true;
+    }
+
+    // ==========================
+    // TABLE ROW
+    // ==========================
     table.innerHTML += `
     <tr>
+
         <td>${i + 1}</td>
-        <td>${q.text || "-"}</td>
+
+        <td>${questionText}</td>
+
         <td class="${isCorrect ? "correct" : "wrong"}">
             ${selectedText}
         </td>
-        <td class="correct">${correctText}</td>
+
+        <td class="correct">
+            ${correctText}
+        </td>
+
     </tr>`;
 });
 
 // ==============================
 // CHART DATA
 // ==============================
-const correctTrend = questions.map(q =>
-    q.selected !== undefined &&
-    q.options[q.selected]?.isCorrect ? 1 : 0
-);
+const correctTrend = questions.map(q => {
+
+    const options =
+        q.options ||
+        q.options_en ||
+        q.options_hi ||
+        [];
+
+    return (
+        q.selected !== undefined &&
+        q.selected !== null &&
+        options[q.selected] &&
+        options[q.selected].isCorrect
+    ) ? 1 : 0;
+
+});
 
 // ==============================
 // BAR CHART
 // ==============================
 new Chart(document.getElementById("barChart"), {
+
     type: "bar",
+
     data: {
-        labels: ["Attempted", "Not Attempted", "Score"],
+
+        labels: [
+            "Attempted",
+            "Not Attempted",
+            "Score"
+        ],
+
         datasets: [{
-            data: [attempted, notAttempted, score],
-            backgroundColor: ["#0092bd", "#ff5e5e", "#00ff9d"]
+
+            data: [
+                attempted,
+                notAttempted,
+                score
+            ],
+
+            backgroundColor: [
+                "#0092bd",
+                "#ff5e5e",
+                "#00ff9d"
+            ]
+
         }]
     },
+
     options: {
-        plugins: { legend: { display: false } }
+
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
     }
 });
 
@@ -613,15 +765,26 @@ new Chart(document.getElementById("barChart"), {
 // LINE CHART
 // ==============================
 new Chart(document.getElementById("lineChart"), {
+
     type: "line",
+
     data: {
-        labels: questions.map((_, i) => "Q" + (i + 1)),
+
+        labels:
+            questions.map((_, i) => "Q" + (i + 1)),
+
         datasets: [{
+
             label: "Correct/Wrong Trend",
+
             data: correctTrend,
+
             borderColor: "#7be8ff",
+
             tension: 0.4,
+
             fill: false
+
         }]
     }
 });
@@ -630,12 +793,28 @@ new Chart(document.getElementById("lineChart"), {
 // PIE CHART
 // ==============================
 new Chart(document.getElementById("pieChart"), {
+
     type: "pie",
+
     data: {
-        labels: ["Attempted", "Not Attempted"],
+
+        labels: [
+            "Attempted",
+            "Not Attempted"
+        ],
+
         datasets: [{
-            data: [attempted, notAttempted],
-            backgroundColor: ["#0092bd", "#ff5e5e"]
+
+            data: [
+                attempted,
+                notAttempted
+            ],
+
+            backgroundColor: [
+                "#0092bd",
+                "#ff5e5e"
+            ]
+
         }]
     }
 });

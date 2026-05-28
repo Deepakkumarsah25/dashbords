@@ -13,12 +13,28 @@ let quizStartTime = Date.now(); // ✅ ADD THIS
 
 
 function loadQuestion(index) {
+
     const q = questions[index];
+
     if (!q) return;
+
+    // ✅ Question Text Support
+    const questionText =
+        q.question_en ||
+        q.question_hi ||
+        q.text ||
+        "";
+
+    // ✅ Options Support
+    const options =
+        q.options_en ||
+        q.options_hi ||
+        q.options ||
+        [];
 
     // Question text
     document.getElementById("question").textContent =
-        `Q${index + 1}. ${q.text}`;
+        `Q${index + 1}. ${questionText}`;
 
     // Question counter
     document.getElementById("questionCounter").textContent =
@@ -29,14 +45,26 @@ function loadQuestion(index) {
         "Marks: " + (q.points || 1);
 
     // Options
-    const optionsElement = document.getElementById("options");
+    const optionsElement =
+        document.getElementById("options");
+
     optionsElement.innerHTML = "";
 
-    q.options.forEach((opt, i) => {
-        const isSelected = q.selected === i;
+    options.forEach((opt, i) => {
 
-        const div = document.createElement("div");
+        const optionText =
+            typeof opt === "string"
+                ? opt
+                : (opt.text || "");
+
+        const isSelected =
+            q.selected === i;
+
+        const div =
+            document.createElement("div");
+
         div.className = "option-box";
+
         div.style = `
             border: 2px solid ${isSelected ? "#007bff" : "#ccc"};
             background-color: ${isSelected ? "#e7f1ff" : "white"};
@@ -47,17 +75,27 @@ function loadQuestion(index) {
         `;
 
         div.innerHTML = `
-            <input type="radio" name="option" value="${i}"
-            ${isSelected ? "checked" : ""} style="margin-right:8px;">
-            ${opt.text}
+            <input
+                type="radio"
+                name="option"
+                value="${i}"
+                ${isSelected ? "checked" : ""}
+                style="margin-right:8px;"
+            >
+
+            ${optionText}
         `;
 
         div.addEventListener("click", () => {
+
             markAttempted(index, i);
+
             loadQuestion(index);
+
         });
 
         optionsElement.appendChild(div);
+
     });
 
     updateNavigation();
@@ -93,58 +131,159 @@ function changeLanguage() {
 
 // ----------------- Final Submit -----------------
 function submitQuiz() {
+
     // ===============================
-// CALCULATE REAL TIME TAKEN
-// ===============================
-const startTime = Number(localStorage.getItem("quizStartTime"));
-let timeTaken = "0 sec";
+    // CALCULATE REAL TIME TAKEN
+    // ===============================
+    const startTime =
+        Number(localStorage.getItem("quizStartTime"));
 
-if (startTime) {
-    const endTime = Date.now();
-    const diffSeconds = Math.floor((endTime - startTime) / 1000);
-    timeTaken = diffSeconds + " sec";
-    localStorage.setItem("timeTaken", timeTaken);
-}
+    let timeTaken = "0 sec";
 
+    if (startTime) {
 
-    const testId = document.getElementById("testId")?.value || "";
-    const studentId = document.getElementById("studentId")?.value || "";
+        const endTime = Date.now();
+
+        const diffSeconds =
+            Math.floor((endTime - startTime) / 1000);
+
+        timeTaken = diffSeconds + " sec";
+
+        localStorage.setItem(
+            "timeTaken",
+            timeTaken
+        );
+    }
+
+    // ===============================
+    // IDS
+    // ===============================
+    const testId =
+        document.getElementById("testId")?.value || "";
+
+    const studentId =
+        document.getElementById("studentId")?.value || "";
 
     let attempted = 0;
     let notAttempted = 0;
     let score = 0;
 
+    // ===============================
+    // SCORE + ANSWER SAVE
+    // ===============================
     questions.forEach(q => {
+
+        // ✅ SUPPORT ALL FORMATS
+        const options =
+            q.options ||
+            q.options_en ||
+            q.options_hi ||
+            [];
+
+        // ✅ FIND CORRECT ANSWER
+        const correctOption =
+            options.find(opt => opt.isCorrect);
+
+        q.correctAnswer =
+            typeof correctOption === "string"
+                ? correctOption
+                : (correctOption?.text || "");
+
+        // ===========================
+        // ATTEMPTED
+        // ===========================
         if (q.attempted) {
+
             attempted++;
-            if (q.options[q.selected]?.isCorrect) {
+
+            const selectedOption =
+                options[q.selected];
+
+            // ✅ SAVE SELECTED ANSWER
+            q.selectedAnswer =
+                typeof selectedOption === "string"
+                    ? selectedOption
+                    : (selectedOption?.text || "");
+
+            // ✅ CHECK CORRECT
+            if (
+                selectedOption &&
+                selectedOption.isCorrect
+            ) {
+
                 score += (q.points || 1);
+
             }
 
-        } else {
-            notAttempted++;
         }
+
+        // ===========================
+        // NOT ATTEMPTED
+        // ===========================
+        else {
+
+            notAttempted++;
+
+            q.selectedAnswer =
+                "Not Attempted";
+
+        }
+
     });
 
-    console.log("MODE:", studentId ? "STUDENT" : "TEACHER");
-    console.log({ testId, studentId, score, attempted, notAttempted });
+    // ===============================
+    // SAVE DATA
+    // ===============================
+    localStorage.setItem(
+        "attempted",
+        attempted
+    );
+
+    localStorage.setItem(
+        "notAttempted",
+        notAttempted
+    );
+
+    localStorage.setItem(
+        "score",
+        score
+    );
+
+    localStorage.setItem(
+        "questions",
+        JSON.stringify(questions)
+    );
+
+    localStorage.setItem(
+        "timeTaken",
+        timeTaken
+    );
+
+    console.log(
+        "MODE:",
+        studentId ? "STUDENT" : "TEACHER"
+    );
+
+    console.log({
+        testId,
+        studentId,
+        score,
+        attempted,
+        notAttempted
+    });
 
     // ===============================
     // 👨‍🏫 TEACHER PREVIEW MODE
     // ===============================
     if (!studentId) {
 
-        // 👉 student jaise hi result dikhao
-        localStorage.setItem("attempted", attempted);
-        localStorage.setItem("notAttempted", notAttempted);
-        localStorage.setItem("score", score);
-        localStorage.setItem("questions", JSON.stringify(questions));
+        localStorage.setItem(
+            "previewMode",
+            "teacher"
+        );
 
-        localStorage.setItem("previewMode", "teacher");
-
-        // ✅ same result page open
         window.location.href =
-            "/testsubmitedbyteacher/advance-submit-test.html";//
+            "/testsubmitedbyteacher/advance-submit-test.html";
 
         return;
     }
@@ -152,28 +291,48 @@ if (startTime) {
     // ===============================
     // 👨‍🎓 STUDENT REAL SUBMISSION
     // ===============================
-    const confirmation = confirm("Are you sure you want to submit the test?");
+    const confirmation =
+        confirm(
+            "Are you sure you want to submit the test?"
+        );
+
     if (!confirmation) return;
 
     fetch("/student/submit-test", {
+
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentId, testId, score })
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            studentId,
+            testId,
+            score
+        })
+
     })
         .then(res => res.text())
-        .then(() => {
-            localStorage.setItem("attempted", attempted);
-            localStorage.setItem("notAttempted", notAttempted);
-            localStorage.setItem("score", score);
 
-            window.location.href = "/TestSubmitedStudent/submit-student-test.html";
+        .then(() => {
+
+            window.location.href =
+                "/TestSubmitedStudent/submit-student-test.html";
+
         })
+
         .catch(err => {
-            console.error("Submit Error:", err);
+
+            console.error(
+                "Submit Error:",
+                err
+            );
+
             alert("❌ Submit failed!");
+
         });
 }
-
 // ----------------- Navigation Circles -----------------
 function updateNavigation() {
     const nav = document.getElementById("circleContainer");

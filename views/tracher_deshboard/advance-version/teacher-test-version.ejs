@@ -9,16 +9,12 @@
     <link rel="stylesheet" href="/css/teacher-advance.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <link rel="icon" type="image/png" href="/assets/signup.png">
-
-
 </head>
-
 <body>
     <script>
         const TEACHER_ID = "<%= teacher._id %>";
         const initialStudents = <% - JSON.stringify(students || []) %>;
     </script>
-
     <div class="main-container">
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
         <!-- Fixed Header -->
@@ -127,9 +123,6 @@
             <nav class="sidebar" id="sidebar">
                 <h3>Teacher Panel</h3>
                 <ul class="nav-menu">
-
-
-
                     <!-- Dashboard -->
                     <li class="nav-item" id="nav-dashboard">
                         <a href="#">
@@ -138,7 +131,6 @@
 
                         </a>
                     </li>
-
                     <!-- ================= Teaching Tools ================= -->
                     <li class="nav-section-title">Teaching Tools</li>
 
@@ -155,9 +147,6 @@
                             <span>Send Request</span>
                         </a>
                     </li>
-
-
-
                     <li class="nav-item" id="nav-students">
                         <a href="#">
                             <i class="fas fa-users"></i>
@@ -300,7 +289,6 @@
                         <a href="#">
                             <i class="fas fa-envelope"></i>
                             <span>Email/SMS Alerts</span>
-
                         </a>
                     </li>
 
