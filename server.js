@@ -17,10 +17,10 @@ const configureMiddleware = require("./config/middleware");
 dotenv.config();
 // Initialize express app
 const app = express();
-const port = process.env.PORT || 9191;
+const port = process.env.PORT || 5000;
 const http = require("http");
 const server = http.createServer(app);
-const mongoUrl = process.env.MONGODB_URI;
+const mongoUrl = process.env.MONGO_URI;
 console.log('🔗 Attempting MongoDB Atlas connection...');
 mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
@@ -63,14 +63,14 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        mongoUrl: mongoUrl,
-        collectionName: 'sessions',
-        ttl: 24 * 60 * 60 // 1 day in seconds
+        mongoUrl: process.env.MONGO_URI,
+        collectionName: "sessions",
+        ttl: 24 * 60 * 60
     }),
     cookie: {
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production'
+        secure: process.env.NODE_ENV === "production"
     }
 }));
 
@@ -129,6 +129,7 @@ const configureViews = () => {
   app.use(express.static(path.join(__dirname, "code", "public"))); // 🔥 code/public
   app.use(express.static(path.join(__dirname,"DCA","public")))
 };
+
 //=========================RTS MIDDLEWIRE=====================
 const rtsApp = require("./RTS/rtsmiddlewire");
 app.use("/rts", rtsApp);
@@ -468,7 +469,9 @@ app.use("/dashboard", dashboardRoutes);
 app.get("/research-papper",(req,res)=>{
   res.render("tracher_deshboard/advance-version/Research-papper/index.ejs")
 })
-app.use("/uploads", express.static("uploads"));
+// app.use("/uploads", express.static("uploads"));
+app.use(express.static("public"));
+app.use("/uploads", express.static("public/uploads"));
 const researchRoutes = require("./routes/researchRoutes");
 app.use("/api/research", researchRoutes);
 //===role by login pages origanition pages ===========================
@@ -527,7 +530,7 @@ app.get("/admin/dashboard", requireAdmin, (req, res) => {
 app.get("/offerlatter",(req,res)=>{
   res.render("Admin/offerlatter/offerlatter-form.ejs")
 })
-app.use(express.urlencoded({ extended: true }));
+
 app.use(express.static("public"));
 
 const offerRoutes = require("./routes/offerRoutes");
@@ -612,23 +615,21 @@ configureRoutes();
 // ================== DB + SERVER START ==================
 async function startServer() {
   try {
-    console.log("🔗 Connecting MongoDB...");
-
-    await mongoose.connect(process.env.MONGODB_URI);
-
-    console.log("✅ MongoDB Connected Successfully");
+    console.log("🔗 Starting Server...");
 
     app.listen(port, () => {
       console.log(`🚀 Server running on http://localhost:${port}`);
     });
 
   } catch (err) {
-    console.error("❌ MongoDB Error:", err);
+    console.error(err);
     process.exit(1);
   }
 }
+
+
 startServer();
-// ✅ SOCKET.IO AFTER SERVER
+//  SOCKET.IO AFTER SERVER
 const { Server } = require("socket.io");
 const io = new Server(server);
 

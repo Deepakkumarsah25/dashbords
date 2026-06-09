@@ -28,8 +28,17 @@
           <div class="notif-dropdown" id="notifDropdown"><div class="notif-header">🔔 Notifications</div><div class="notif-list" id="notifList"></div></div>
         </div>
         <div class="profile-wrap" id="profileBtn">
-          <img class="avatar-img" id="profileAvatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="avatar">
-          <div><div class="profile-name" id="topbarProfileName">Rahul Mehta</div><div class="profile-role" id="topbarProfileRole">Admin</div></div>
+          <img class="avatar-img" id="profileAvatar" src="images/image.jpeg" alt="avatar">
+          <div>
+<div class="profile-name" id="topbarProfileName">
+    <%= user.name %>
+</div>
+
+<div class="profile-role" id="topbarProfileRole">
+    <%= user.role %>
+</div>
+
+          </div>
         </div>
       </div>
     </div>
@@ -37,10 +46,10 @@
     <section class="page-head">
       <div><h2>Dashboard</h2><p>Welcome back, <span id="welcomeName">Admin</span> 👋 Real-time insights</p></div>
       <div class="quick-actions">
-       <a href="/students"><button class="btn blue"><i class="fas fa-plus"></i> Add Student</button></a>
-        <a href="/fees"><button class="btn green"><i class=""></i> Collect Fees</button></a>
-        <a href="/test"><button class="btn purple"><i class="fas fa-pen"></i> Create Test</button></a>
-        <a href="/Attendence"><button class="btn orange"><i class="fas fa-user-check"></i> Mark Attendance</button></a>
+       <a href="/computer/students"><button class="btn blue"><i class="fas fa-plus"></i> Add Student</button></a>
+        <a href="/computer/fees"><button class="btn green"><i class=""></i> Collect Fees</button></a>
+        <a href="/computer/test"><button class="btn purple"><i class="fas fa-pen"></i> Create Test</button></a>
+        <a href="/computer/Attendence"><button class="btn orange"><i class="fas fa-user-check"></i> Mark Attendance</button></a>
       </div>
     </section>
 
@@ -66,10 +75,10 @@
     <div class="modal-body" id="profileModalBody">
       <!-- VIEW MODE -->
       <div id="profileViewMode">
-        <div class="info-row"><i class="fas fa-user"></i><div class="view-field"><strong>Full Name</strong><br><span id="profileName">Rahul Mehta</span></div></div>
-        <div class="info-row"><i class="fas fa-envelope"></i><div class="view-field"><strong>Email Address</strong><br><span id="profileEmail">rahul@ridtech.edu</span></div></div>
-        <div class="info-row"><i class="fas fa-phone"></i><div class="view-field"><strong>Phone Number</strong><br><span id="profilePhone">+91 98765 43210</span></div></div>
-        <div class="info-row"><i class="fas fa-user-tag"></i><div class="view-field"><strong>Role</strong><br><span id="profileRole">Super Admin</span></div></div>
+        <div class="info-row"><i class="fas fa-user"></i><div class="view-field"><strong>Full Name</strong><br><span id="profileName"><%= user.name %></span></div></div>
+        <div class="info-row"><i class="fas fa-envelope"></i><div class="view-field"><strong>Email Address</strong><br><span id="profileEmail"><%= user.email %></span></div></div>
+        <div class="info-row"><i class="fas fa-phone"></i><div class="view-field"><strong>Phone Number</strong><br><span id="profilePhone"><%= user.phone %></span></div></div>
+        <div class="info-row"><i class="fas fa-user-tag"></i><div class="view-field"><strong>Role</strong><br><span id="profileRole"><%= user.role %></span></div></div>
         <div class="profile-actions"><button id="editProfileBtn" class="btn blue btn-sm"><i class="fas fa-edit"></i> Edit Profile</button><button id="closeProfileBtn" class="btn btn-sm" style="background:#eef2ff;">Close</button></div>
       </div>
       <!-- EDIT MODE (hidden by default) -->
@@ -89,8 +98,8 @@
 <script>
   // ---------- DASHBOARD CORE DATA & FUNCTIONS (unchanged logic) ----------
   const statsData = [
-    { title: "Total Students", value: "256", icon: "fas fa-users", trend: "↑12 this month", bg: "#eef6ff", color: "#2f80ed" },
-    { title: "Fees Collected Today", value: "₹18,500", icon: "fas fa-rupee-sign", trend: "↑8% vs yesterday", bg: "#ecfdf3", color: "#16a34a" },
+    { title: "Total Students", value: "189", icon: "fas fa-users", trend: "↑12 this month", bg: "#eef6ff", color: "#2f80ed" },
+    { title: "Fees Collected Today", value: "₹8000", icon: "fas fa-rupee-sign", trend: "↑8% vs yesterday", bg: "#ecfdf3", color: "#16a34a" },
     { title: "Pending Fees", value: "₹1200", icon: "fas fa-exclamation-triangle", trend: "23 Students", bg: "#fff7ed", color: "#f59e0b" },
     { title: "Active Courses", value: "8", icon: "fas fa-book-open", trend: "All Running", bg: "#f5f3ff", color: "#7c5cff" },
     { title: "Upcoming Tests", value: "3", icon: "fas fa-calendar-alt", trend: "This Week", bg: "#fff1f2", color: "#ec4899" },
@@ -159,14 +168,16 @@
   
   // ---------- FULLY WORKING PROFILE SYSTEM (EDIT, SAVE, AVATAR, PERSIST) ----------
   let currentProfile = {
-    name: "Rahul Mehta",
-    email: "rahul@ridtech.edu",
-    phone: "+91 98765 43210",
-    role: "Super Admin",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg"
-  };
-  function loadProfileFromStorage() { const saved = localStorage.getItem("ridtech_profile"); if(saved) { const p = JSON.parse(saved); currentProfile = { ...currentProfile, ...p }; } applyProfileToUI(); }
-  function saveProfileToStorage() { localStorage.setItem("ridtech_profile", JSON.stringify(currentProfile)); }
+    name: "<%= user.name %>",
+    email: "<%= user.email %>",
+    phone: "<%= user.phone %>",
+    role: "<%= user.role %>",
+    avatar: "/images/imag.jpeg"
+};
+  function loadProfileFromStorage() {
+    applyProfileToUI();
+}
+  
   function applyProfileToUI() {
     document.getElementById("profileName").innerText = currentProfile.name;
     document.getElementById("profileEmail").innerText = currentProfile.email;
@@ -192,10 +203,36 @@
     const newEmail = document.getElementById("editEmail").value.trim();
     const newPhone = document.getElementById("editPhone").value.trim();
     const newRole = document.getElementById("editRole").value.trim();
-    if(!newName || !newEmail) { showToast("❌ Name and Email cannot be empty"); return; }
-    currentProfile.name = newName; currentProfile.email = newEmail; currentProfile.phone = newPhone || currentProfile.phone; currentProfile.role = newRole || currentProfile.role;
-    saveProfileToStorage(); applyProfileToUI(); closeEditMode(); showToast("✅ Profile updated successfully!");
-  }
+
+    if (!newName || !newEmail) {
+        showToast("❌ Name and Email cannot be empty");
+        return;
+    }
+
+    currentProfile.name = newName;
+    currentProfile.email = newEmail;
+    currentProfile.phone = newPhone || currentProfile.phone;
+    currentProfile.role = newRole || currentProfile.role;
+
+    applyProfileToUI();
+    closeEditMode();
+
+    showToast("✅ Profile updated successfully!");
+}
+
+function updateAvatar(imageDataUrl) {
+    currentProfile.avatar = imageDataUrl;
+    applyProfileToUI();
+
+    showToast("🖼️ Profile picture updated");
+}
+
+function resetAvatar() {
+    currentProfile.avatar = "/images/image.jpeg";
+    applyProfileToUI();
+
+    showToast("🔄 Avatar reset successfully");
+}
   function updateAvatar(imageDataUrl) { currentProfile.avatar = imageDataUrl; saveProfileToStorage(); applyProfileToUI(); showToast("🖼️ Profile picture updated"); }
   function resetAvatar() { currentProfile.avatar = "https://randomuser.me/api/portraits/men/32.jpg"; saveProfileToStorage(); applyProfileToUI(); showToast("🔄 Avatar reset to default"); }
   function handleFileUpload(file) { if(file && file.type.startsWith("image/")) { const reader = new FileReader(); reader.onload = (e) => updateAvatar(e.target.result); reader.readAsDataURL(file); } else showToast("⚠️ Please select an image file"); }
@@ -212,10 +249,38 @@
   document.getElementById("resetAvatarBtn")?.addEventListener("click", resetAvatar);
   document.getElementById("modalAvatarTrigger")?.addEventListener("click", () => { if(avatarUploadInput) avatarUploadInput.click(); });
   // sync initial load
-  loadProfileFromStorage();
-  renderStats(); renderSchedule(); renderRecentTable(""); renderAlerts(); renderBottomStats(); initCharts(); updateNotifUI();
+ loadProfileFromStorage();
+
+renderStats();
+loadDashboardStudentCount();
+
+renderSchedule();
+renderRecentTable("");
+renderAlerts();
+renderBottomStats();
+initCharts();
+updateNotifUI();
   showToast("✅ Profile fully interactive · Edit & save changes");
   setTimeout(() => addCrossDashboardNotif(), 3000);
+
+  async function loadDashboardStudentCount() {
+
+    try {
+
+        const res = await fetch("/computer/api/students");
+
+        const students = await res.json();
+
+        statsData[0].value = students.length;
+
+        renderStats();
+
+    } catch (err) {
+
+        console.log("Student Count Error:", err);
+
+    }
+}
 </script>
 </body>
 </html>

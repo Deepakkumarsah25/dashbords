@@ -3,16 +3,23 @@ const Test = require("../models/Test");
 
 // CREATE TEST
 const createTest = async (req, res) => {
-
     try {
 
-        // console.log("REQ BODY:", req.body);
+        console.log("REQ BODY =", req.body);
 
-        const {
-            testTitle,
-            timeLimit,
-            questions
-        } = req.body;
+        const { testTitle, timeLimit, questions } = req.body;
+
+        if (!testTitle) {
+            return res.status(400).json({
+                message: "Test title required"
+            });
+        }
+
+        if (!questions || questions.length === 0) {
+            return res.status(400).json({
+                message: "No questions selected"
+            });
+        }
 
         const newTest = new Test({
             testTitle,
@@ -22,22 +29,24 @@ const createTest = async (req, res) => {
 
         await newTest.save();
 
-        // console.log("SAVED TEST:", newTest);
+        console.log("TEST SAVED =", newTest);
 
-        res.status(201).json(newTest);
+        res.status(201).json({
+            success: true,
+            message: "Test Created",
+            test: newTest
+        });
 
     } catch (error) {
 
-        console.log(error);
+        console.log("CREATE TEST ERROR =", error);
 
         res.status(500).json({
+            success: false,
             message: error.message
         });
-
     }
-
 };
-
 
 // GET ALL TESTS
 const getAllTests = async (req, res) => {

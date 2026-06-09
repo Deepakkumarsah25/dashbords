@@ -375,15 +375,17 @@ document.getElementById('createTestFromBankForm').addEventListener('submit', asy
     console.log("SelectedQs:", selectedQs);
 
     try {
-        const res = await fetch('http://localhost:3000/api/tests', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-    testTitle: title,
-    timeLimit: time,
-    questions: selectedQs   
-})
-        });
+  const res = await fetch('/api/tests', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        testTitle: title,
+        timeLimit: time,
+        questions: selectedQs
+    })
+});
 
         const data = await res.json();
 
@@ -410,8 +412,9 @@ document.getElementById('createTestFromBankForm').addEventListener('submit', asy
         showToast("Question updated");
     });
     
-    document.getElementById('editTestFormSubmit').addEventListener('submit', (e) => {
-        e.preventDefault();
+   document.getElementById('editTestFormSubmit')
+.addEventListener('submit', async (e) => {
+   e.preventDefault();
        const testId = document.getElementById('editTestId').value;
         const newTitle = document.getElementById('editTestTitle').value.trim();
         const newTime = parseInt(document.getElementById('editTestTime').value);
@@ -551,7 +554,7 @@ document.getElementById('modalTitle').innerHTML = `<i class="fas fa-graduation-c
     });
 
     try {
-        const res = await fetch('http://localhost:3000/api/submissions', {
+        const res = await fetch('http://localhost:9192/api/submissions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

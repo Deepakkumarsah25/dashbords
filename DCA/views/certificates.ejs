@@ -1,478 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>RID Tech | Certificate Portal + Admin Verify</title>
-  <!-- Font Awesome + Google Fonts -->
+  <title>RID Institute | Certificate Application</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/slidebar.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #f1f5f9; min-height: 100vh; }
-    
-    /* Dashboard Layout */
-    .dashboard-layout { display: flex; min-height: 100vh; width: 100%; }
-    
-    /* Sidebar - Responsive */
-    .sidebar {
-      width: 280px;
-      background: linear-gradient(180deg, #0f2b3d, #1a4a6f);
-      color: white;
-      flex-shrink: 0;
-      overflow-y: auto;
-      transition: transform 0.3s ease;
-      position: fixed;
-      height: 100vh;
-      z-index: 1000;
-    }
-    .sidebar-header { padding: 28px 24px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .logo { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #fff, #93c5fd); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .subhead { font-size: 0.7rem; color: #bfdbfe; margin-top: 6px; }
-    .nav-section { padding: 20px; }
-    /* No nav items needed - sidebar just shows branding */
-    
-    /* Main Content */
-    .main-content {
-      flex: 1;
-      margin-left: 280px;
-      background: #f8fafc;
-      padding: 20px 30px;
-      overflow-x: auto;
-      transition: margin-left 0.3s ease;
-      min-height: 100vh;
-      width: calc(100% - 280px);
-    }
-    
-    /* Mobile Menu Toggle */
-    .menu-toggle {
-      display: none;
-      background: linear-gradient(95deg, #2563eb, #3b82f6);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 14px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      align-items: center;
-      gap: 10px;
-      width: fit-content;
-    }
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      backdrop-filter: blur(2px);
-    }
-    
-    @media (max-width: 900px) {
-      .sidebar { transform: translateX(-100%); position: fixed; }
-      .sidebar.open { transform: translateX(0); }
-      .main-content { margin-left: 0; padding: 16px; width: 100%; }
-      .menu-toggle { display: flex; }
-    }
-    @media (min-width: 901px) {
-      .sidebar { transform: translateX(0) !important; position: relative; }
-      .menu-toggle { display: none; }
-    }
-    
-    /* Card Styles */
-    .cert-container { background: white; border-radius: 1.8rem; padding: 2rem; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-    .dashboard-header { background: linear-gradient(135deg, #1e2a47, #0f2b3d); border-radius: 1.5rem; padding: 1.2rem 2rem; margin-bottom: 1.5rem; color: white; }
-    .dashboard-header h2 { font-size: 1.5rem; display: flex; align-items: center; gap: 12px; }
-    .card { background: white; border-radius: 1.5rem; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 1px solid #eef2f8; overflow: hidden; margin-bottom: 2rem; }
-    .card-header { background: #f8fafc; padding: 1rem 1.5rem; border-bottom: 2px solid #e2edff; display: flex; align-items: center; gap: 12px; }
-    .card-header i { font-size: 1.3rem; color: #3b82f6; }
-    .card-header h3 { font-size: 1.1rem; font-weight: 700; }
-    .card-body { padding: 1.5rem; }
-    
-    /* Form */
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; font-weight: 600; font-size: 0.85rem; color: #475569; margin-bottom: 5px; }
-    input, select { width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 1rem; font-size: 0.9rem; font-family: 'Inter', sans-serif; background: #f8f9fa; }
-    input:focus, select:focus { outline: none; border-color: #3b82f6; background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-    .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .form-row .form-group { flex: 1; min-width: 180px; }
-    .btn-primary { background: linear-gradient(95deg, #2563eb, #3b82f6); color: white; border: none; padding: 12px 20px; border-radius: 2rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; justify-content: center; transition: 0.2s; }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(37,99,235,0.3); }
-    .btn-success { background: linear-gradient(95deg, #059669, #10b981); }
-    .btn-outline { background: transparent; border: 2px solid #3b82f6; color: #2563eb; }
-    .info-text { background: #f0f7ff; padding: 12px; border-radius: 1rem; border-left: 4px solid #3b82f6; font-size: 0.85rem; margin-top: 1rem; }
-    .success-message, .error-message { padding: 12px; border-radius: 1rem; margin-top: 1rem; display: none; }
-    .success-message { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
-    .error-message { background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
-    
-    /* Admin Panel */
-    .admin-panel { background: #fffbeb; border: 1px solid #fde68a; }
-    .pending-item { background: white; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; border: 1px solid #ffe4b5; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-    .pending-info { flex: 1; }
-    .pending-info strong { font-size: 1rem; }
-    .pending-id { font-family: monospace; background: #eef2ff; padding: 2px 8px; border-radius: 30px; font-size: 0.7rem; }
-    .btn-verify { background: #10b981; color: white; border: none; padding: 6px 16px; border-radius: 2rem; cursor: pointer; font-weight: 600; }
-    
-    /* Two columns for form + download */
-    .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
-    @media (max-width: 800px) { .two-columns { grid-template-columns: 1fr; } }
-    
-    .toast-msg { position: fixed; bottom: 30px; right: 30px; background: #1e293b; color: white; padding: 12px 24px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; opacity: 0; transition: 0.2s; pointer-events: none; }
-    .toast-msg.show { opacity: 1; }
-  </style>
+  <link rel="stylesheet" href="/css/certificates.css">
+
 </head>
+
 <body>
-     <%- include('partials/sidebar') %>
-<div class="dashboard-layout">
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
-  <!-- <div class="sidebar" id="sidebar"> -->
-    
-    <div class="nav-section">
-      <!-- No navigation items - sidebar only branding as requested -->
-      <!-- <div style="padding: 10px 16px; color:#93c5fd; font-size:0.8rem;"><i class="fas fa-shield-alt"></i> Secure Credentials</div> -->
-    </div>
-  <!-- </div> -->
 
-  <main class="main-content" id="mainContent">
-    <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
-    <div id="dynamicPanel"></div>
-  </main>
+  <div class="dashboard-layout">
+    <!-- Sidebar -->
+    <%- include('partials/sidebar') %>
+
+      <!-- Sidebar Overlay -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- Main Content - Full Screen -->
+      <main class="main-content">
+        <button class="menu-toggle" id="menuToggleBtn">
+          <i class="fas fa-bars"></i>
+        </button>
+<form
+ id="certificateForm"
+ action="/computer/api/application/create"
+ method="POST"
+ enctype="multipart/form-data">
+
+          <!-- Header -->
+
+
+          <!-- Email Section -->
+          <div class="section">
+            <div class="section-title">
+              <i class="fas fa-envelope"></i>
+              <h3> Your Email</h3>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-envelope"></i> Email Address <span class="required">*</span></label>
+              <input type="email" name="email" placeholder="Enter your email address" required>
+              <small style="display: block; margin-top: 5px; color: #666;">
+                <i class="fas fa-info-circle"></i> Certificate download link will be sent to this email
+              </small>
+            </div>
+          </div>
+
+          <!-- Student Details Section -->
+          <div class="section">
+            <div class="section-title">
+              <i class="fas fa-user-graduate"></i>
+              <h3>Student Details</h3>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fas fa-user"></i> Student Name <span class="required">*</span></label>
+                <input type="text" name="studentName" placeholder="Full name" required>
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-user-friends"></i> Father's Name <span class="required">*</span></label>
+                <input type="text" name="fatherName" placeholder="Father's name" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label><i class="fas fa-book"></i> Course Name <span class="required">*</span></label>
+              <input type="text" name="courseName" placeholder="e.g., ADCA, DCA, Web Development" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fas fa-calendar-alt"></i> Admission Date <span class="required">*</span></label>
+                <input type="date" name="admissionDate" required>
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-calendar-check"></i> Completion Date <span class="required">*</span></label>
+                <input type="date" name="completionDate" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fas fa-chart-line"></i> Marks (%) <span class="required">*</span>
+                  <span class="auto-badge"><i class="fas fa-magic"></i> Auto Grade</span>
+                </label>
+                <input type="number" id="marks" name="marks" min="0" max="100" step="0.01"
+                  placeholder="Enter marks (0-100)" required>
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-star"></i> Grade <span class="required">*</span></label>
+                <input type="text" id="grade" name="grade" readonly placeholder="Auto-calculated">
+              </div>
+            </div>
+
+<div class="form-group">
+<label><i class="fas fa-image"></i> Student Photo <span class="required">*</span></label>
+
+<input
+ id="studentPhoto"
+ type="file"
+ name="photo"
+ accept="image/*"
+ required>
+
+  <div style="margin-top:15px;">
+    <img id="photoPreview"
+         src=""
+         style="display:none;width:150px;height:180px;object-fit:cover;border-radius:10px;border:2px solid #ddd;">
+  </div>
+
+  <small style="display:block;margin-top:5px;color:#666;">
+    <i class="fas fa-info-circle"></i>
+    Upload JPG, PNG or JPEG image
+  </small>
 </div>
-<div id="toastMsg" class="toast-msg"></div>
 
-<script>
-  // ---------- DATA STORE ----------
-  let applications = []; // each: { id, fullName, fatherName, dob, course, certificateType, phone, email, startDate, endDate, duration, durationUnit, projectName, status, appliedAt }
-  
-  function loadData() {
-    const stored = localStorage.getItem('rid_cert_admin_v1');
-    if(stored) applications = JSON.parse(stored);
-    else applications = [];
-  }
-  function saveData() {
-    localStorage.setItem('rid_cert_admin_v1', JSON.stringify(applications));
-  }
-  
-  function showToast(msg, isError = false) {
-    const toast = document.getElementById('toastMsg');
-    toast.textContent = msg;
-    toast.style.background = isError ? '#b91c1c' : '#1e293b';
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2700);
-  }
-  
-  function generateAppId() {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2,'0');
-    const d = String(now.getDate()).padStart(2,'0');
-    const rand = Math.floor(Math.random() * 10000).toString().padStart(4,'0');
-    return `RID-${y}${m}${d}-${rand}`;
-  }
-  
-  function autoCalculateDuration() {
-    const start = document.getElementById('startDate')?.value;
-    const end = document.getElementById('endDate')?.value;
-    if (start && end) {
-      const diffDays = Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24));
-      if (diffDays > 0) {
-        if (diffDays <= 60) {
-          document.getElementById('duration').value = Math.max(1, Math.round(diffDays / 7));
-          document.getElementById('durationUnit').value = 'weeks';
-        } else {
-          document.getElementById('duration').value = Math.max(1, Math.round(diffDays / 30));
-          document.getElementById('durationUnit').value = 'months';
-        }
-      }
-    }
-  }
-  
-  // Generate beautiful certificate HTML
-  function generateCertificateHTML(app) {
-    const isCompletion = app.certificateType === 'CERTIFICATE_OF_COMPLETION';
-    const titleText = isCompletion ? 'CERTIFICATE OF COMPLETION' : 'EXPERIENCE LETTER';
-    const bodyStatement = isCompletion
-      ? `has successfully completed the comprehensive training program in “${escapeHtml(app.course)}”`
-      : `has successfully completed the professional tenure / project in “${escapeHtml(app.course)}” with project title “${escapeHtml(app.projectName)}”`;
-    const startDateFormatted = new Date(app.startDate).toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric' });
-    const endDateFormatted = new Date(app.endDate).toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric' });
-    const durationText = `${app.duration} ${app.durationUnit}`;
-    const issueDate = new Date().toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric' });
-    
-    return `<!DOCTYPE html>
-    <html>
-    <head><meta charset="UTF-8"><title>Certificate_${app.id}</title>
-    <style>
-      * { margin:0; padding:0; box-sizing:border-box; }
-      body { background: #e9ecef; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Playfair Display', 'Inter', serif; padding: 40px 20px; }
-      .cert-wrapped { max-width: 1050px; width: 100%; margin: auto; background: white; border-radius: 32px; box-shadow: 0 30px 40px -20px rgba(0,0,0,0.3); overflow: hidden; }
-      .cert-inner { background: #fffcf5; padding: 2rem; border: 1px solid #eedd99; border-radius: 28px; margin: 1.5rem; box-shadow: inset 0 0 0 4px #fff8e7, 0 10px 20px rgba(0,0,0,0.05); }
-      .gold-border { background: linear-gradient(135deg, #f9d976, #f39f86); height: 8px; width: 100%; }
-      .header-cert { text-align: center; margin: 20px 0 10px; }
-      .header-cert h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: 2px; background: linear-gradient(145deg, #8B5A2B, #C99B3B); -webkit-background-clip: text; background-clip: text; color: transparent; }
-      .org-name { font-size: 1rem; color: #5a626e; border-top: 2px solid #f1c40f; display: inline-block; padding-top: 6px; }
-      .seal-icon { font-size: 3rem; color: #c9a03d; margin: 12px 0; }
-      .cert-title { font-size: 1.9rem; font-weight: 800; border-bottom: 2px dashed #e2b13b; display: inline-block; margin: 15px 0; color: #2c3e66; }
-      .recipient-name { font-size: 2.2rem; font-weight: 800; margin: 15px 0; color: #1f4e6e; text-transform: uppercase; letter-spacing: 1px; }
-      .desc-text { font-size: 1.05rem; line-height: 1.5; color: #2d3e50; max-width: 85%; margin: 20px auto; font-family: 'Inter', sans-serif; }
-      .details-grid { background: #fef7e0; border-radius: 30px; padding: 18px; display: flex; justify-content: space-between; flex-wrap: wrap; margin: 20px 0; gap: 15px; border: 1px solid #ffe2aa; }
-      .signature-area { display: flex; justify-content: space-between; margin-top: 35px; border-top: 1px solid #e2c28b; padding-top: 25px; }
-      .stamp { text-align: right; opacity: 0.8; font-size: 0.8rem; }
-      @media print { body { background: white; padding: 0; } .cert-wrapped { box-shadow: none; } .no-print { display: none; } }
-    </style>
-    </head>
-    <body>
-    <div class="cert-wrapped"><div class="gold-border"></div><div class="cert-inner">
-      <div class="header-cert"><h1>RID TECH</h1><div class="org-name">(Govt. Recognized Institute | Est. 2015)</div></div>
-      <div class="seal-icon"><i class="fas fa-award"></i></div>
-      <div class="cert-title">${titleText}</div>
-      <div class="recipient-name">${escapeHtml(app.fullName)}</div>
-      <div class="desc-text">This is to certify that <strong>${escapeHtml(app.fullName)}</strong>, Son/Daughter of <strong>${escapeHtml(app.fatherName)}</strong>, ${bodyStatement} from <strong>${startDateFormatted}</strong> to <strong>${endDateFormatted}</strong> with a total duration of <strong>${durationText}</strong>, demonstrating excellence and dedication.</div>
-      <div class="details-grid">
-        <span><strong>📌 Project:</strong> ${escapeHtml(app.projectName)}</span>
-        <span><strong>🎓 Course:</strong> ${escapeHtml(app.course)}</span>
-        <span><strong>🆔 ID:</strong> ${app.id}</span>
-        <span><strong>📅 Issue Date:</strong> ${issueDate}</span>
-      </div>
-      <div class="signature-area">
-        <div><strong>Dr. A. Mehta</strong><br><span style="font-size:0.7rem;">Director, RID Tech</span><br><span style="font-size:0.65rem;">(Authorized Signatory)</span></div>
-        <div class="stamp"><img src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Stamp_icon_2.svg" style="width:55px; opacity:0.7;"><br>Digital Stamp</div>
-      </div>
-      <div style="text-align: center; font-size: 0.7rem; margin-top: 20px; color:#7a6a42;">Blockchain Verified • RID TECH CREDENTIAL</div>
-    </div><div class="gold-border"></div></div>
-    <div class="no-print" style="text-align:center; margin-top:20px;"><button onclick="window.print();" style="background:#2c3e66; color:white; border:none; border-radius:40px; padding:12px 32px; margin:10px; cursor:pointer;"><i class="fas fa-print"></i> Save as PDF / Print</button></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"><\/script>
-    <\/body><\/html>`;
-  }
-  
-  function downloadCertificate(app) {
-    if (!app) return false;
-    if (app.status !== 'verified') {
-      showToast("❌ Certificate not verified by admin yet. Please wait for verification.", true);
-      return false;
-    }
-    const certHTML = generateCertificateHTML(app);
-    const win = window.open();
-    win.document.write(certHTML);
-    win.document.close();
-    showToast(`📜 Downloading certificate for ${app.fullName}`, false);
-    return true;
-  }
-  
-  function escapeHtml(str) {
-    if(!str) return '';
-    return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-  }
-  
-  // Render full page: Application Form + Download Section + Admin Panel
-  function renderFullPage() {
-    const container = document.getElementById('dynamicPanel');
-    
-    // Build pending applications list for admin
-    const pendingApps = applications.filter(a => a.status === 'pending');
-    let adminHtml = '';
-    if (pendingApps.length === 0) {
-      adminHtml = '<div class="info-text" style="background:#f1f5f9;"><i class="fas fa-check-circle"></i> No pending requests. All certificates are verified.</div>';
-    } else {
-      adminHtml = pendingApps.map(app => `
-        <div class="pending-item" data-id="${app.id}">
-          <div class="pending-info">
-            <div><strong>${escapeHtml(app.fullName)}</strong> (${escapeHtml(app.fatherName)})</div>
-            <div style="font-size:0.8rem;">📧 ${escapeHtml(app.email)} | 📞 ${app.phone}</div>
-            <div style="font-size:0.8rem;">🎓 ${escapeHtml(app.course)} | 📌 ${escapeHtml(app.projectName)}</div>
-            <div><span class="pending-id">${app.id}</span> <span style="font-size:0.7rem;">Applied: ${new Date(app.appliedAt).toLocaleString()}</span></div>
+          <!-- Hidden Fields -->
+          <input type="hidden" id="certificateNo" name="certificateNo">
+          <input type="hidden" id="registrationNo" name="registrationNo">
+          <input type="hidden" id="enrollNo" name="enrollNo">
+          <input type="hidden" id="rollNo" name="rollNo">
+
+          <!-- Note Box -->
+          <div class="note-box">
+            <p>
+              <i class="fas fa-shield-alt"></i>
+              <strong>Note:</strong> Certificate Number, Registration Number, Enroll No., and Roll No. will be
+              auto-generated.
+              After admin verification, the certificate download link will be sent to your email address.
+            </p>
           </div>
-          <button class="btn-verify verify-btn" data-id="${app.id}"><i class="fas fa-check-circle"></i> Verify & Approve</button>
-        </div>
-      `).join('');
-    }
-    
-    const html = `
-  
-        
-        <!-- Two columns: Apply Form + Download Section -->
-        <div class="two-columns">
-          <!-- Left: Application Form -->
-          <div class="card">
-            <div class="card-header"><i class="fas fa-edit"></i><h3>Apply for Certificate</h3></div>
-            <div class="card-body">
-              <form id="certificateForm">
-                <div class="form-row">
-                  <div class="form-group"><label>Full Name *</label><input type="text" id="fullName" placeholder="Full name" required></div>
-                  <div class="form-group"><label>Father's Name *</label><input type="text" id="fatherName" placeholder="Father's name" required></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label>DOB *</label><input type="date" id="dob" required></div>
-                  <div class="form-group"><label>Course *</label>
-                    <select id="course" required><option value="" disabled selected>Select</option>
-                      <option>Computer Fundamentals</option><option>ADCA</option><option>DCA</option>
-                      <option>CCC</option><option>Tally ERP9</option><option>Web Development</option>
-                      <option>PGDCA</option><option>O LEVEL</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label>Certificate Type *</label>
-                    <select id="certificateType" required>
-                      <option value="" disabled selected>Select</option>
-                      <option value="CERTIFICATE_OF_COMPLETION">🏅 Certificate of Completion</option>
-                      <option value="EXPERIENCE_LETTER">📁 Experience Letter</option>
-                    </select>
-                  </div>
-                  <div class="form-group"><label>Phone (10 digit) *</label><input type="tel" id="phone" maxlength="10" pattern="[0-9]{10}" required></div>
-                </div>
-                <div class="form-group"><label>Email *</label><input type="email" id="email" placeholder="email@example.com" required></div>
-                <div class="form-row">
-                  <div class="form-group"><label>Start Date *</label><input type="date" id="startDate" required></div>
-                  <div class="form-group"><label>End Date *</label><input type="date" id="endDate" required></div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group"><label>Duration *</label><input type="number" id="duration" placeholder="e.g., 3" required></div>
-                  <div class="form-group"><label>Unit *</label>
-                    <select id="durationUnit" required><option value="" disabled selected>Select</option><option value="weeks">Weeks</option><option value="months">Months</option></select>
-                  </div>
-                </div>
-                <div class="form-group"><label>Project Title *</label><input type="text" id="projectName" placeholder="e.g., E-Commerce Website" required></div>
-                <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> Submit Request</button>
-                <div id="formSuccessMsg" class="success-message"></div>
-              </form>
-            </div>
-          </div>
-          
-          <!-- Right: Download Certificate Section -->
-          <div class="card">
-            <div class="card-header"><i class="fas fa-download"></i><h3>Download Certificate</h3></div>
-            <div class="card-body">
-              <div class="form-group"><label>Enter Your Phone Number (Registered)</label><input type="tel" id="downloadPhone" placeholder="10-digit mobile number" maxlength="10"></div>
-              <button id="downloadByPhoneBtn" class="btn-primary"><i class="fas fa-file-pdf"></i> Download Certificate</button>
-              <div class="info-text" style="margin-top:1rem;"><i class="fas fa-info-circle"></i> After admin verification, you can download your certificate using the phone number you provided.</div>
-              <div id="downloadErrorMsg" class="error-message"></div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Admin Verification Panel -->
-        <div class="card admin-panel">
-          <div class="card-header"><i class="fas fa-user-shield"></i><h3>🔐 Admin Verification Panel (Pending Requests)</h3></div>
-          <div class="card-body" id="adminPendingList">
-            ${adminHtml}
-          </div>
-        </div>
-      </div>
-    `;
-    
-    container.innerHTML = html;
-    
-    // Attach form events
-    const form = document.getElementById('certificateForm');
-    if(form) {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const fullName = document.getElementById('fullName').value.trim();
-        const fatherName = document.getElementById('fatherName').value.trim();
-        const dob = document.getElementById('dob').value;
-        const course = document.getElementById('course').value;
-        const certType = document.getElementById('certificateType').value;
-        const phone = document.getElementById('phone').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        const duration = document.getElementById('duration').value;
-        const durationUnit = document.getElementById('durationUnit').value;
-        const projectName = document.getElementById('projectName').value.trim();
-        
-        if(!fullName || !fatherName || !dob || !course || !certType || !phone.match(/^[0-9]{10}$/) || !email.includes('@') || !startDate || !endDate || !duration || duration<=0 || !durationUnit || !projectName) {
-          showToast("Please fill all fields correctly (phone 10 digits)", true);
-          return;
-        }
-        if(new Date(startDate) >= new Date(endDate)) { showToast("End date must be after start date", true); return; }
-        
-        const appId = generateAppId();
-        const newApp = {
-          id: appId, fullName, fatherName, dob, course, certificateType: certType,
-          phone, email, startDate, endDate, duration: parseInt(duration), durationUnit, projectName,
-          status: 'pending', appliedAt: new Date().toISOString()
-        };
-        applications.push(newApp);
-        saveData();
-        
-        const successDiv = document.getElementById('formSuccessMsg');
-        successDiv.innerHTML = `<i class="fas fa-check-circle"></i> Request submitted! ID: <strong>${appId}</strong><br>Admin will verify soon. You will receive certificate via download section after verification.`;
-        successDiv.style.display = 'block';
-        setTimeout(() => successDiv.style.display = 'none', 5000);
-        showToast(`✅ Request submitted! ID: ${appId}. Awaiting admin verification.`);
-        form.reset();
-        renderFullPage(); // refresh admin panel
-      });
-      document.getElementById('startDate')?.addEventListener('change', autoCalculateDuration);
-      document.getElementById('endDate')?.addEventListener('change', autoCalculateDuration);
-    }
-    
-    // Download by phone number
-    const downloadBtn = document.getElementById('downloadByPhoneBtn');
-    const downloadPhoneInput = document.getElementById('downloadPhone');
-    const downloadErrorDiv = document.getElementById('downloadErrorMsg');
-    if(downloadBtn) {
-      downloadBtn.addEventListener('click', () => {
-        const phoneNum = downloadPhoneInput.value.trim();
-        if(!phoneNum.match(/^[0-9]{10}$/)) {
-          downloadErrorDiv.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Please enter a valid 10-digit phone number.";
-          downloadErrorDiv.style.display = 'block';
-          setTimeout(() => downloadErrorDiv.style.display = 'none', 3000);
-          return;
-        }
-        // Find verified application with this phone number
-        const verifiedApp = applications.find(app => app.phone === phoneNum && app.status === 'verified');
-        if(!verifiedApp) {
-          downloadErrorDiv.innerHTML = "<i class='fas fa-times-circle'></i> No verified certificate found for this number. Either request is pending or number not registered.";
-          downloadErrorDiv.style.display = 'block';
-          setTimeout(() => downloadErrorDiv.style.display = 'none', 4000);
-          return;
-        }
-        downloadCertificate(verifiedApp);
-      });
-    }
-    
-    // Attach verify buttons
-    document.querySelectorAll('.verify-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const id = btn.getAttribute('data-id');
-        const appIndex = applications.findIndex(a => a.id === id);
-        if(appIndex !== -1 && applications[appIndex].status === 'pending') {
-          applications[appIndex].status = 'verified';
-          saveData();
-          showToast(`✅ Application ${id} verified! User can now download certificate.`);
-          renderFullPage(); // refresh UI
-        }
-      });
-    });
+
+          <!-- Submit Button -->
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-paper-plane"></i>
+            Submit Application
+          </button>
+
+        </form>
+      </main>
+  </div>
+
+  <!-- Toast Message -->
+  <div id="toastMsg" class="toast-message"></div>
+
+  <script>
+
+    const photoInput = document.getElementById("studentPhoto");
+const photoPreview = document.getElementById("photoPreview");
+
+photoInput.addEventListener("change", function () {
+  const file = this.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      photoPreview.src = e.target.result;
+      photoPreview.style.display = "block";
+    };
+
+    reader.readAsDataURL(file);
   }
-  
-  // Sidebar toggle & responsive
-  function initSidebar() {
+});
+    // Sidebar Toggle Functionality
     const menuToggle = document.getElementById('menuToggleBtn');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
-    if(menuToggle) {
+
+    if (menuToggle) {
       menuToggle.addEventListener('click', () => {
         sidebar.classList.toggle('open');
         overlay.classList.toggle('active');
+        overlay.style.display = overlay.classList.contains('active') ? 'block' : 'none';
       });
+
       overlay.addEventListener('click', () => {
         sidebar.classList.remove('open');
         overlay.classList.remove('active');
+        overlay.style.display = 'none';
       });
     }
-  }
-  
-  loadData();
-  renderFullPage();
-  initSidebar();
-</script>
+
+    // Close sidebar on window resize to desktop
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        overlay.style.display = 'none';
+      }
+    });
+
+    // Auto-grade calculation
+    const marksInput = document.getElementById("marks");
+    const gradeInput = document.getElementById("grade");
+
+    function calculateGrade(marks) {
+      if (marks === '' || marks === null) return '';
+      const m = parseFloat(marks);
+      if (isNaN(m)) return '';
+      if (m >= 90) return 'A+';
+      if (m >= 80) return 'A';
+      if (m >= 70) return 'B+';
+      if (m >= 60) return 'B';
+      if (m >= 50) return 'C+';
+      if (m >= 40) return 'C';
+      if (m >= 33) return 'D';
+      return 'F';
+    }
+
+    marksInput.addEventListener("input", function () {
+      gradeInput.value = calculateGrade(this.value);
+    });
+
+    // Toast message
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toastMsg');
+      toast.textContent = message;
+      toast.style.background = isError ? '#b91c1c' : '#1e293b';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Form submission
+    document.getElementById("certificateForm")
+.addEventListener("submit", function () {
+
+  document.getElementById("grade").value =
+    calculateGrade(document.getElementById("marks").value);
+
+});
+    document.getElementById("certificateForm").addEventListener("submit", function (e) {
+      // Generate unique numbers
+      const now = new Date();
+      const year = now.getFullYear();
+      const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+
+      document.getElementById("certificateNo").value = "RID/" + year + "/" + random;
+document.getElementById("registrationNo").value =
+  "REG" + Date.now();
+      document.getElementById("enrollNo").value = "RID/" + year + "/" + Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+      document.getElementById("rollNo").value = Math.floor(Math.random() * 99999999).toString().padStart(8, '0');
+
+      // Validate fields
+      const email = document.querySelector('input[name="email"]').value.trim();
+      const studentName = document.querySelector('input[name="studentName"]').value.trim();
+      const fatherName = document.querySelector('input[name="fatherName"]').value.trim();
+      const courseName = document.querySelector('input[name="courseName"]').value.trim();
+      const admissionDate = document.querySelector('input[name="admissionDate"]').value;
+      const completionDate = document.querySelector('input[name="completionDate"]').value;
+      const marks = document.querySelector('input[name="marks"]').value;
+const photo = document.getElementById("studentPhoto").files[0];
+
+if (!email || !studentName || !fatherName || !courseName || !admissionDate || !completionDate || !marks || !photo) {
+        e.preventDefault();
+        showToast("❌ Please fill all required fields", true);
+        return;
+      }
+
+      if (new Date(completionDate) <= new Date(admissionDate)) {
+        e.preventDefault();
+        showToast("❌ Completion date must be after admission date", true);
+        return;
+      }
+
+      if (marks < 0 || marks > 100) {
+        e.preventDefault();
+        showToast("❌ Marks should be between 0-100", true);
+        return;
+      }
+
+      // Show loading state
+      const submitBtn = document.querySelector('.submit-btn');
+      submitBtn.classList.add('loading');
+      submitBtn.innerHTML = '<i class="fas fa-spinner"></i> Submitting...';
+
+      showToast("✅ Application submitted! You will receive email confirmation soon.");
+    });
+
+    // Marks validation
+    marksInput.addEventListener('change', function () {
+      let val = parseFloat(this.value);
+      if (val < 0) this.value = 0;
+      if (val > 100) this.value = 100;
+      gradeInput.value = calculateGrade(this.value);
+    });
+
+    // Update sidebar stats from localStorage if available
+    function updateSidebarStats() {
+      try {
+        const stored = localStorage.getItem('rid_cert_data');
+        if (stored) {
+          const applications = JSON.parse(stored);
+          const pendingCount = applications.filter(a => a.status === 'pending').length;
+          const verifiedCount = applications.filter(a => a.status === 'verified').length;
+
+          const pendingEl = document.getElementById('statPending');
+          const verifiedEl = document.getElementById('statVerified');
+          const totalEl = document.getElementById('statTotal');
+
+          if (pendingEl) pendingEl.innerText = pendingCount;
+          if (verifiedEl) verifiedEl.innerText = verifiedCount;
+          if (totalEl) totalEl.innerText = applications.length;
+        }
+      } catch (e) {
+        console.log('No stored data');
+      }
+    }
+
+    updateSidebarStats();
+  </script>
 </body>
+
 </html>

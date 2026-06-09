@@ -3,57 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>RID Tech | Course Manager & Neo Dashboard</title>
+  <title>RID Tech | Course Manager - MongoDB Edition</title>
   <!-- Google Fonts + Font Awesome 6 -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="/css/slidebar.css">
   <link rel="stylesheet" href="/css/courses.css">
-  
 
 </head>
 <body>
+  <%- include('partials/sidebar') %>
 <div class="dashboard">
-  <!-- Sidebar Overlay for mobile -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-  <!-- MODERN SIDEBAR (FULLY RESPONSIVE TOGGLE) -->
-  <aside class="sidebar" id="sidebar">
-    <div class="logo-area">
-      <h2>RID Tech</h2>
-      <p>next‑gen learning hub</p>
-    </div>
-    <div class="nav-menu">
-      <a href="/" class="nav-item active"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a>
-      <a href="/students" class="nav-item"><i class="fas fa-users"></i><span>Students</span></a>
-      <a href="/courses" class="nav-item"><i class="fas fa-book-open"></i><span>Courses</span></a>
-      <a href="/certificates" class="nav-item"><i class="fas fa-certificate"></i><span>Apply for Certificates</span></a>
-      <a href="/test" class="nav-item"><i class="fas fa-plus-circle"></i><span>Create Test</span></a>
-      <a href="/collection" class="nav-item"><i class="fas fa-database"></i><span>Test Collection</span></a>
-      <a href="/Create_ID" class="nav-item"><i class="fas fa-id-card"></i><span>Create ID card</span></a>
-      <a href="/registrations" class="nav-item"><i class="fas fa-file-alt"></i><span>Apply for Franchises</span></a>
-      <a href="/fees" class="nav-item"><i class="fas fa-rupee-sign"></i><span>Fee Management</span></a>
-      <a href="/Attendence" class="nav-item"><i class="fas fa-calendar-check"></i><span>Attendance</span></a>
-      <a href="/results" class="nav-item"><i class="fas fa-chart-bar"></i><span>Result</span></a>
-      <a href="/settings" class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
-    </div>
-  </aside>
 
   <!-- MAIN CONTENT (Course Manager) -->
   <div class="main-content" id="mainContent">
-    <!-- Mobile toggle button placed inside main content -->
-    <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i></button>
+    <button class="menu-toggle" id="menuToggleBtn"><i class="fas fa-bars"></i> </button>
 
     <div class="manager-container">
       <div class="manager-header">
         <div class="title-section">
           <h1><i class="fas fa-chalkboard-user" style="margin-right: 10px; color:#2563eb;"></i> All Courses</h1>
-          <p><i class="fas fa-chalkboard-user"></i> Manage courses, track enrollments & organize curriculum</p>
+       
         </div>
         <button class="btn-primary" onclick="openModal()"><i class="fas fa-plus-circle"></i> Add Course</button>
       </div>
 
-      <!-- stats + search panel -->
       <div class="stats-search-panel">
         <div class="stats-group">
           <div class="stat-badge"><i class="fas fa-book-open"></i> <span id="totalCoursesCount">0</span> Courses</div>
@@ -65,14 +39,12 @@
         </div>
       </div>
 
-      <!-- dynamic course table panel -->
       <div id="dynamicPanel"></div>
-      <!-- <footer>✧ full CRUD · connected to backend API ✧</footer> -->
     </div>
   </div>
 </div>
 
-<!-- MODAL for Add/Edit -->
+<!-- MODAL -->
 <div id="courseModal" class="modal">
   <div class="modal-content">
     <h3 id="modalTitle">Add New Course</h3>
@@ -100,140 +72,213 @@
 <div id="toastMsg" class="toast">✅ Action completed</div>
 
 <script>
-  // ------------------------------
-  // FULL COURSE MANAGER + SIDEBAR TOGGLE (PERFECT RESPONSIVE)
-  // ------------------------------
+  // ============================================
+  // COURSE MANAGER WITH MONGODB BACKEND INTEGRATION
+  // All data persists in MongoDB via REST API
+  // ============================================
+  
   let courses = [];
   let editMode = false;
   let editId = null;
   let currentSearchTerm = '';
+  let isLoading = false;
 
-  const API_URL = "/api/courses";
+  // API endpoint for MongoDB operations
+  const API_BASE_URL = '/api/courses';
 
-  // Toast helper
-  function showToast(msg, isError = false) {
+  // Toast notification helper
+  function showToast(message, isError = false) {
     const toast = document.getElementById('toastMsg');
-    toast.textContent = (isError ? '⚠️ ' : '✅ ') + msg;
+    toast.textContent = (isError ? '⚠️ ' : '✅ ') + message;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
+    setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
-  // Fetch courses from backend
+  // Fetch all courses from MongoDB
   async function fetchCourses() {
+    if (isLoading) return;
+    isLoading = true;
+    
     try {
-      const res = await fetch(API_URL);
-      if (!res.ok) throw new Error("Failed to fetch");
-      courses = await res.json();
-      renderCourseManager();
-    } catch (err) {
-      console.error(err);
-      showToast("Using demo data (backend not ready)", true);
-      // fallback demo data for smooth UI preview
-      if (courses.length === 0) {
-        courses = [
-          { _id: "1", courseName: "UI/UX Design", courseCategory: "Design", courseEnrollments: 124 },
-          { _id: "2", courseName: "Machine Learning A-Z", courseCategory: "Data & AI", courseEnrollments: 342 },
-          { _id: "3", courseName: "Full-Stack JavaScript", courseCategory: "Development", courseEnrollments: 289 },
-          { _id: "4", courseName: "Cloud Computing AWS", courseCategory: "Cloud", courseEnrollments: 178 }
-        ];
-        renderCourseManager();
+      // Show loading state in table
+      const container = document.getElementById('dynamicPanel');
+      if (container) {
+        container.innerHTML = `<div class="table-wrapper"><div class="loading-spinner"><i class="fas fa-spinner fa-pulse"></i> Loading courses from MongoDB...</div></div>`;
       }
+      
+      const response = await fetch(`${API_BASE_URL}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      // Ensure we have an array (MongoDB returns array of courses)
+      courses = Array.isArray(data) ? data : [];
+      renderCourseManager();
+      
+      if (courses.length === 0) {
+        showToast("No courses found. Add your first course!", false);
+      }
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      showToast(`Failed to load courses: ${error.message}`, true);
+      courses = [];
+      renderCourseManager();
+    } finally {
+      isLoading = false;
     }
   }
 
-  // Create or Update course
-  async function handleFormSubmit(e) {
-    e.preventDefault();
+  // Add new course to MongoDB
+  async function addCourse(courseData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(courseData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+      
+      const newCourse = await response.json();
+      showToast(`Course "${newCourse.courseName}" added to MongoDB!`);
+      await fetchCourses(); // Refresh the list
+      return true;
+    } catch (error) {
+      console.error('Error adding course:', error);
+      showToast(`Failed to add course: ${error.message}`, true);
+      return false;
+    }
+  }
+
+  // Update existing course in MongoDB
+  async function updateCourse(courseId, courseData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${courseId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(courseData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+      
+      const updatedCourse = await response.json();
+      showToast(`Course "${updatedCourse.courseName}" updated in MongoDB!`);
+      await fetchCourses(); // Refresh the list
+      return true;
+    } catch (error) {
+      console.error('Error updating course:', error);
+      showToast(`Failed to update course: ${error.message}`, true);
+      return false;
+    }
+  }
+
+  // Delete course from MongoDB
+  async function deleteCourse(courseId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${courseId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+      
+      const result = await response.json();
+      showToast(result.message || 'Course deleted from MongoDB!');
+      await fetchCourses(); // Refresh the list
+      return true;
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      showToast(`Failed to delete course: ${error.message}`, true);
+      return false;
+    }
+  }
+
+  // Handle form submit (Create or Update)
+  async function handleFormSubmit(event) {
+    event.preventDefault();
+    
     const courseName = document.getElementById('courseName').value.trim();
     const courseCategory = document.getElementById('courseCategory').value.trim();
     const courseEnrollments = parseInt(document.getElementById('courseEnrollments').value) || 0;
 
     if (!courseName || !courseCategory) {
-      showToast("Course name and category required", true);
+      showToast("Course name and category are required", true);
       return;
     }
 
-    const payload = { courseName, courseCategory, courseEnrollments };
+    const courseData = {
+      courseName: courseName,
+      courseCategory: courseCategory,
+      courseEnrollments: courseEnrollments
+    };
 
-    try {
-      if (editMode && editId) {
-        const res = await fetch(`${API_URL}/${editId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error("Update failed");
-        showToast("Course updated");
-      } else {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error("Create failed");
-        showToast("Course added");
-      }
+    let success = false;
+    
+    if (editMode && editId) {
+      success = await updateCourse(editId, courseData);
+    } else {
+      success = await addCourse(courseData);
+    }
+    
+    if (success) {
       closeModal();
-      await fetchCourses();
-    } catch (err) {
-      console.error(err);
-      // fallback local update/demo mode
-      if (!editMode) {
-        const newId = Date.now().toString();
-        courses.unshift({ _id: newId, courseName, courseCategory, courseEnrollments });
-        renderCourseManager();
-        showToast("Demo: Course added locally");
-      } else {
-        const index = courses.findIndex(c => c._id === editId);
-        if (index !== -1) {
-          courses[index] = { ...courses[index], courseName, courseCategory, courseEnrollments };
-          renderCourseManager();
-          showToast("Demo: Course updated locally");
-        }
-      }
-      closeModal();
+      document.getElementById('courseForm').reset();
     }
   }
 
-  // Delete course
-  async function deleteCourseById(id) {
-    if (!confirm("Delete this course? This action is permanent.")) return;
-    try {
-      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Delete failed");
-      showToast("Course deleted");
-      await fetchCourses();
-    } catch (err) {
-      courses = courses.filter(c => c._id !== id);
-      renderCourseManager();
-      showToast("Demo: Course deleted locally");
-    }
+  // Delete course with confirmation
+  window.deleteCourseById = async function(courseId) {
+    if (!confirm("⚠️ Delete this course permanently from MongoDB? This action cannot be undone.")) return;
+    await deleteCourse(courseId);
   }
 
-  // Open modal for add/edit
-  function openModal(course = null) {
+  // Open modal for add or edit
+  window.openModal = function(course = null) {
     const modal = document.getElementById('courseModal');
-    if (course) {
+    const modalTitle = document.getElementById('modalTitle');
+    const courseNameInput = document.getElementById('courseName');
+    const courseCategoryInput = document.getElementById('courseCategory');
+    const courseEnrollmentsInput = document.getElementById('courseEnrollments');
+    const editCourseIdField = document.getElementById('editCourseId');
+
+    if (course && course._id) {
       editMode = true;
       editId = course._id;
-      document.getElementById('modalTitle').innerText = "Edit Course";
-      document.getElementById('courseName').value = course.courseName;
-      document.getElementById('courseCategory').value = course.courseCategory;
-      document.getElementById('courseEnrollments').value = course.courseEnrollments;
-      document.getElementById('editCourseId').value = course._id;
+      modalTitle.innerText = "✏️ Edit Course";
+      courseNameInput.value = course.courseName;
+      courseCategoryInput.value = course.courseCategory;
+      courseEnrollmentsInput.value = course.courseEnrollments || 0;
+      editCourseIdField.value = course._id;
     } else {
       editMode = false;
       editId = null;
-      document.getElementById('modalTitle').innerText = "Add New Course";
+      modalTitle.innerText = "➕ Add New Course";
       document.getElementById('courseForm').reset();
-      document.getElementById('courseEnrollments').value = "0";
-      document.getElementById('editCourseId').value = "";
+      courseEnrollmentsInput.value = "0";
+      editCourseIdField.value = "";
     }
     modal.style.display = "flex";
   }
 
   function closeModal() {
     document.getElementById('courseModal').style.display = "none";
+    document.getElementById('courseForm').reset();
+    editMode = false;
+    editId = null;
   }
 
   function escapeHtml(str) {
@@ -246,58 +291,86 @@
     });
   }
 
-  // Render table, stats, search
+  // Render course table with MongoDB data
   function renderCourseManager() {
     const container = document.getElementById('dynamicPanel');
     if (!container) return;
 
-    let filtered = courses.filter(c =>
-      c.courseName.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
-      c.courseCategory.toLowerCase().includes(currentSearchTerm.toLowerCase())
-    );
+    // Apply search filter
+    let filteredCourses = courses;
+    if (currentSearchTerm.trim() !== '') {
+      filteredCourses = courses.filter(course =>
+        course.courseName.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
+        course.courseCategory.toLowerCase().includes(currentSearchTerm.toLowerCase())
+      );
+    }
 
     const totalCourses = courses.length;
-    const totalEnrollments = courses.reduce((sum, c) => sum + (c.courseEnrollments || 0), 0);
+    const totalEnrollments = courses.reduce((sum, course) => sum + (course.courseEnrollments || 0), 0);
+    
     document.getElementById('totalCoursesCount').innerText = totalCourses;
     document.getElementById('totalEnrollmentsCount').innerText = totalEnrollments.toLocaleString();
 
-    if (filtered.length === 0) {
+    // Empty state
+    if (filteredCourses.length === 0) {
+      const emptyMessage = courses.length === 0 
+        ? '<i class="fas fa-database" style="margin-right: 8px;"></i> No courses in MongoDB. Click "Add Course" to get started! 🚀'
+        : '<i class="fas fa-search" style="margin-right: 8px;"></i> No courses match your search. Try different keywords.';
+      
       container.innerHTML = `
         <div class="table-wrapper">
           <table class="course-table">
             <thead><tr><th>Course Name</th><th>Category</th><th>Enrollments</th><th>Actions</th></tr></thead>
-            <tbody><tr class="empty-row"><td colspan="4"><i class="fas fa-database"></i> No courses match your search. Add a new course!</td></tr></tbody>
+            <tbody><tr class="empty-row"><td colspan="4">${emptyMessage}</td></tr></tbody>
           </table>
         </div>
       `;
       return;
     }
 
-    let rows = filtered.map(course => `
-      <tr>
-        <td><strong>${escapeHtml(course.courseName)}</strong></td>
-        <td><span class="category-chip">${escapeHtml(course.courseCategory)}</span></td>
-        <td><span class="enroll-value"><i class="fas fa-user-friends"></i> ${course.courseEnrollments.toLocaleString()} enrolled</span></td>
-        <td>
-          <div class="action-btns">
-            <button class="edit-btn" onclick='openModal(${JSON.stringify(course).replace(/'/g, "&#39;")})'>Edit</button>
-            <button class="delete-btn" onclick="deleteCourseById('${course._id}')">Delete</button>
-          </div>
-        </td>
-      </tr>
-    `).join("");
+    // Build table rows with MongoDB _id
+    let rows = filteredCourses.map(course => {
+      const safeCourse = {
+        _id: course._id,
+        courseName: course.courseName,
+        courseCategory: course.courseCategory,
+        courseEnrollments: course.courseEnrollments || 0
+      };
+      const jsonData = JSON.stringify(safeCourse).replace(/'/g, "&#39;");
+      
+      return `
+        <tr>
+          <td><strong>${escapeHtml(course.courseName)}</strong></strong></td>
+          <td><span class="category-chip">${escapeHtml(course.courseCategory)}</span></td>
+          <td><span class="enroll-value"><i class="fas fa-user-friends"></i> ${(course.courseEnrollments || 0).toLocaleString()} enrolled</span></td>
+          <td>
+            <div class="action-btns">
+              <button class="edit-btn" onclick='openModal(${jsonData})'><i class="fas fa-edit"></i> Edit</button>
+              <button class="delete-btn" onclick="deleteCourseById('${course._id}')"><i class="fas fa-trash"></i> Delete</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
 
     container.innerHTML = `
       <div class="table-wrapper">
         <table class="course-table">
-          <thead><tr><th>Course Name</th><th>Category</th><th>Enrollments</th><th>Actions</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Course Name</th>
+              <th>Category</th>
+              <th>Enrollments</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
     `;
   }
 
-  // SIDEBAR TOGGLE LOGIC (fully responsive, works on all devices)
+  // ========== SIDEBAR TOGGLE LOGIC ==========
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebarOverlay');
   const menuToggleBtn = document.getElementById('menuToggleBtn');
@@ -322,7 +395,6 @@
     }
   }
 
-  // Attach event listeners for sidebar controls
   if (menuToggleBtn) {
     menuToggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -333,15 +405,12 @@
     overlay.addEventListener('click', closeSidebar);
   }
 
-  // On resize, handle sidebar state: if screen > 768 and sidebar was open forced? Reset
   function handleResize() {
     if (window.innerWidth > 768) {
-      // ensure sidebar is visible by removing transform but keep open class? Remove open class for clean state
       if (sidebar) sidebar.classList.remove('open');
       if (overlay) overlay.classList.remove('active');
       document.body.style.overflow = '';
     } else {
-      // On small screens, if sidebar gets stuck open without overlay? ensure overlay sync
       if (sidebar && sidebar.classList.contains('open')) {
         overlay.classList.add('active');
       } else {
@@ -352,37 +421,17 @@
 
   window.addEventListener('resize', handleResize);
   document.addEventListener('keydown', (e) => { if (e.key === "Escape") closeSidebar(); });
-  // Close any nav links on mobile after click
+  
+  // Navigation active highlight
   document.querySelectorAll('.nav-item').forEach(link => {
-    link.addEventListener('click', () => {
-      if (window.innerWidth <= 768) {
-        closeSidebar();
-      }
+    link.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) closeSidebar();
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      link.classList.add('active');
     });
   });
 
-  // highlight current active based on href (simple)
-  const currentPath = window.location.pathname;
-
-document.querySelectorAll('.nav-item').forEach(link => {
-  link.classList.remove('active');
-
-  const href = link.getAttribute('href');
-
-  if (href === currentPath) {
-    link.classList.add('active');
-  }
-});
-  if (currentPath === '/' || currentPath === '') {
-    document.querySelector('.nav-item[href="/"]')?.classList.add('active');
-  }
-
-  // Initialise everything
-  document.getElementById('courseForm').addEventListener('submit', handleFormSubmit);
-  document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
-  window.addEventListener('click', (e) => {
-    if (e.target.id === 'courseModal') closeModal();
-  });
+  // Search input handler
   const searchInput = document.getElementById('searchInput');
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
@@ -390,8 +439,25 @@ document.querySelectorAll('.nav-item').forEach(link => {
       renderCourseManager();
     });
   }
-  handleResize(); // initial call
+
+  // Initialize event listeners
+  document.getElementById('courseForm').addEventListener('submit', handleFormSubmit);
+  document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
+  window.addEventListener('click', (e) => {
+    if (e.target.id === 'courseModal') closeModal();
+  });
+  
+  handleResize();
+  
+  // Initial load from MongoDB
   fetchCourses();
+  
+  // Auto-refresh every 30 seconds (optional, keeps data in sync)
+  setInterval(() => {
+    if (!document.hidden) {
+      fetchCourses();
+    }
+  }, 30000);
 </script>
 </body>
 </html>
