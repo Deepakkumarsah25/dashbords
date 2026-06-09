@@ -422,7 +422,7 @@ const downloadCertificate = async (req, res) => {
           .body-row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
           .main-content { flex: 1; min-width: 200px; }
           .certify-text { text-align: center; font-size: 14px; color: #333; margin-bottom: 4px; }
-          .student-name { font-family: 'Great Vibes', cursive; font-size: 46px; color: #222; text-align: center; margin: 4px 0 2px; line-height: 1.1; }
+          .student-name {font-family: Arial, sans-serif;  font-size: 46px; color: #222; text-align: center; margin: 4px 0 2px; line-height: 1.1; }
           .name-underline { border-bottom: 1px solid #555; margin: 0 40px 10px; }
           .father-row { font-size: 13px; color: #333; margin-bottom: 4px; display: flex; align-items: center; flex-wrap: wrap; }
           .father-row .label { min-width: 30px; }
@@ -471,7 +471,7 @@ const downloadCertificate = async (req, res) => {
                   <div class="logo-area"><div class="logo-circle">${logoHtml}</div><div class="logo-sub">Computer & Technical Institute</div></div>
                   <div class="center-header">
                     <div class="institute-title">RID<span style="font-size:14px;">™</span></div>
-                    <div class="location-bar">MALDAH, BALLIA (U.P.)</div>
+                    <div class="location-bar">Bhopal, Madhya Pradesh (M.P.), India</div>
                     <div class="iso-text">An ISO 9001 : 2015 Certified Institute</div>
                     <div class="cert-title-bar">CERTIFICATE OF COMPLETION</div>
                   </div>

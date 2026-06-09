@@ -170,7 +170,7 @@ function loadLocal() {
     // ✅ MongoDB से Tests लाने का function
 async function loadTests() {
     try {
-        const res = await fetch('/api/tests');
+        const res = await fetch('/computer/api/tests');
         allTests = await res.json();
 
         renderAllTestCards();
@@ -284,7 +284,7 @@ function renderAllTestCards() {
         btn.onclick = async () => {
             const testId = btn.dataset.id;
 
-            const res = await fetch(`/api/submissions/${testId}`);
+            const res = await fetch(`/computer/api/submissions/${testId}`);
             const submissions = await res.json();
 
             let html = submissions.length
@@ -305,7 +305,7 @@ function renderAllTestCards() {
     document.querySelectorAll('.delete-test-btn').forEach(btn => {
         btn.onclick = async () => {
             if(confirm("Delete this test?")) {
-                await fetch(`/api/tests/${btn.dataset.id}`, {
+                await fetch(`/computer/api/tests/${btn.dataset.id}`, {
                     method: 'DELETE'
                 });
 
@@ -375,7 +375,7 @@ document.getElementById('createTestFromBankForm').addEventListener('submit', asy
     console.log("SelectedQs:", selectedQs);
 
     try {
-  const res = await fetch('/api/tests', {
+  const res = await fetch('/computer/api/tests', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'
@@ -412,9 +412,8 @@ document.getElementById('createTestFromBankForm').addEventListener('submit', asy
         showToast("Question updated");
     });
     
-   document.getElementById('editTestFormSubmit')
-.addEventListener('submit', async (e) => {
-   e.preventDefault();
+    document.getElementById('editTestFormSubmit').addEventListener('submit', (e) => {
+        e.preventDefault();
        const testId = document.getElementById('editTestId').value;
         const newTitle = document.getElementById('editTestTitle').value.trim();
         const newTime = parseInt(document.getElementById('editTestTime').value);
@@ -471,7 +470,7 @@ document.getElementById('createTestFromBankForm').addEventListener('submit', asy
     try {
 
         const res = await fetch(
-            `http://localhost:3000/api/tests/${testId}`,
+            `http://localhost:9192/computer/api/tests/${testId}`,
             {
                 method: 'PUT',
                 headers: {
@@ -554,7 +553,7 @@ document.getElementById('modalTitle').innerHTML = `<i class="fas fa-graduation-c
     });
 
     try {
-        const res = await fetch('http://localhost:9192/api/submissions', {
+        const res = await fetch('http://localhost:9192/computer/api/submissions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -492,6 +492,7 @@ app.get("/coaching-dashboard",(req,res)=>{
   res.render("organisation/coaching-dashboard.ejs")
   
 })
+
 // Research Papers
 app.get("/research-paper", (req, res) => {
   res.render("Research-Papers/Home");

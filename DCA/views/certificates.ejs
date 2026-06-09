@@ -122,7 +122,7 @@
 
           <!-- Hidden Fields -->
           <input type="hidden" id="certificateNo" name="certificateNo">
-          <input type="hidden" id="registrationNo" name="registrationNo">
+<input type="hidden" id="registrationNo" name="registrationNo" value="083632">
           <input type="hidden" id="enrollNo" name="enrollNo">
           <input type="hidden" id="rollNo" name="rollNo">
 
@@ -242,8 +242,7 @@ photoInput.addEventListener("change", function () {
       const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
 
       document.getElementById("certificateNo").value = "RID/" + year + "/" + random;
-document.getElementById("registrationNo").value =
-  "REG" + Date.now();
+document.getElementById("registrationNo").value = "083632";
       document.getElementById("enrollNo").value = "RID/" + year + "/" + Math.floor(Math.random() * 9999).toString().padStart(4, '0');
       document.getElementById("rollNo").value = Math.floor(Math.random() * 99999999).toString().padStart(8, '0');
 
