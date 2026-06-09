@@ -17,10 +17,16 @@ const courseSchema = new mongoose.Schema(
     courseEnrollments: {
         type: Number,
         default: 0
-    }
+    },
+    organisationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Organisation",
+    required: true
+}
 },
+
 {
     timestamps: true
 });
 
-module.exports = mongoose.model("Course", courseSchema);
+module.exports = mongoose.model("DcaCourse", courseSchema);

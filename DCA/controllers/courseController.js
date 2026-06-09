@@ -4,6 +4,9 @@ const Course = require("../models/Course");
 exports.createCourse = async (req, res) => {
     try {
 
+        console.log("Session =>", req.session);
+        console.log("UserId =>", req.session?.userId);
+
         const {
             courseName,
             courseCategory,
@@ -13,12 +16,15 @@ exports.createCourse = async (req, res) => {
         const course = await Course.create({
             courseName,
             courseCategory,
-            courseEnrollments
+            courseEnrollments,
+            organisationId: req.session.userId
         });
 
         res.status(201).json(course);
 
     } catch (error) {
+
+        console.log(error);
 
         res.status(500).json({
             success: false,
@@ -27,12 +33,13 @@ exports.createCourse = async (req, res) => {
 
     }
 };
-
 // GET ALL COURSES
 exports.getCourses = async (req, res) => {
     try {
 
-        const courses = await Course.find().sort({
+        const courses = await Course.find({
+            organisationId: req.session.userId
+        }).sort({
             createdAt: -1
         });
 
@@ -52,8 +59,11 @@ exports.getCourses = async (req, res) => {
 exports.updateCourse = async (req, res) => {
     try {
 
-        const course = await Course.findByIdAndUpdate(
-            req.params.id,
+        const course = await Course.findOneAndUpdate(
+            {
+                _id: req.params.id,
+                organisationId: req.session.userId
+            },
             req.body,
             {
                 new: true
@@ -82,9 +92,10 @@ exports.updateCourse = async (req, res) => {
 exports.deleteCourse = async (req, res) => {
     try {
 
-        const course = await Course.findByIdAndDelete(
-            req.params.id
-        );
+        const course = await Course.findOneAndDelete({
+            _id: req.params.id,
+            organisationId: req.session.userId
+        });
 
         if (!course) {
             return res.status(404).json({

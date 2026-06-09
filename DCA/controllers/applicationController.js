@@ -9,14 +9,14 @@ const transporter = nodemailer.createTransport({
     }
 });
 const calculateGrade = (marks) => {
-  if (marks >= 90) return "A+";
-  if (marks >= 80) return "A";
-  if (marks >= 70) return "B+";
-  if (marks >= 60) return "B";
-  if (marks >= 50) return "C+";
-  if (marks >= 40) return "C";
-  if (marks >= 33) return "D";
-  return "F";
+    if (marks >= 90) return "A+";
+    if (marks >= 80) return "A";
+    if (marks >= 70) return "B+";
+    if (marks >= 60) return "B";
+    if (marks >= 50) return "C+";
+    if (marks >= 40) return "C";
+    if (marks >= 33) return "D";
+    return "F";
 };
 // Send email function
 const sendEmail = async (to, subject, htmlContent) => {
@@ -27,7 +27,7 @@ const sendEmail = async (to, subject, htmlContent) => {
             subject: subject,
             html: htmlContent
         };
-        
+
         const info = await transporter.sendMail(mailOptions);
         console.log('Email sent: ' + info.response);
         return true;
@@ -38,24 +38,24 @@ const sendEmail = async (to, subject, htmlContent) => {
 };
 
 
- const createApplication = async (req, res) => {
+const createApplication = async (req, res) => {
     const marks = Number(req.body.marks);
 
-req.body.grade = calculateGrade(marks);
+    req.body.grade = calculateGrade(marks);
     console.log("BODY =>", req.body);
 
     const year = new Date().getFullYear();
 
-req.body.certificateNo =
-  "RID/" + year + "/" + Math.floor(Math.random() * 9999).toString().padStart(4, "0");
+    req.body.certificateNo =
+        "RID/" + year + "/" + Math.floor(Math.random() * 9999).toString().padStart(4, "0");
 
-req.body.enrollNo =
-  "RID/" + year + "/" + Math.floor(Math.random() * 9999).toString().padStart(4, "0");
+    req.body.enrollNo =
+        "RID/" + year + "/" + Math.floor(Math.random() * 9999).toString().padStart(4, "0");
 
-req.body.rollNo =
-  Math.floor(Math.random() * 99999999).toString().padStart(8, "0");
+    req.body.rollNo =
+        Math.floor(Math.random() * 99999999).toString().padStart(8, "0");
     try {
-                const photoUrl = req.file
+        const photoUrl = req.file
             ? "/uploads/" + req.file.filename
             : "";
 
@@ -64,7 +64,7 @@ req.body.rollNo =
             photoUrl
 
         });
-        
+
         // Send confirmation email to user
         const userEmailHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -87,9 +87,9 @@ req.body.rollNo =
                 <p>Thank you,<br>DCA Certificate Team</p>
             </div>
         `;
-        
+
         await sendEmail(data.email, 'Certificate Application Submitted Successfully', userEmailHtml);
-        
+
         // Send email to ADMIN with Verify button
         const adminEmailHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
@@ -129,14 +129,16 @@ req.body.rollNo =
                 <small style="color: #999;">Admin Panel | DCA Certificate System</small>
             </div>
         `;
-        
+
         // Send to admin email (configure in .env)
         await sendEmail(process.env.ADMIN_EMAIL, ' New Certificate Application - Action Required', adminEmailHtml);
-        
-        res.status(200).json({
-            success: true,
-            message: "Application submitted successfully. Admin has been notified.",
-            data: data
+
+        res.render("application-success", {
+            studentName: data.studentName,
+            courseName: data.courseName,
+            certificateNo: data.certificateNo,
+            enrollNo: data.enrollNo,
+            rollNo: data.rollNo
         });
     } catch (error) {
         console.log(error);
@@ -148,13 +150,13 @@ req.body.rollNo =
 const verifyApplicationViaEmail = async (req, res) => {
     try {
         const { id } = req.params;
-        
+
         const application = await DCACertificatedApplication.findByIdAndUpdate(
             id,
             { status: "verified" },
             { new: true }
         );
-        
+
         if (!application) {
             return res.status(404).send(`
                 <div style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
@@ -163,11 +165,11 @@ const verifyApplicationViaEmail = async (req, res) => {
                 </div>
             `);
         }
-        
+
         // Create download link for user
-const downloadLink =
-`${process.env.BACKEND_URL}/api/application/download-certificate/${encodeURIComponent(application.certificateNo)}`;
-        
+        const downloadLink =
+            `${process.env.BACKEND_URL}/api/application/download-certificate/${encodeURIComponent(application.certificateNo)}`;
+
         // Send verification and download email to USER
         const userEmailHtml = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -206,9 +208,9 @@ const downloadLink =
                 <small style="color: #666;">This is an automated message. Please do not reply to this email.</small>
             </div>
         `;
-        
+
         await sendEmail(application.email, 'Your Certificate is Ready for Download!', userEmailHtml);
-        
+
         // Return success page to admin
         res.send(`
             <div style="font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
@@ -226,7 +228,7 @@ const downloadLink =
                 </div>
             </div>
         `);
-        
+
     } catch (error) {
         console.log(error);
         res.status(500).send(`
@@ -244,14 +246,14 @@ const getApplicationByCertificateNo = async (req, res) => {
     try {
         const { certificateNo } = req.params;
         const application = await DCACertificatedApplication.findOne({ certificateNo });
-        
+
         if (!application) {
             return res.status(404).json({
                 success: false,
                 message: "Certificate not found"
             });
         }
-        
+
         res.status(200).json({
             success: true,
             data: application
@@ -304,9 +306,9 @@ const getVerifiedApplications = async (req, res) => {
 const downloadCertificate = async (req, res) => {
     try {
         const { certificateNo } = req.params;
-        
+
         console.log(`Attempting to download certificate: ${certificateNo}`); // Debug log
-        
+
         const application = await DCACertificatedApplication.findOne({
             certificateNo: certificateNo
         });
@@ -363,7 +365,7 @@ const downloadCertificate = async (req, res) => {
 
         // Helper function to format date
         const formatDateDMY = (dateStr) => {
-            if(!dateStr) return '';
+            if (!dateStr) return '';
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const date = new Date(dateStr);
             return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
@@ -373,7 +375,7 @@ const downloadCertificate = async (req, res) => {
         const formattedEnd = formatDateDMY(application.completionDate);
         const formattedIssue = formatDateDMY(new Date());
         const photoHtml = application.photoUrl ? `<img src="${application.photoUrl}" alt="Student Photo">` : '<span>No Photo</span>';
-        
+
         // Institute logo URL - change this to your institute logo
         const INSTITUTE_LOGO_SRC = "/assets/images/ridtechlogo.png";
         const logoHtml = `<img src="${INSTITUTE_LOGO_SRC}" alt="Institute Logo" style="width:70px;height:70px;border-radius:50%;object-fit:cover;">`;
@@ -482,9 +484,9 @@ const downloadCertificate = async (req, res) => {
                 <div class="body-row">
                   <div class="main-content">
                     <div class="certify-text">This is to Certify that</div>
-<div class="student-name">
-${escapeHtml(application.studentName)}
-</div>
+                   <div class="student-name">
+                   ${escapeHtml(application.studentName)}
+                   </div>
                     <div class="name-underline"></div>
                     <div class="father-row"><span class="label">S/o</span><span class="val">${escapeHtml(application.fatherName)}</span></div>
                     <div class="completed-text">has successfully completed the</div>
@@ -494,9 +496,9 @@ ${escapeHtml(application.studentName)}
                     <div class="wish-text">We wish him/her all the best for future endeavors.</div>
                     <div class="signatures">
                       <div class="sig-block">
-<div style="font-family:'Great Vibes',cursive;font-size:26px;">
-Dr. Rajesh Kumar
-</div>
+                     <div style="font-family:'Great Vibes',cursive;font-size:26px;">
+                     Dr. Rajesh Kumar
+                    </div>
 
                      <div class="sig-line"></div>
 
@@ -536,7 +538,7 @@ Dr. Rajesh Kumar
         </div>
    
         <\/body><\/html>`);
-        
+
     } catch (err) {
         console.error("Download error:", err);
         res.status(500).send(`
@@ -563,21 +565,21 @@ Dr. Rajesh Kumar
 
 // Helper function for escapeHtml
 function escapeHtml(str) {
-    if(!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if(m === '&') return '&amp;';
-        if(m === '<') return '&lt;';
-        if(m === '>') return '&gt;';
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function (m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
         return m;
     });
 }
 
 
 module.exports = {
-  createApplication,
-  verifyApplicationViaEmail,
-  getApplicationByCertificateNo,
-  getPendingApplications,
-  getVerifiedApplications,
-  downloadCertificate,
+    createApplication,
+    verifyApplicationViaEmail,
+    getApplicationByCertificateNo,
+    getPendingApplications,
+    getVerifiedApplications,
+    downloadCertificate,
 };
