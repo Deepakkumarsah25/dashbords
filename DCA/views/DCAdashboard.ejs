@@ -142,7 +142,43 @@
   function markAllSeen() { notifications.forEach(n => n.seen = true); updateNotifUI(); }
   function renderStats() { document.getElementById("statsSection").innerHTML = statsData.map(s => `<div class="stat-card"><div class="stat-top"><div class="stat-icon" style="background:${s.bg}; color:${s.color}"><i class="${s.icon}"></i></div><div><div class="stat-title">${s.title}</div><div class="stat-value">${s.value}</div></div></div><div class="stat-sub">${s.trend}</div></div>`).join(''); }
   function renderSchedule() { document.getElementById("scheduleList").innerHTML = scheduleItems.map(s => `<div class="schedule-item"><div><div class="time">${s.time}</div><div><strong>${s.title}</strong><div class="sub">${s.details}</div></div></div></div>`).join(''); }
-  function renderRecentTable(filter = "") { const tbody = document.getElementById("recentTbody"); let filtered = studentsList.filter(s => s.name.toLowerCase().includes(filter) || s.course.toLowerCase().includes(filter)); tbody.innerHTML = filtered.map(s => `<tr><td>${s.name}</td><td>${s.course}</td><td>${s.batch}</td><td><span class="status ${s.class}">${s.status}</span></td></tr>`).join(''); }
+  function renderRecentTable(filter = "") {
+
+    const tbody = document.getElementById("recentTbody");
+
+    filter = filter.toLowerCase().trim();
+
+    let filtered = studentsList.filter(s =>
+        (s.name || "").toLowerCase().includes(filter) ||
+        (s.course || "").toLowerCase().includes(filter) ||
+        (s.batch || "").toLowerCase().includes(filter) ||
+        (s.status || "").toLowerCase().includes(filter)
+    );
+
+    if (!filtered.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align:center;padding:20px;color:#888;">
+                    🔍 No Record Found
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(s => `
+        <tr>
+            <td>${s.name}</td>
+            <td>${s.course}</td>
+            <td>${s.batch}</td>
+            <td>
+                <span class="status ${s.class}">
+                    ${s.status}
+                </span>
+            </td>
+        </tr>
+    `).join('');
+}
   function renderAlerts() { document.getElementById("alertsList").innerHTML = alertsData.map(a => `<div class="alert-item"><div><strong style="color:${a.color}">${a.title}</strong><div class="sub">${a.desc}</div></div><i class="fas fa-arrow-right"></i></div>`).join(''); }
   function renderBottomStats() { document.getElementById("bottomStats").innerHTML = bottomStatsData.map(b => `<div class="mini-card"><div class="mini-ico"><i class="${b.icon}"></i></div><div><strong>${b.value}</strong><span> ${b.label}</span></div></div>`).join(''); }
   let enrollmentChart, feeChart, courseChart;
@@ -162,7 +198,9 @@
   if(menuToggle) menuToggle.addEventListener("click", (e) => { e.stopPropagation(); sidebar.classList.contains("open") ? closeSidebar() : openSidebar(); });
   overlay?.addEventListener("click", closeSidebar);
   document.querySelectorAll(".nav-item").forEach(item => { item.addEventListener("click", () => { if(window.innerWidth <= 768) closeSidebar(); showToast(`📌 ${item.innerText} section (demo)`); }); });
-  document.getElementById("searchInput")?.addEventListener("input", (e) => renderRecentTable(e.target.value.toLowerCase().trim()));
+  document.getElementById("searchInput")?.addEventListener("input", (e) => {
+    renderRecentTable(e.target.value.toLowerCase().trim());
+});
   const bell = document.getElementById("bellIcon"), notifDrop = document.getElementById("notifDropdown"); if(bell && notifDrop) { bell.addEventListener("click", (e) => { e.stopPropagation(); notifDrop.classList.toggle("show"); markAllSeen(); }); document.addEventListener("click", (e) => { if(!bell.contains(e.target)) notifDrop.classList.remove("show"); }); }
   document.querySelectorAll(".quick-actions .btn, .view-btn").forEach(btn => btn.addEventListener("click", () => showToast(`✨ ${btn.innerText.trim()} (demo action)`)));
   
@@ -252,7 +290,7 @@ function resetAvatar() {
  loadProfileFromStorage();
 
 renderStats();
-loadDashboardStudentCount();
+
 
 renderSchedule();
 renderRecentTable("");
@@ -268,12 +306,20 @@ updateNotifUI();
     try {
 
         const res = await fetch("/computer/api/students");
-
         const students = await res.json();
 
         statsData[0].value = students.length;
 
+        studentsList = students.map(s => ({
+            name: s.name || "",
+            course: s.course || "",
+            batch: s.batch || "N/A",
+            status: s.fee || "Pending",
+            class: (s.fee || "Pending").toLowerCase()
+        }));
+
         renderStats();
+        renderRecentTable("");
 
     } catch (err) {
 
@@ -281,6 +327,7 @@ updateNotifUI();
 
     }
 }
+loadDashboardStudentCount();
 </script>
 </body>
 </html>

@@ -20,6 +20,15 @@ const router = express.Router();
 /* =========================================================
    ROUTES
 ========================================================= */
+router.use((req, res, next) => {
+
+    console.log("===== DCA SESSION =====");
+    console.log(req.session);
+    console.log("USER ID =", req.session?.userId);
+
+    next();
+
+});
 router.get("/admissions", (req, res) => {
     res.render("admissions");
 });
@@ -32,6 +41,7 @@ router.get("/courses", (req, res) => {
 router.get("/test", (req, res) => {
     res.render("Create_Test.ejs");
 });
+router.use("/fees", feeRoutes);
 router.get("/", async (req, res) => {
     try {
 
@@ -99,7 +109,7 @@ router.use("/franchise", franchiseRoutes);
 router.use("/fees", feeRoutes);
 const courseRoutes = require("./routes/courseRoutes");
 
-// app.use("/api/courses", courseRoutes);
+router.use("/api/courses", courseRoutes);
 router.use("/api/application", applicationRoutes);
 /* =========================================================
 
