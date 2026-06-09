@@ -1,5 +1,5 @@
 const Fee = require("../models/Fee");
-
+const Student = require("../models/Student");
 // SAVE or UPDATE
 const saveFee = async (req, res) => {
 
@@ -84,10 +84,11 @@ const getFees = async (req, res) => {
 
     try {
 
-        const fees = await Fee.find().sort({
+        const fees = await Student.find({
+            organisationId: req.session.userId
+        }).sort({
             createdAt: -1
         });
-
         res.json({
             success: true,
             data: fees

@@ -56,31 +56,31 @@ exports.login = async (req, res) => {
       secure: false, // local development
       maxAge: 3600000,
     });
-// 🔥 SESSION SAVE
-req.session.userId = user._id;
+    // 🔥 SESSION SAVE
+  req.session.userId = user._id;
 req.session.userRole = user.role;
 req.session.userEmail = user.email;
 
-// 🔥 REDIRECT FIX
-//const redirectUrl = req.session.redirectTo || "/rts/dashboard";
-const redirectUrl = req.body.redirect || req.query.redirect;
+    // 🔥 REDIRECT FIX
+    //const redirectUrl = req.session.redirectTo || "/rts/dashboard";
+    const redirectUrl = req.body.redirect || req.query.redirect;
 
-// 🟢 STUDENT
-if (user.role === "student") {
-  return res.redirect(redirectUrl || "/rts/dashboard");
-}
+    // 🟢 STUDENT
+    if (user.role === "student") {
+      return res.redirect(redirectUrl || "/rts/dashboard");
+    }
 
-// 🟢 TEACHER 🔥
-if (user.role === "teacher") {
+    // 🟢 TEACHER 🔥
+    if (user.role === "teacher") {
 
-  // agar redirect hai (like specific page)
-  if (redirectUrl) {
-    return res.redirect(redirectUrl);
-  }
+      // agar redirect hai (like specific page)
+      if (redirectUrl) {
+        return res.redirect(redirectUrl);
+      }
 
-  // warna direct dashboard
-  return res.redirect("/teacher-dashboard");
-}
+      // warna direct dashboard
+      return res.redirect("/teacher-dashboard");
+    }
 
     if (user.role === "organisation") {
 
@@ -89,8 +89,18 @@ if (user.role === "teacher") {
       }
 
       if (user.organisationType === "DCA") {
+
+    return req.session.save((err) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Session Error");
+        }
+
         return res.redirect("/computer");
-      }
+    });
+
+}
 
       if (user.organisationType === "Coaching Centre") {
         return res.redirect("/coaching-dashboard");
@@ -114,33 +124,33 @@ if (user.role === "teacher") {
 
 exports.logout = (req, res) => {
 
-    res.clearCookie("token");
+  res.clearCookie("token");
 
-    req.session.destroy((err) => {
+  req.session.destroy((err) => {
 
-        if (err) {
+    if (err) {
 
-            console.log(err);
+      console.log(err);
 
-            return res.status(500).json({
-                success: false
-            });
+      return res.status(500).json({
+        success: false
+      });
 
-        }
+    }
 
-        res.clearCookie("connect.sid");
+    res.clearCookie("connect.sid");
 
-        res.set({
-            "Cache-Control": "no-store, no-cache, must-revalidate, private",
-            "Pragma": "no-cache",
-            "Expires": "0"
-        });
-
-        return res.json({
-            success: true
-        });
-
+    res.set({
+      "Cache-Control": "no-store, no-cache, must-revalidate, private",
+      "Pragma": "no-cache",
+      "Expires": "0"
     });
+
+    return res.json({
+      success: true
+    });
+
+  });
 
 };
 exports.verifyOTP = async (req, res) => {
@@ -226,8 +236,8 @@ exports.resetPassword = async (req, res) => {
   }
 };
 exports.logout = (req, res) => {
-    res.clearCookie("token"); // agar JWT use kar raha hai
-    req.session?.destroy?.(); // agar session use ho raha hai
+  res.clearCookie("token"); // agar JWT use kar raha hai
+  req.session?.destroy?.(); // agar session use ho raha hai
 
-    return res.redirect("/login");
+  return res.redirect("/login");
 };
