@@ -204,8 +204,8 @@ Downloaded on: ${new Date().toLocaleString()}
                     <td><strong>${displayStudent}</strong></td>
                     <td>${displayCourse}</td>
                     <td><strong>${formatINR(fee.amount)}</strong></td>
-                   <td>-</td>
-                    <td><span class="status-badge ${statusClass}">${fee.fee}</span></td>
+<td>${fee.createdAt ? new Date(fee.createdAt).toLocaleDateString('en-IN') : 'N/A'}</td>
+<td><span class="status-badge ${statusClass}">${fee.fee}</span></td>
                     <td class="action-group">
                         <button class="edit-btn" data-id="${fee._id}"><i class="fas fa-edit"></i> Edit</button>
                         <button class="delete-btn" data-id="${fee._id}"><i class="fas fa-trash-alt"></i> Del</button>
@@ -298,6 +298,10 @@ Downloaded on: ${new Date().toLocaleString()}
                 document.getElementById("courseName").value = fee.course;
                 document.getElementById("amount").value = fee.amount;
                 document.getElementById("statusSelect").value = fee.fee;
+                document.getElementById("paymentDate").value =
+    fee.createdAt
+        ? new Date(fee.createdAt).toISOString().split("T")[0]
+        : "";
 
                 document.getElementById("modalTitle").innerHTML =
                     '<i class="fas fa-pen"></i> Edit Student';
@@ -316,6 +320,7 @@ async function handleFormSubmit(e) {
     const course = document.getElementById("courseName").value.trim();
     const amount = document.getElementById("amount").value;
     const status = document.getElementById("statusSelect").value;
+    const paymentDate = document.getElementById("paymentDate").value;
     const editId = document.getElementById("editId").value;
 
     try {
@@ -331,12 +336,13 @@ async function handleFormSubmit(e) {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    name: student,
-                    course,
-                    amount: Number(amount),
-                    fee: status
-                })
+               body: JSON.stringify({
+    name: student,
+    course,
+    amount: Number(amount),
+    fee: status,
+    paymentDate
+})
             }
         );
 
