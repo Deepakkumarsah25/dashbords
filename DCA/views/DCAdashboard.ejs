@@ -25,7 +25,7 @@
       <div class="top-actions">
         <div class="notification-wrapper">
           <div class="icon-btn" id="bellIcon"><i class="far fa-bell"></i><span class="badge" id="notifCount">3</span></div>
-          <div class="notif-dropdown" id="notifDropdown"><div class="notif-header">🔔 Notifications</div><div class="notif-list" id="notifList"></div></div>
+          <div class="notif-dropdown" id="notifDropdown"><div class="notif-head">🔔 Notifications</div><div class="notif-list" id="notifList"></div></div>
         </div>
         <div class="profile-wrap" id="profileBtn">
           <img class="avatar-img" id="profileAvatar" src="images/image.jpeg" alt="avatar">
@@ -44,7 +44,7 @@
     </div>
 
     <section class="page-head">
-      <div><h2>Dashboard</h2><p>Welcome back, <span id="welcomeName">Admin</span> 👋 Real-time insights</p></div>
+      <div><h2>Dashboard</h2><p>Welcome back, <span id="welcomeName">Admin</span></p></div>
       <div class="quick-actions">
        <a href="/computer/students"><button class="btn blue"><i class="fas fa-plus"></i> Add Student</button></a>
         <a href="/computer/fees"><button class="btn green"><i class=""></i> Collect Fees</button></a>
@@ -98,12 +98,12 @@
 <script>
   // ---------- DASHBOARD CORE DATA & FUNCTIONS (unchanged logic) ----------
   const statsData = [
-    { title: "Total Students", value: "189", icon: "fas fa-users", trend: "↑12 this month", bg: "#eef6ff", color: "#2f80ed" },
-    { title: "Fees Collected Today", value: "₹8000", icon: "fas fa-rupee-sign", trend: "↑8% vs yesterday", bg: "#ecfdf3", color: "#16a34a" },
-    { title: "Pending Fees", value: "₹1200", icon: "fas fa-exclamation-triangle", trend: "23 Students", bg: "#fff7ed", color: "#f59e0b" },
-    { title: "Active Courses", value: "8", icon: "fas fa-book-open", trend: "All Running", bg: "#f5f3ff", color: "#7c5cff" },
-    { title: "Upcoming Tests", value: "3", icon: "fas fa-calendar-alt", trend: "This Week", bg: "#fff1f2", color: "#ec4899" },
-    { title: "Today Attendance", value: "86%", icon: "fas fa-chart-line", trend: "Average", bg: "#ecfeff", color: "#06b6d4" }
+    { title: "Total Students", value: "", icon: "fas fa-users", trend: "↑12 this month", bg: "#eef6ff", color: "#2f80ed" },
+    { title: "Fees Collected Today", value: "₹", icon: "fas fa-rupee-sign", trend: "↑8% vs yesterday", bg: "#ecfdf3", color: "#16a34a" },
+    { title: "Pending Fees", value: "₹", icon: "fas fa-exclamation-triangle", trend: "23 Students", bg: "#fff7ed", color: "#f59e0b" },
+    { title: "Active Courses", value: "", icon: "fas fa-book-open", trend: "All Running", bg: "#f5f3ff", color: "#7c5cff" },
+    { title: "Upcoming Tests", value: "", icon: "fas fa-calendar-alt", trend: "This Week", bg: "#fff1f2", color: "#ec4899" },
+    { title: "Today Attendance", value: "%", icon: "fas fa-chart-line", trend: "Average", bg: "#ecfeff", color: "#06b6d4" }
   ];
   const scheduleItems = [
     { time: "10:00 AM", title: "DCA Batch (Morning)", details: "Room 1 • Raj Sir" },
@@ -125,11 +125,11 @@
     { title: "Tests Scheduled", desc: "3 tests scheduled this week", color: "#2563eb" }
   ];
   const bottomStatsData = [
-    { icon: "fas fa-th", label: "Total Batches", value: "12" },
-    { icon: "fas fa-user-friends", label: "Total Teachers", value: "6" },
-    { icon: "fas fa-chalkboard", label: "Total Classrooms", value: "3" },
-    { icon: "fas fa-certificate", label: "Total Certificates", value: "156" },
-    { icon: "fas fa-book", label: "Library Books", value: "245" }
+    { icon: "fas fa-th", label: "Total Batches", value: "" },
+    { icon: "fas fa-user-friends", label: "Total Teachers", value: "" },
+    { icon: "fas fa-chalkboard", label: "Total Classrooms", value: "" },
+    { icon: "fas fa-certificate", label: "Total Certificates", value: "" },
+    { icon: "fas fa-book", label: "Library Books", value: "" }
   ];
   let notifications = [
     { id: 1, text: "📘 New student registration: Vikram Singh (Full Stack)", time: "2 min ago", cross: false, seen: false },
@@ -188,7 +188,7 @@
     const feeCtx = document.getElementById('feeChart')?.getContext('2d'); if(feeCtx) { if(feeChart) feeChart.destroy(); feeChart = new Chart(feeCtx, { type: 'bar', data: { labels: ['Week 1','Week 2','Week 3','Week 4','Week 5'], datasets: [{ label: 'Paid (₹K)', data: [35,42,37,48,39], backgroundColor: '#22c55e' }, { label: 'Pending (₹K)', data: [18,15,10,18,16], backgroundColor: '#f59e0b' }] }, options: { responsive: true } }); }
     const courseCtx = document.getElementById('courseChart')?.getContext('2d'); if(courseCtx) { if(courseChart) courseChart.destroy(); courseChart = new Chart(courseCtx, { type: 'doughnut', data: { labels: ['DCA','ADCA','Tally','Python','Web Dev'], datasets: [{ data: [30,20,15,20,15], backgroundColor: ['#3b82f6','#22c55e','#f59e0b','#8b5cf6','#f472b6'], borderWidth: 0 }] }, options: { responsive: true, cutout: '62%' } }); }
   }
-  function addCrossDashboardNotif() { notifications.unshift({ id: Date.now(), text: "🏛️ [ACCOUNTS DASHBOARD] Fee collection updated: ₹5,200 received from Web Dev batch", time: "Just now", cross: true, seen: false }); if(notifications.length>8) notifications.pop(); updateNotifUI(); showToast("🔔 New notification from Finance Dashboard"); }
+  function addCrossDashboardNotif() { notifications.unshift({ id: Date.now(), text: "🏛️ [ACCOUNTS DASHBOARD] ", time: "Just now", cross: true, seen: false }); if(notifications.length>1) notifications.pop(); updateNotifUI(); showToast("🔔 New notification from Admin "); }
   setInterval(addCrossDashboardNotif, 14000);
   
   // SIDEBAR LOGIC

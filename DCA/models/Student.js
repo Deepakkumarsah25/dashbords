@@ -14,11 +14,11 @@ const studentSchema = new mongoose.Schema(
         trim: true,
     },
 
-    mobile: {
-        type: String,
-        required: true
-    },
-
+mobile: {
+    type: String,
+    trim: true,
+    default: ""
+},
     amount: {
         type: Number,
         required: true,

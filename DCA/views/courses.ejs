@@ -22,7 +22,7 @@
     <div class="manager-container">
       <div class="manager-header">
         <div class="title-section">
-          <h1><i class="fas fa-chalkboard-user" style="margin-right: 10px; color:#2563eb;"></i> All Courses</h1>
+          <h1><i class="" style="margin-right: 10px; color:#2563eb;"></i> All Courses</h1>
        
         </div>
         <button class="btn-primary" onclick="openModal()"><i class="fas fa-plus-circle"></i> Add Course</button>
@@ -30,7 +30,7 @@
 
       <div class="stats-search-panel">
         <div class="stats-group">
-          <div class="stat-badge"><i class="fas fa-book-open"></i> <span id="totalCoursesCount">0</span> Courses</div>
+          <div class="stat-badge"><i class=""></i> <span id="totalCoursesCount">0</span> Courses</div>
           <div class="stat-badge"><i class="fas fa-user-graduate"></i> <span id="totalEnrollmentsCount">0</span> Total Enrollments</div>
         </div>
         <div class="search-wrapper">
@@ -314,7 +314,7 @@ const API_BASE_URL = '/computer/api/courses';
     // Empty state
     if (filteredCourses.length === 0) {
       const emptyMessage = courses.length === 0 
-        ? '<i class="fas fa-database" style="margin-right: 8px;"></i> No courses in MongoDB. Click "Add Course" to get started! 🚀'
+        ? '<i class="fas fa-database" style="margin-right: 8px;"></i> No courses in MongoDB. Click "Add Course" to get started! '
         : '<i class="fas fa-search" style="margin-right: 8px;"></i> No courses match your search. Try different keywords.';
       
       container.innerHTML = `

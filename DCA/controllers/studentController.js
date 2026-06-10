@@ -10,7 +10,7 @@ const getStudents = async (req, res) => {
     if (!req.session?.userId) {
       return res.status(401).json({
         success: false,
-        message: "Login required"
+       message: "Please login first"
       });
     }
 
@@ -55,24 +55,27 @@ const addStudent = async (req, res) => {
       });
     }
 
-    if (!name || !course || !mobile || !amount) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required"
-      });
-    }
+if (!name || !course || !amount) {
+  return res.status(400).json({
+    success: false,
+    message: "Name, Course and Amount are required"
+  });
+}
+if (mobile) {
 
-    const exist = await Student.findOne({
-      mobile,
-      organisationId: req.session.userId
+  const exist = await Student.findOne({
+    mobile,
+    organisationId: req.session.userId
+  });
+
+  if (exist) {
+    return res.status(400).json({
+      success: false,
+      message: "Mobile already exists"
     });
+  }
 
-    if (exist) {
-      return res.status(400).json({
-        success: false,
-        message: "Mobile already exists"
-      });
-    }
+}
 
     const student = await Student.create({
       name,

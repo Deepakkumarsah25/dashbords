@@ -30,35 +30,63 @@
         </div>
 
         <!-- Popup Modal -->
-        <div class="popup" id="popup">
-            <form id="studentForm">
-                <div class="popup-box">
-                    <div class="close-modal" id="closeModalBtn"><i class="fas fa-times-circle"></i></div>
-                    <h3><i class="fas fa-rupee-sign"></i> All Student </h3>
+       <!-- Popup Modal -->
+<div class="popup" id="popup">
+    <form id="studentForm">
+        <div class="popup-box">
 
-                    <input type="text" id="name" placeholder="Full name * (letters & spaces)" name="name"
-                        autocomplete="off">
-                    <div id="nameError" class="error-text"></div>
-                    <input type="text" id="course" placeholder="Course name * (e.g., Full Stack, DCA)" name="course"
-                        autocomplete="off">
-                    <div id="courseError" class="error-text"></div>
-                    <input type="tel" id="mobile" placeholder="Mobile number * (10 digits, 6-9 start)" name="mobile"
-                        autocomplete="off">
-                    <div id="mobileError" class="error-text"></div>
-                    <input type="number" id="amount" placeholder="Fee Amount (₹) * e.g., 5000" step="1" name="amount"
-                        min="1" value="5000">
-                    <div id="amountError" class="error-text"></div>
-                    <select id="fee" name="fee">
-                        <option value="Paid">✅ Paid</option>
-                        <option value="Pending">⏳ Pending</option>
-                    </select>
-                    <button type="button" id="saveStudentBtn">
-                        <i class="fas fa-save"></i> Save Student
-                    </button>
-                </div>
-            </form>
+            <button type="button" class="close-modal" id="closeModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <h2 class="popup-title">
+                <i class="fas fa-user-graduate"></i>
+                Add Student
+            </h2>
+
+            <div class="form-group">
+                <label>Student Name</label>
+                <input type="text" id="name" name="name"
+                    placeholder="Enter student name" autocomplete="off">
+                <div id="nameError" class="error-text"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Course</label>
+                <input type="text" id="course" name="course"
+                    placeholder="Enter course name" autocomplete="off">
+                <div id="courseError" class="error-text"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="tel" id="mobile" name="mobile"
+                    placeholder="Enter mobile number" autocomplete="off">
+                <div id="mobileError" class="error-text"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Fee Amount (₹)</label>
+                <input type="number" id="amount" name="amount"
+                    placeholder="Enter fee amount" min="1" value="5000">
+                <div id="amountError" class="error-text"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Payment Status</label>
+                <select id="fee" name="fee">
+                    <option value="Paid">✅ Paid</option>
+                    <option value="Pending">⏳ Pending</option>
+                </select>
+            </div>
+
+            <button type="button" id="saveStudentBtn" class="save-btn">
+                <i class="fas fa-save"></i> Save Student
+            </button>
+
         </div>
-
+    </form>
+</div>
         <script>
             // ---------- STUDENT DATA ----------
             let students = [];
@@ -276,7 +304,7 @@
             <div class="container">
                 <div class="header">
                     <div class="title-section">
-                        <i class="fas fa-graduation-cap"></i>
+                        <i class=""></i>
                         <h2>All Student Fee </h2>
                     </div>
                     <button class="add-btn" id="openAddStudentBtn"><i class="fas fa-plus-circle"></i> Add Student</button>

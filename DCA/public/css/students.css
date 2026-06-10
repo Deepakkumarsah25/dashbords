@@ -350,95 +350,136 @@
         }
         .actions button:hover { background: #eef2ff; transform: translateY(-1px); }
         /* Modal */
-        .popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1100;
-            animation: fadeOverlay 0.2s ease;
-        }
-        .popup-box {
-            background: white;
-            border-radius: 1.5rem;
-            width: 90%;
-            max-width: 420px;
-            padding: 1.5rem;
-            box-shadow: 0 30px 45px -20px rgba(0,0,0,0.4);
-            animation: slideUpModal 0.3s ease;
-        }
-        .popup-box h3 {
-            margin-bottom: 1rem;
-            font-weight: 700;
-            font-size: 1.3rem;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-align: center;
-        }
-        .popup-box input, .popup-box select {
-            width: 100%;
-            margin: 8px 0;
-            padding: 10px 14px;
-            border-radius: 1.5rem;
-            border: 1.5px solid #e2e8f0;
-            font-size: 0.85rem;
-            outline: none;
-            font-family: 'Inter', sans-serif;
-            transition: 0.2s;
-        }
-        .popup-box input:focus, .popup-box select:focus {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139,92,246,0.2);
-        }
-        .error-text {
-            color: #dc2626;
-            font-size: 0.7rem;
-            margin: 4px 0 6px 0;
-            padding-left: 12px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .popup-box button {
-            background: linear-gradient(95deg, #4f46e5, #8b5cf6);
-            border: none;
-            padding: 10px;
-            border-radius: 1.5rem;
-            width: 100%;
-            font-weight: bold;
-            color: white;
-            margin-top: 16px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .popup-box button:hover { transform: scale(0.98); }
-        .close-modal { text-align: right; cursor: pointer; font-size: 1.2rem; margin-bottom: 5px; color: #94a3b8; }
-        .empty-row td { text-align: center; padding: 2rem; color: #64748b; }
-        mark { background: #fef08a; border-radius: 4px; padding: 0 2px; }
-        @media (max-width: 600px) {
-            .main-content { padding: 1rem; }
-            .container { padding: 1rem; }
-            .stats-container { flex-direction: column; }
-            .stat-cards-row { justify-content: space-between; flex-wrap: wrap; }
-            .stat-item { flex: 1; justify-content: center; padding: 0.4rem 0.6rem; font-size: 0.7rem; }
-            thead th { font-size: 0.65rem; padding: 0.6rem 0.4rem; }
-            td { font-size: 0.7rem; padding: 0.6rem 0.4rem; }
-            .actions button { padding: 3px 8px; font-size: 0.65rem; }
-            .title-section h2 { font-size: 1.1rem; }
-        }
-        @media (min-width: 768px) {
-            .container { padding: 1.8rem; }
-            .title-section h2 { font-size: 1.8rem; }
-            .add-btn { padding: 0.8rem 1.8rem; font-size: 0.95rem; }
-        }
-   
+        /* Modern Popup Modal */
+.popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+    animation: fadeOverlay 0.25s ease;
+}
+
+.popup-box {
+    position: relative;
+    width: 92%;
+    max-width: 480px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+    animation: slideUpModal 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.7);
+}
+
+.popup-box h3 {
+    text-align: center;
+    margin-bottom: 22px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.popup-box h3 i {
+    color: #4f46e5;
+    margin-right: 8px;
+}
+
+.close-modal {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.close-modal:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    transform: rotate(90deg);
+}
+
+.popup-box input,
+.popup-box select {
+    width: 100%;
+    height: 52px;
+    margin-top: 10px;
+    padding: 0 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    background: #fff;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.25s ease;
+}
+
+.popup-box input:focus,
+.popup-box select:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+}
+
+.popup-box input::placeholder {
+    color: #94a3b8;
+}
+
+.error-text {
+    color: #dc2626;
+    font-size: 12px;
+    margin: 5px 0 8px 4px;
+    font-weight: 500;
+}
+
+#saveStudentBtn {
+    width: 100%;
+    height: 54px;
+    border: none;
+    border-radius: 14px;
+    margin-top: 18px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25);
+}
+
+#saveStudentBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 24px rgba(79, 70, 229, 0.35);
+}
+
+#saveStudentBtn:active {
+    transform: scale(0.98);
+}
+
+@media (max-width: 600px) {
+    .popup-box {
+        width: 95%;
+        padding: 22px;
+        border-radius: 20px;
+    }
+
+    .popup-box h3 {
+        font-size: 1.2rem;
+    }
+
+    .popup-box input,
+    .popup-box select,
+    #saveStudentBtn {
+        height: 48px;
+        font-size: 13px;
+    }
+}
