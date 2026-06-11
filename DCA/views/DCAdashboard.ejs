@@ -99,8 +99,8 @@
   // ---------- DASHBOARD CORE DATA & FUNCTIONS (unchanged logic) ----------
   const statsData = [
     { title: "Total Students", value: "", icon: "fas fa-users", trend: "↑12 this month", bg: "#eef6ff", color: "#2f80ed" },
-    { title: "Fees Collected Today", value: "₹", icon: "fas fa-rupee-sign", trend: "↑8% vs yesterday", bg: "#ecfdf3", color: "#16a34a" },
-    { title: "Pending Fees", value: "₹", icon: "fas fa-exclamation-triangle", trend: "23 Students", bg: "#fff7ed", color: "#f59e0b" },
+    { title: "Fees Collected ", value: "₹", icon: "fas fa-rupee-sign", trend: "↑8% vs yesterday", bg: "#ecfdf3", color: "#16a34a" },
+    { title: "Pending Fees", value: "₹", icon: "fas fa-exclamation-triangle", bg: "#fff7ed", color: "#f59e0b" },
     { title: "Active Courses", value: "", icon: "fas fa-book-open", trend: "All Running", bg: "#f5f3ff", color: "#7c5cff" },
     { title: "Upcoming Tests", value: "", icon: "fas fa-calendar-alt", trend: "This Week", bg: "#fff1f2", color: "#ec4899" },
     { title: "Today Attendance", value: "%", icon: "fas fa-chart-line", trend: "Average", bg: "#ecfeff", color: "#06b6d4" }
@@ -189,7 +189,7 @@
     const courseCtx = document.getElementById('courseChart')?.getContext('2d'); if(courseCtx) { if(courseChart) courseChart.destroy(); courseChart = new Chart(courseCtx, { type: 'doughnut', data: { labels: ['DCA','ADCA','Tally','Python','Web Dev'], datasets: [{ data: [30,20,15,20,15], backgroundColor: ['#3b82f6','#22c55e','#f59e0b','#8b5cf6','#f472b6'], borderWidth: 0 }] }, options: { responsive: true, cutout: '62%' } }); }
   }
   function addCrossDashboardNotif() { notifications.unshift({ id: Date.now(), text: "🏛️ [ACCOUNTS DASHBOARD] ", time: "Just now", cross: true, seen: false }); if(notifications.length>1) notifications.pop(); updateNotifUI(); showToast("🔔 New notification from Admin "); }
-  setInterval(addCrossDashboardNotif, 14000);
+  setInterval(addCrossDashboardNotif, 1400000);
   
   // SIDEBAR LOGIC
   const sidebar = document.getElementById("sidebar"), overlay = document.getElementById("sidebarOverlay"), menuToggle = document.getElementById("menuToggleBtn");
@@ -328,6 +328,25 @@ updateNotifUI();
     }
 }
 loadDashboardStudentCount();
+async function loadFeeStats() {
+    try {
+        const res = await fetch("/computer/fees/all");
+        const data = await res.json();
+
+        console.log("FEE API =", data);
+
+        if (!data.success) return;
+
+        statsData[1].value = "₹" + (data.totalCollected || 0);
+        statsData[2].value = "₹" + (data.totalPending || 0);
+
+        renderStats();
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+loadFeeStats();
 </script>
 </body>
 </html>

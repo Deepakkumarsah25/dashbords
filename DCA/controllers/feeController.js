@@ -49,13 +49,14 @@ const saveFee = async (req, res) => {
         }
 
         // CREATE
-        const newFee = new Fee({
-            student,
-            course,
-            amount,
-            date,
-            status
-        });
+       const newFee = new Fee({
+    organisationId: req.session.userId,
+    student,
+    course,
+    amount,
+    date,
+    status
+});
 
         await newFee.save();
 
@@ -84,26 +85,31 @@ const getFees = async (req, res) => {
 
     try {
 
-        const fees = await Student.find({
-            organisationId: req.session.userId
-        }).sort({
-            createdAt: -1
-        });
+        const fees = await Fee.find({});
+
+        const totalCollected = fees
+            .filter(f => f.status === "Paid")
+            .reduce((sum, f) => sum + Number(f.amount || 0), 0);
+
+        const totalPending = fees
+            .filter(f => f.status === "Pending")
+            .reduce((sum, f) => sum + Number(f.amount || 0), 0);
+
+        console.log("TOTAL COLLECTED =", totalCollected);
+        console.log("TOTAL PENDING =", totalPending);
+
         res.json({
             success: true,
-            data: fees
+            fees,
+            totalCollected,
+            totalPending
         });
 
     } catch (err) {
-
-        res.json({
-            success: false
-        });
-
+        console.log(err);
+        res.json({ success: false });
     }
-
 };
-
 
 // DELETE
 const deleteFee = async (req, res) => {

@@ -7,7 +7,7 @@ const testRoutes = require("./routes/testRoutes");
 const submissionRoutes = require("./routes/submissionRoutes");
 const franchiseRoutes = require("./routes/franchiseRoutes");
 const feeRoutes = require("./routes/feeRoutes");
-
+const bcrypt = require("bcryptjs");
 const applicationRoutes = require("./routes/applicationRoutes");
 const Organisation = require("../models/Organisation");
 
@@ -79,8 +79,114 @@ router.get("/reports", (req, res) => {
 router.get("/results", (req, res) => {
     res.render("results");
 });
-router.get("/settings", (req, res) => {
-    res.render("settings");
+router.get("/settings", async (req, res) => {
+    try {
+        if (!req.session.userId) {
+            return res.redirect("/login");
+        }
+
+        const user = await Organisation.findById(req.session.userId);
+
+        if (!user) {
+            return res.redirect("/login");
+        }
+
+        res.render("settings", { user });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Server Error");
+    }
+});
+router.post("/settings/general", async (req, res) => {
+
+    console.log("USER =", req.session.userId);
+    console.log("BODY =", req.body);
+
+    try {
+
+        const { instituteName, email, contactNumber } = req.body;
+
+        const user = await Organisation.findByIdAndUpdate(
+            req.session.userId,
+            {
+                name: instituteName,
+                email,
+                phone: contactNumber
+            },
+            { new: true }
+        );
+
+        return res.json({
+            success: true,
+            user
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+});
+router.post("/api/users/change-password", async (req, res) => {
+    try {
+
+        if (!req.session.userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Login required"
+            });
+        }
+
+        const { currentPassword, newPassword } = req.body;
+
+        const user = await Organisation.findById(req.session.userId);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const isMatch = await bcrypt.compare(
+            currentPassword,
+            user.password
+        );
+
+        if (!isMatch) {
+            return res.status(400).json({
+                success: false,
+                message: "Current password incorrect"
+            });
+        }
+
+        const hashedPassword =
+            await bcrypt.hash(newPassword, 10);
+
+        user.password = hashedPassword;
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: "Password updated successfully"
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+
+    }
 });
 router.get("/students", (req, res) => {
     res.render("students.ejs");

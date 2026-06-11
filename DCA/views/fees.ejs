@@ -277,7 +277,7 @@ Downloaded on: ${new Date().toLocaleString()}
             }
 
             function openAddModal() {
-               document.getElementById("editId").value = "";
+                document.getElementById("editId").value = "";
                 document.getElementById("modalTitle").innerHTML = '<i class="fas fa-plus-circle"></i> Add New Payment';
                 document.getElementById("studentName").value = "";
                 document.getElementById("courseName").value = "";
@@ -299,9 +299,9 @@ Downloaded on: ${new Date().toLocaleString()}
                 document.getElementById("amount").value = fee.amount;
                 document.getElementById("statusSelect").value = fee.fee;
                 document.getElementById("paymentDate").value =
-    fee.createdAt
-        ? new Date(fee.createdAt).toISOString().split("T")[0]
-        : "";
+                    fee.createdAt
+                        ? new Date(fee.createdAt).toISOString().split("T")[0]
+                        : "";
 
                 document.getElementById("modalTitle").innerHTML =
                     '<i class="fas fa-pen"></i> Edit Student';
@@ -313,54 +313,54 @@ Downloaded on: ${new Date().toLocaleString()}
                 document.getElementById("feeModal").style.display = "none";
                 document.getElementById("editId").value = "";
             }
-async function handleFormSubmit(e) {
-    e.preventDefault();
+            async function handleFormSubmit(e) {
+                e.preventDefault();
 
-    const student = document.getElementById("studentName").value.trim();
-    const course = document.getElementById("courseName").value.trim();
-    const amount = document.getElementById("amount").value;
-    const status = document.getElementById("statusSelect").value;
-    const paymentDate = document.getElementById("paymentDate").value;
-    const editId = document.getElementById("editId").value;
+                const student = document.getElementById("studentName").value.trim();
+                const course = document.getElementById("courseName").value.trim();
+                const amount = document.getElementById("amount").value;
+                const status = document.getElementById("statusSelect").value;
+                const paymentDate = document.getElementById("paymentDate").value;
+                const editId = document.getElementById("editId").value;
 
-    try {
+                try {
 
-        const isEdit = editId && editId.length > 0;
+                    const isEdit = editId && editId.length > 0;
 
-        const response = await fetch(
-            isEdit
-                ? `/computer/api/students/${editId}`
-                : `/computer/api/students`,
-            {
-                method: isEdit ? "PUT" : "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-               body: JSON.stringify({
-    name: student,
-    course,
-    amount: Number(amount),
-    fee: status,
-    paymentDate
-})
+                    const response = await fetch(
+                        isEdit
+                            ? `/computer/api/students/${editId}`
+                            : `/computer/api/students`,
+                        {
+                            method: isEdit ? "PUT" : "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                name: student,
+                                course,
+                                amount: Number(amount),
+                                fee: status,
+                                paymentDate
+                            })
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showToast(isEdit ? "Updated Successfully" : "Payment Added Successfully");
+                        closeModal();
+                        await fetchStudents();
+                    } else {
+                        showToast(data.message || "Save Failed", true);
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    showToast("Server Error", true);
+                }
             }
-        );
-
-        const data = await response.json();
-
-        if (response.ok) {
-            showToast(isEdit ? "Updated Successfully" : "Payment Added Successfully");
-            closeModal();
-            await fetchStudents();
-        } else {
-            showToast(data.message || "Save Failed", true);
-        }
-
-    } catch (err) {
-        console.error(err);
-        showToast("Server Error", true);
-    }
-}
             function exportToCSV() {
                 if (!fees.length) {
                     showToast("No data to export", true);
